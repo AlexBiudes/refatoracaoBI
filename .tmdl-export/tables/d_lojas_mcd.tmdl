@@ -1,0 +1,32 @@
+table d_lojas_mcd
+	lineageTag: 684449bc-1fa6-47ce-869c-5e5e442321a8
+
+	column loja
+		dataType: string
+		lineageTag: 65a79d42-2e3f-478d-a1f0-e22bc7ec8ad3
+		summarizeBy: none
+		sourceColumn: loja
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 98c8a938-cfe8-4033-849d-d054234ad4ad
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_lojas_mcd = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Zc07DoAgEEXRvUzNwxk+g7RGe2OCDWH/2zAq3dQnN7d3attBjli8RvFRZGFmgQgN9+JuMEHTh2e7DGakPEuLiqATo8ECLhODwRV1/Z93M1hRKo3xAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [loja = _t, cnpj = _t]),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"})
+				in
+				    #"Valor Substituído2"
+
+	annotation PBI_ResultType = Table
+

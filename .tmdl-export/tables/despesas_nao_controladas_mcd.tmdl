@@ -1,0 +1,73 @@
+table despesas_nao_controladas_mcd
+	lineageTag: 1ef92db1-47d2-427c-8d97-d20323c0530b
+
+	column classificacao
+		dataType: string
+		lineageTag: 23c9744a-bc59-4bc1-92df-0628c623772e
+		summarizeBy: none
+		sourceColumn: classificacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_cliente
+		dataType: string
+		lineageTag: 4b42e01a-730c-4527-bf86-5a77d084c7e9
+		summarizeBy: none
+		sourceColumn: descricao_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column estabelecimento
+		dataType: string
+		lineageTag: 734b892a-b0ac-4c1e-9888-89d57c3ca5e8
+		summarizeBy: none
+		sourceColumn: estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column sigla_filial
+		dataType: string
+		lineageTag: addb3949-0758-481d-8463-f445f198fcce
+		summarizeBy: none
+		sourceColumn: sigla_filial
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 019f1d0c-353d-4487-b899-2039f5aac070
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_desp
+		dataType: string
+		lineageTag: 985eabd0-2884-41d1-8223-6b54fff33b6a
+		summarizeBy: none
+		sourceColumn: chave_desp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition despesas_nao_controladas_mcd = m
+		mode: import
+		source =
+				let
+				     Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    despesas_nao_controladas_mcd_COPIA_Table = BI_QA_Schema{[Name="VIZ_DESPESAS_NAO_CONTROLADAS_MCD",Kind="Table"]}[Data],
+				    #"Valor Substituído" = Table.ReplaceValue(despesas_nao_controladas_mcd_COPIA_Table,".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído2", "chave_desp", each [cnpj] & [descricao_cliente]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_desp", type text}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Tipo Alterado"," ","",Replacer.ReplaceText,{"chave_desp"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído3", {"chave_desp"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

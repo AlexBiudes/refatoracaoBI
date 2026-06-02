@@ -1,0 +1,54 @@
+table d_contas_analise_espec
+	lineageTag: 7757692a-36db-47e4-b38d-351de4f6085e
+
+	column Query
+		dataType: string
+		lineageTag: 5f1b0fe6-b2a6-4959-b5f1-b0c270286ea4
+		summarizeBy: none
+		sourceColumn: Query
+
+		annotation SummarizationSetBy = Automatic
+
+	column Conta
+		dataType: string
+		lineageTag: 0d597c8f-0334-433d-9002-f4be99e2b5e2
+		summarizeBy: none
+		sourceColumn: Conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 3d602cde-ffb4-4021-88cd-6ddd1ab3285f
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 0e2b56ff-a736-4e31-a85f-2d48a82f01ef
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_contas_analise_espec = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-planning-367317"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_tratado",Kind="Schema"]}[Data],
+				    balancetenew_Table = BI_tratado_Schema{[Name="VIZ_D_Contas_Analise_Espec",Kind="Table"]}[Data],
+				    #"Colunas Renomeadas" = Table.RenameColumns(balancetenew_Table,{{"descricao2", "descricao_cliente"}, {"descricao", "Query"}}),
+				    #"Colunas Reordenadas" = Table.ReorderColumns(#"Colunas Renomeadas",{"cnpj", "Query", "descricao_cliente"}),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Colunas Reordenadas",{{"descricao_cliente", "Conta"}}),
+				    #"Texto em Minúscula" = Table.TransformColumns(#"Colunas Renomeadas1",{{"ID", Text.Lower, type text}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Texto em Minúscula"," ","",Replacer.ReplaceText,{"ID"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído", {"ID"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+

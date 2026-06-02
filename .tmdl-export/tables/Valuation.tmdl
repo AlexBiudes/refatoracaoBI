@@ -1,0 +1,154 @@
+table Valuation
+	lineageTag: 0eb6bdad-d80c-453d-afab-100916b1d376
+
+	measure Multiplo_card = ```
+			
+			VAR UltimoDiaPeriodo = 
+			    LASTDATE(
+			        VALUES(dCalendario[data])
+			    )
+			VAR UltimoMesSelecionado = 
+			    EOMONTH(UltimoDiaPeriodo,0)
+			RETURN
+			COALESCE(
+			CALCULATE(
+			    SUM(Valuation[multiplo]),
+			    FILTER(
+			        ALL(dCalendario),
+			        dCalendario[data] = UltimoMesSelecionado
+			    )
+			), 4)
+			
+			```
+		formatString: 0.0
+		lineageTag: aaf670ca-967f-408c-8451-f06cff6611bf
+
+	measure Gap_valuation = ```
+			
+			CALCULATE(
+			    SUM(Valuation[Valuation_BI]) - 
+			    [Valuation]
+			)
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 11d07045-2e32-4a5e-a9fe-aaf09470fd7c
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure EBITDA_ajustado_ =
+			
+			CALCULATE([ebitda_medio_CFS] - [ajuste_ebitda_card])
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: c5dc33ee-bea1-4850-a170-804f6c090ae7
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure valuation_esperado =
+			
+			COALESCE(
+			CALCULATE(
+			    SUM(Valuation[Valuation_BI])
+			), 0)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: b242265a-07b6-419b-9924-93477617e0d6
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure multiplo_teste =
+			
+			SUM(Valuation[multiplo])
+		lineageTag: bbdd741a-c32f-446c-9157-d539545d5722
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ajuste_ebitda_card =
+			
+			COALESCE(
+			CALCULATE(
+			    SUM(Valuation[Ajuste_Ebitda]
+			    )), 0)
+		lineageTag: 432bb68d-103b-4bfd-9c42-005647cb5fe9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column multiplo
+		dataType: double
+		lineageTag: f308ccd2-0df2-4331-9629-2c8ea654308d
+		summarizeBy: sum
+		sourceColumn: multiplo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cnpj
+		dataType: string
+		lineageTag: 3ab07de6-f928-463d-b4f9-af105c9c78ac
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: 25f48969-fbae-4c0a-88bd-66b47a33d51e
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7e311e87-5181-4057-96d9-05988232673f
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column grupo_empresarial
+		dataType: string
+		lineageTag: f083f6c1-2ac4-4899-afde-643afe8731b7
+		summarizeBy: none
+		sourceColumn: grupo_empresarial
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ajuste_Ebitda
+		dataType: double
+		lineageTag: ff439869-deb0-4c8a-bd87-b356859e53f5
+		summarizeBy: sum
+		sourceColumn: Ajuste_Ebitda
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Valuation_BI
+		dataType: double
+		lineageTag: 2fea14e7-718b-442e-9da0-0c6834c323db
+		summarizeBy: sum
+		sourceColumn: Valuation_BI
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Valuation = m
+		mode: import
+		source =
+				let
+				    Fonte = Value.NativeQuery(GoogleBigQuery.Database(){[Name="bi-planning-367317"]}[Data], "SELECT * FROM `bi-performance.BI_PROD.Valuation`", null, [EnableFolding=true]),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,null,"Sem Grupo Indicado",Replacer.ReplaceValue,{"grupo_empresarial"}),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Valor Substituído",{{"periodo", type date}}),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Tipo Alterado2",{{"periodo", "data"}, {"ajuste_ebitda", "Ajuste_Ebitda"}, {"valuation", "Valuation_BI"}}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Colunas Renomeadas1",null,0,Replacer.ReplaceValue,{"Ajuste_Ebitda"})
+				in
+				     #"Valor Substituído1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

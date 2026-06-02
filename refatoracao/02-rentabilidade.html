@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentabilidade | Planning BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <div class="radial-symbol"></div>
+                    <span class="logo-text">Planning</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="01-ebitda.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    EBITDA
+                </a>
+                <a href="02-rentabilidade.html" class="nav-item active">
+                    <span class="nav-icon">📈</span>
+                    Rentabilidade
+                </a>
+                <a href="03-variacao-custos.html" class="nav-item">
+                    <span class="nav-icon">💸</span>
+                    Var. Custos
+                </a>
+            </nav>
+            <div class="tagline">
+                Building your company's future. <span class="highlight-today">Today.</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="executive-header">
+                <div class="header-titles">
+                    <h1>Análise de Rentabilidade</h1>
+                    <p class="subtitle">Detalhamento de margens, lucro bruto e líquido</p>
+                </div>
+                <div class="header-filters">
+                    <select class="filter-dropdown">
+                        <option>Ano: 2023</option>
+                        <option>Ano: 2022</option>
+                    </select>
+                    <select class="filter-dropdown">
+                        <option>DRE Categoria: Todas</option>
+                        <option>Operacional</option>
+                        <option>Não Operacional</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="gradient-line"></div>
+
+            <section class="kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-title">Lucro Bruto</div>
+                    <div class="kpi-value">R$ 6.9M</div>
+                    <div class="kpi-trend positive">↑ 3.1% YoY</div>
+                </div>
+                <div class="kpi-card highlight-card">
+                    <div class="kpi-title">Margem Bruta</div>
+                    <div class="kpi-value">57.0%</div>
+                    <div class="kpi-trend positive">↑ 1.2p.p YoY</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Lucro Líquido</div>
+                    <div class="kpi-value">R$ 2.4M</div>
+                    <div class="kpi-trend negative">↓ 1.5% YoY</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Margem Líquida</div>
+                    <div class="kpi-value">19.8%</div>
+                    <div class="kpi-trend negative">↓ 0.8p.p YoY</div>
+                </div>
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-container">
+                    <h3>Margem Bruta vs Margem Líquida</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="marginChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Impacto de Despesas Não Operacionais</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="nonOpChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const ctxMargin = document.getElementById('marginChart').getContext('2d');
+        new Chart(ctxMargin, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [
+                    {
+                        label: 'Margem Bruta (%)',
+                        data: [55, 56, 57, 56, 56.5, 57],
+                        borderColor: '#0AE18C',
+                        backgroundColor: 'rgba(10, 225, 140, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Margem Líquida (%)',
+                        data: [18, 19, 20.5, 20, 19.5, 19.8],
+                        borderColor: '#14C8FA',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const ctxNonOp = document.getElementById('nonOpChart').getContext('2d');
+        new Chart(ctxNonOp, {
+            type: 'bar',
+            data: {
+                labels: ['Desp. Financeiras', 'Impostos', 'Outras Desp.'],
+                datasets: [{
+                    label: 'Impacto (R$)',
+                    data: [-800000, -450000, -150000],
+                    backgroundColor: '#FF3131',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+</body>
+</html>

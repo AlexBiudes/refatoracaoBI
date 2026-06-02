@@ -1,0 +1,28 @@
+table Simulador_PMR
+	lineageTag: 033cb9a6-b8e0-4a8b-be4d-c8cd87cd3aa4
+
+	measure 'Valor Simulador_PMR' = SELECTEDVALUE('Simulador_PMR'[Simulador_PMR], 0)
+		lineageTag: 3d1801dd-864e-4507-9e0d-a0528d4fc793
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Simulador_PMR
+		lineageTag: 2b970927-a9e1-40cf-823a-79a13f8b845f
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Simulador_PMR = calculated
+		mode: import
+		source = GENERATESERIES(-20, 20, 1)
+
+	annotation PBI_Id = 69a168bbdfb5429ea096db0ccd0a3a24
+

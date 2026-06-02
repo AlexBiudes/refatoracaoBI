@@ -1,0 +1,26 @@
+table simulador_custos
+	lineageTag: a5eac0e4-d224-43c5-b911-ded82992838a
+
+	measure 'Valor simulador_custos' = SELECTEDVALUE('simulador_custos'[simulador_custos], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: 030d0399-e179-42f3-90f2-1f3e4aae1c78
+
+	column simulador_custos
+		formatString: 0%;-0%;0%
+		lineageTag: f966788f-9582-406a-8767-d34047f4887e
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_custos = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 7e3dfe2c59f547d79a62e0b9a9929f62
+

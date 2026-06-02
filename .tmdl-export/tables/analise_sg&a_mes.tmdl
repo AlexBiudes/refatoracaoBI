@@ -1,0 +1,48 @@
+table analise_sg&a_mes
+	lineageTag: 9f966f57-213e-437f-aebf-81087099eba4
+
+	column analise_sga_mes
+		lineageTag: 595ee834-6788-45e4-836f-798d73a9833d
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'analise_sga_mes Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'analise_sga_mes Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'analise_sga_mes Campos'
+		isHidden
+		lineageTag: 8199bfcd-fcee-4ffc-9df7-ef5057d89373
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'analise_sga_mes Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'analise_sga_mes Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 4ae67be3-961b-4619-867d-89de70fc7ad3
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition analise_sg&a_mes = calculated
+		mode: import
+		source =
+				{
+				    ("G&A", NAMEOF('Medidas_balancetenew'[analise_g&a]), 1),
+				    ("SG&A", NAMEOF('Medidas_balancetenew'[analise_gs&a]), 2)
+				}
+
+	annotation PBI_Id = 7a7c27ffa04142cb84d961f6e53fe499
+

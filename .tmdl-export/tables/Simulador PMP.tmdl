@@ -1,0 +1,26 @@
+table 'Simulador PMP'
+	lineageTag: 9e607c64-4947-47ba-9d13-2a9989632327
+
+	measure 'Valor Simulador PMP' = SELECTEDVALUE('Simulador PMP'[Simulador PMP], 0)
+		formatString: 0
+		lineageTag: 14a7db09-33f1-445b-b0c3-925e13a93e3c
+
+	column 'Simulador PMP'
+		formatString: 0
+		lineageTag: 1cf4ae51-555c-4c3e-b53b-ff88698f14f7
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Simulador PMP' = calculated
+		mode: import
+		source = GENERATESERIES(-20, 20, 1)
+
+	annotation PBI_Id = a3c056de8d454a02b649721afc243741
+

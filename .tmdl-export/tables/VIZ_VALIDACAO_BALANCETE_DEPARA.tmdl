@@ -1,0 +1,107 @@
+table VIZ_VALIDACAO_BALANCETE_DEPARA
+	lineageTag: 5ee84552-430c-425d-b16c-ce5001fff0ff
+
+	measure 'true false' =
+			
+			IF(
+			SUMX(
+			VIZ_VALIDACAO_BALANCETE_DEPARA,
+			IF(VIZ_VALIDACAO_BALANCETE_DEPARA[encontrada] = "true", 1, 0)
+			) > 0,
+			"verdadeiro",
+			"falso"
+			)
+		lineageTag: 97c95152-3ba5-4032-8d57-3035dd86a0a5
+
+	measure 'contagem falso' =
+			
+			COALESCE(
+			CALCULATE(
+			COUNTROWS(VIZ_VALIDACAO_BALANCETE_DEPARA),
+			VIZ_VALIDACAO_BALANCETE_DEPARA[encontrada] = FALSE()
+			), 0)
+		formatString: 0
+		lineageTag: 602ff085-b107-4114-ab81-46c3025b76fb
+
+	measure 'contagem verdadeiro' =
+			
+			COALESCE(
+			CALCULATE(
+			COUNTROWS(VIZ_VALIDACAO_BALANCETE_DEPARA),
+			(VIZ_VALIDACAO_BALANCETE_DEPARA[encontrada] = TRUE()
+			)),
+			0
+			)
+		formatString: 0
+		lineageTag: e7b7fffb-8e57-4d13-a96e-2ed52afaf652
+
+	measure 'contagem total' =
+			
+			COALESCE(
+			CALCULATE(
+			COUNTROWS(VIZ_VALIDACAO_BALANCETE_DEPARA)
+			), 0)
+		formatString: 0
+		lineageTag: bdb3dd80-973e-4ccb-93b0-cfcccf59a185
+
+	column cnpj
+		dataType: string
+		lineageTag: 4ad701c1-d9c1-477d-a317-0ea7504e17f6
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_base
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: eb655409-538d-42ec-bfcf-daa275f30092
+		summarizeBy: none
+		sourceColumn: data_base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column conta
+		dataType: string
+		lineageTag: af913bad-6c22-4e99-ab8e-19ca9e1c2dd8
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column encontrada
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d42d806f-9fb9-43a9-a921-6a9923b34b81
+		summarizeBy: none
+		sourceColumn: encontrada
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao
+		dataType: string
+		lineageTag: f10b5d96-ba8b-4a22-889e-5cfe5e99e7ca
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	partition VIZ_VALIDACAO_BALANCETE_DEPARA = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    VIZ_VALIDACAO_BALANCETE_DEPARA_View = BI_QA_Schema{[Name="VIZ_VALIDACAO_BALANCETE_DEPARA",Kind="View"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(VIZ_VALIDACAO_BALANCETE_DEPARA_View,{{"data_base", type date}}),
+				    #"Consulta Acrescentada" = Table.Combine({#"Tipo Alterado", VIZ_VALIDACAO_BALANCETE_DEPARA_UAU})
+				in
+				    #"Consulta Acrescentada"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

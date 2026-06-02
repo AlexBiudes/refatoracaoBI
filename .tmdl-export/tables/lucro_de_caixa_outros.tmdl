@@ -1,0 +1,98 @@
+table lucro_de_caixa_outros
+	lineageTag: 76c6982e-45a8-4835-9dc8-ea8ec45cfd62
+
+	measure cfs_outros_itens_de_lucro =
+			
+			[cfs_juros_totais] + [cfs_impostos_recebidos] + [cfs_renda_extraordinaria] + [cfs_distribuicao_de_lucros_DIF] + [Ebitda_despesa_depreciacao]
+		formatString: #,0
+		lineageTag: 3402df68-1698-4488-857a-cbe67a8fddb7
+
+	measure cfs_lucro_mantido =
+			
+			[cfs_renda_extraordinaria] - [TotalJuros] + [cfs_impostos_recebidos] - [cfs_distribuicao_de_lucros_DIF] + [Ebitda_despesa_depreciacao] // DEPRECIAÇÃO ESTÁ SOMANDO POIS ELA VEM NEGATIVA
+		formatString: #,0
+		lineageTag: e3239f86-3b74-4e80-8155-015b75e75eda
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_despesa_financeira = ```
+			
+			SUMX(
+			    FILTER(
+			        balancetenew, 
+			        balancetenew[Query] = "DRE_Despesa_financeira"), 
+			        balancetenew[vlr]
+			        )
+			```
+		formatString: #,0
+		lineageTag: 9dc5bb58-5069-4266-bd6e-2a52877903e8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_lucro_mantido_simulado = [cfs_outros_itens_de_lucro] + [cfs_lucro_de_cx_oper_simulado]
+		formatString: #,0
+		lineageTag: f9b2f485-d843-4b50-9859-5bd03693d98b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_outros_itens_de_lucro_ACU =
+			
+			[cfs_juros_totais_ACU] + [cfs_impostos_recebidos_ACU] + [cfs_renda_extraordinaria_ACU] + [cfs_distribuicao_de_lucros_DIF_ACU] + [Ebitda_despesa_depreciacao_ACU]
+		formatString: #,0
+		lineageTag: 89d6113d-f79f-498e-9afe-ba57aded93ed
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_lucro_mantido_simulado_ACU = [cfs_outros_itens_de_lucro_ACU] + [cfs_lucro_de_cx_oper_simulado_ACU]
+		formatString: #,0
+		lineageTag: e2dc8001-3fb4-4e3f-86f7-a562e2dc72db
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Lucro de cx Outros Itens'
+		dataType: string
+		lineageTag: 2fd4eaf3-9284-4e4a-a845-06cdb20144ed
+		summarizeBy: none
+		sourceColumn: Lucro de cx Outros Itens
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Outros Itens'
+		dataType: string
+		lineageTag: d658bb1e-821b-47fd-89e9-0936325966e1
+		summarizeBy: none
+		sourceColumn: Outros Itens
+		sortByColumn: ordem_outros
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_outros
+		dataType: int64
+		formatString: 0
+		lineageTag: 247bcb2f-ffe4-4ef9-a86a-be594d87bba1
+		summarizeBy: sum
+		sourceColumn: ordem_outros
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: 12a755bc-b09b-44ef-ab5a-7cc9b4434bf5
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition lucro_de_caixa_outros = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("hU+7CsJAEPyV5Voj4rOzEGIRUZS0IcUlt8gWuQ17FxH/Riz8kPyYl6Sx0RTDMrM7w2yWqXPjhR0kHq0Dg3BsSmEVqUPTyRd9ZRfYPGCq8uj3fVLV7DxDiiUWZDppETD5a0rRGg37uxfNYsi2TyEd9OWoMybnhYqG2nf74llMNzIh7KvyarRyjLVgSbqPAIRdxeLpMfCwX48m9BNO2vrh403AVuX5Bw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Lucro de cx Outros Itens" = _t, #"Outros Itens" = _t, ordem_outros = _t, sinal = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem_outros", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

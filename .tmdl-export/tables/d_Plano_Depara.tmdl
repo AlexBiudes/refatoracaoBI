@@ -1,0 +1,159 @@
+table d_Plano_Depara
+	lineageTag: 880cab72-d433-4181-a673-aa3a39e5b412
+
+	column chave_primaria
+		dataType: string
+		lineageTag: cfbf5edc-c0c6-41b9-9854-6368174f8ec5
+		summarizeBy: none
+		sourceColumn: chave_primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: d410435a-3fb6-464d-b17b-4695fc01f639
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta_de
+		dataType: string
+		lineageTag: 5df68afd-0bff-4b45-b6fc-775e44c31274
+		summarizeBy: none
+		sourceColumn: conta_de
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_de
+		dataType: string
+		lineageTag: 50d8fa91-3b29-43e9-8d8a-a1b628bca07e
+		summarizeBy: none
+		sourceColumn: descricao_de
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta_para
+		dataType: string
+		lineageTag: 2161f4f7-8579-4c8e-9ff0-679ac60af519
+		summarizeBy: none
+		sourceColumn: conta_para
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_para
+		dataType: string
+		lineageTag: e204d564-2a19-406c-bb4c-2866ac4465bd
+		summarizeBy: none
+		sourceColumn: descricao_para
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_intercompany
+		dataType: string
+		lineageTag: 1187738c-1967-4e94-a261-3d7394a2b04c
+		summarizeBy: none
+		sourceColumn: company_intercompany
+
+		annotation SummarizationSetBy = Automatic
+
+	column origem_operacao
+		dataType: string
+		lineageTag: 7c6e52ba-64eb-4013-a5e5-8814c2b9f673
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 02b6d004-1839-475c-9991-4a173db62a03
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_operacao
+		dataType: string
+		lineageTag: 89ecf958-efb1-49d9-93f3-7713301cb7c7
+		summarizeBy: none
+		sourceColumn: chave_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column ContaDRE
+		dataType: string
+		lineageTag: c5285cb8-3ec4-4b4c-8d62-05e8cc21cb43
+		summarizeBy: none
+		sourceColumn: ContaDRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo
+		dataType: string
+		lineageTag: aae34f50-c621-4bfe-a238-3dcbe61b44d9
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column rn
+		dataType: int64
+		formatString: 0
+		lineageTag: ae757564-3551-4c16-b7e4-9ea7f6e06717
+		summarizeBy: none
+		sourceColumn: rn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_Plano_Depara = m
+		mode: import
+		source = ```
+				let
+				    Fonte = Value.NativeQuery(GoogleBigQuery.Database(){[Name="bi-performance"]}[Data], "SELECT AS STRUCT *
+				FROM (
+				  SELECT 
+				    chave_primaria,
+				    empresa,
+				    conta_de,
+				    descricao_de,
+				    conta_para,
+				    descricao_para,
+				    company_intercompany,
+				    origem_operacao,
+				    cnpj,
+				    ROW_NUMBER() OVER (PARTITION BY chave_primaria ORDER BY chave_primaria) AS rn
+				  FROM `bi-performance.BI_PROD.VIZ_PLANO_DEPARA`
+				)
+				WHERE rn = 1
+				", null, [EnableFolding=true]),
+				    #"Linhas Filtradas1" = Table.SelectRows(Fonte, each [chave_primaria] <> null and [chave_primaria] <> ""),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Linhas Filtradas1","Geral","Outras Operações",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído1", "chave_operacao", each [cnpj] & " " & [origem_operacao]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_operacao", type text}}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Tipo Alterado",{{"chave_operacao", Text.Upper, type text}, {"origem_operacao", Text.Upper, type text}}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Texto em Maiúscula",null,"GERAL",Replacer.ReplaceValue,{"origem_operacao"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído2", each true),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Linhas Filtradas","Í","I",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"Valor Substituído3", "ContaDRE", each [conta_de] & " " & [descricao_de]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada1",{{"ContaDRE", type text}}),
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"Tipo Alterado1", "conta_para", "conta_para - Copiar"),
+				    #"Primeiros caracteres extraídos" = Table.TransformColumns(#"Coluna Duplicada", {{"conta_para - Copiar", each Text.Start(_, 1), type text}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Primeiros caracteres extraídos",{{"conta_para - Copiar", "grupo"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas","-","",Replacer.ReplaceText,{"chave_primaria"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído"," ","",Replacer.ReplaceText,{"chave_primaria"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4",".","",Replacer.ReplaceText,{"chave_primaria"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído5", {"chave_primaria"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Duplicatas Removidas","1","Ativo",Replacer.ReplaceText,{"grupo"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6","2","Passivo",Replacer.ReplaceText,{"grupo"}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Valor Substituído7","3","Resultado",Replacer.ReplaceText,{"grupo"}),
+				    #"Valor Substituído9" = Table.ReplaceValue(#"Valor Substituído8","4","Resultado",Replacer.ReplaceText,{"grupo"}),
+				    #"Valor Substituído10" = Table.ReplaceValue(#"Valor Substituído9","9","Resultado",Replacer.ReplaceText,{"grupo"})
+				in
+				    #"Valor Substituído10"
+				```
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

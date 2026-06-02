@@ -1,0 +1,248 @@
+table balancetenew
+	lineageTag: 1c44ec42-a0e0-4019-89a7-6ad8be48064f
+
+	measure total_mes_atual = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    [saldo_passivo_balancetenew],
+			    dCalendario[data] = UltimoMesTrimestre
+			)
+			```
+		formatString: #,0
+		lineageTag: 6170b832-7409-4437-91ea-bdc25e4117a1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure total_mes_anterior = ```
+			
+			CALCULATE(
+			    SUMX(balancetenew,
+			    balancetenew[total_mes_atual]),
+			    DATEADD(dCalendario[data], -1, MONTH
+			    )
+			)
+			
+			```
+		lineageTag: aeec34ec-68ea-4ef6-b58f-d328b21d615d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure desvio = ```
+			
+			[total_mes_atual] - [total_mes_anterior]
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			```
+		formatString: #,0
+		lineageTag: 26f9a908-f6f1-44ce-8778-215e50287531
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure desvio% = ```
+			
+			DIVIDE([desvio],
+			    [total_mes_anterior]
+			    
+			)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 58c4da77-770d-48fc-8373-26c8eda8e51b
+
+	measure Saldo_Trimestral_bn = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			RETURN 
+			    CALCULATE(
+			        [saldo_passivo_balancetenew]
+			    , 
+			        FILTER(
+			            ALL(dCalendario[data]), 
+			            dCalendario[data] = UltimoMesTrimestre
+			        )
+			)
+			```
+		formatString: #,0
+		lineageTag: 554b7827-a7d9-48db-b0d8-929342ecfd87
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure total_mes_atual_sinal_invertido =
+			
+			CALCULATE(
+			    SUM(balancetenew[vlr])
+			) *-1
+		formatString: #,0
+		lineageTag: 75be9244-076a-4623-8064-af0a85cfa9f9
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Saldo_Trimestral_ACU = ```
+			
+			CALCULATE(
+			    SUM(balancetenew[vlr]),
+			    DATESYTD((dCalendario[data]))
+			)
+			
+			
+			
+			
+			
+			
+			
+			
+			```
+		formatString: #,0
+		lineageTag: d951eb99-f43a-4b77-964d-741a508186e6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Medida 2'
+		lineageTag: 53be9bc0-f8b0-43ac-9dae-638a8ff63ea7
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure saldo_balancete =
+			
+			ROUND(
+			SUM(balancetenew[vlr]), 0)
+		formatString: #,0
+		lineageTag: be4d1481-aed5-42db-98de-530b0f41c10a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column vlr
+		dataType: double
+		formatString: #,0
+		lineageTag: 1ea64b78-f2d8-40ff-9d34-fcec972989ab
+		summarizeBy: sum
+		sourceColumn: vlr
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column Query
+		dataType: string
+		lineageTag: 258e0a0d-92c4-4a15-a4b8-e823ca95e840
+		summarizeBy: none
+		sourceColumn: Query
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ea0a30c4-db53-44ba-b526-38e75ced22fb
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column empresa
+		dataType: string
+		lineageTag: 61504686-d214-4466-b803-15f550143faf
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_cliente
+		dataType: string
+		lineageTag: c9cb5a21-5231-44eb-9388-5d21819e0ccf
+		summarizeBy: none
+		sourceColumn: descricao_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: d40a69e5-b4c7-4d29-b488-6780332087d5
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_primaria
+		dataType: string
+		lineageTag: 439fb02c-524e-43dc-af00-d55e30c31f12
+		summarizeBy: none
+		sourceColumn: chave_primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: 6f709951-1815-448a-b72e-6a9350cef0e3
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column Origem_Operacao =
+			
+			SUBSTITUTE(
+			    RELATED('d_Plano_Depara'[origem_operacao]),
+			    " ",
+			    "_"
+			)
+		lineageTag: bd863fc6-e5a7-42b6-8d61-371ef57a5f2a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition balancetenew-10859714-9306-407a-8c33-dbb9fdcfa8e4 = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_QA",Kind="Schema"]}[Data],
+				    balancetenew_Table = BI_tratado_Schema{[Name="VIZ_BALANCETE_AUTO_BI_NEW",Kind="Table"]}[Data],
+				    #"Consulta Acrescentada" = Table.Combine({balancetenew_Table, VIZ_BALANCETE_AUTO_BI_UAU}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Consulta Acrescentada",{{"data", type date}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado",{{"descricao2", "descricao_cliente"}, {"descricao", "Query"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas",null,"000",Replacer.ReplaceValue,{"conta"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído", "chave_primaria", each [conta] & [cnpj]),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Personalização Adicionada",{{"descricao_cliente", Text.Upper, type text}, {"chave_primaria", Text.Upper, type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Texto em Maiúscula",{"grupo"}),
+				    #"Consultas Mescladas" = Table.NestedJoin(#"Colunas Removidas", {"conta"}, d_Plano_Depara, {"conta_de"}, "d_Plano_Depara", JoinKind.LeftOuter),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Consultas Mescladas", each ([empresa] <> ""))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navegação
+

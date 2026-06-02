@@ -1,0 +1,9 @@
+role CBF
+	modelPermission: read
+
+	tablePermission balancetenew = [cnpj] == "33655721000199"
+
+	tablePermission d_clientes_time = [cnpj] == "33655721000199"
+
+	annotation PBI_Id = bc08df733a2e4145a1ecabf35b0c29ea
+

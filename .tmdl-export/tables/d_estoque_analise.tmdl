@@ -1,0 +1,41 @@
+table d_estoque_analise
+	lineageTag: d1078252-cf62-4dd0-a992-763ff08980bb
+
+	column tipo_ranking
+		dataType: string
+		lineageTag: 4e0f9da7-5f4b-44d8-b18f-5d1d794c4bd6
+		summarizeBy: none
+		sourceColumn: tipo_ranking
+
+		annotation SummarizationSetBy = Automatic
+
+	column matriz_cnpj
+		dataType: string
+		lineageTag: dad58d8a-9615-43f3-942c-55a49e8fdc1a
+		summarizeBy: none
+		sourceColumn: matriz_cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_origem
+		dataType: string
+		lineageTag: 13c27dc6-e651-4f7f-8c7c-1513aad3e917
+		summarizeBy: none
+		sourceColumn: tipo_origem
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_estoque_analise = m
+		mode: import
+		source =
+				let
+				    Fonte = Value.NativeQuery(GoogleBigQuery.Database(){[Name="bi-performance"]}[Data], "SELECT#(lf)DISTINCT#(lf)tipo_ranking#(lf)FROM `bi-performance.BI_PROD.VIZ_Ranking_Estoque`", null, [EnableFolding=true]),
+				    #"Coluna Condicional Adicionada" = Table.AddColumn(Fonte, "matriz_cnpj", each if [tipo_ranking] = "MATRIZ/ORIGEM DE OPERAÇÃO" then "Consolidado" else if [tipo_ranking] = "MATRIZ/ORIGEM DE OPERAÇÃO CONSOLIDADA" then "Consolidado" else if [tipo_ranking] = "CNPJ/ORIGEM DE OPERAÇÃO CONSOLIDADA" then "Por Entidade" else if [tipo_ranking] = "CNPJ/ORIGEM DE OPERAÇÃO" then "Por Entidade" else null, type text),
+				    #"Coluna Personalizada Adicionada" = Table.AddColumn(#"Coluna Condicional Adicionada", "tipo_origem", each let splittiporanking = Splitter.SplitTextByDelimiter(" OPERAÇÃO ", QuoteStyle.None)([tipo_ranking]), splitsplittiporanking0 = Splitter.SplitTextByDelimiter("/", QuoteStyle.None)(splittiporanking{0}?), splittiporanking2 = List.Reverse(Splitter.SplitTextByDelimiter(" ", QuoteStyle.None)([tipo_ranking])), splittiporanking3 = Splitter.SplitTextByDelimiter("/", QuoteStyle.None)([tipo_ranking]) in Text.Combine({Text.Middle(splitsplittiporanking0{1}?, 11, 1), Text.Reverse(Text.Middle(Text.Reverse(Text.Lower(splittiporanking2{2}?)), 4, 2)), Text.Middle(Text.Proper(splitsplittiporanking0{1}?), 9, 3), Text.Reverse(Text.Middle(Text.Reverse([tipo_ranking]), 26, 1)), Text.Middle(Text.Lower(splittiporanking3{1}?), 12, 3), Text.Middle(Text.Lower(splittiporanking2{0}?), 5, 1), Text.Middle(Text.Lower(splitsplittiporanking0{1}?), 16)}), type text)
+				in
+				    #"Coluna Personalizada Adicionada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

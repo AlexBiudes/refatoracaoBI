@@ -1,0 +1,26 @@
+table simulador_despesas_gerais
+	lineageTag: 549a8692-b7df-4ee9-b9f6-1edea8c550f9
+
+	measure 'Valor simulador_despesas_gerais' = SELECTEDVALUE('simulador_despesas_gerais'[simulador_despesas_gerais], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: d790d105-d98a-4f48-a0d8-3cb3948c9d89
+
+	column simulador_despesas_gerais
+		formatString: 0%;-0%;0%
+		lineageTag: 3d8d9c3e-1c10-4d0e-991d-63b43400c34a
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_despesas_gerais = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 32227e660e1b4147b0604cab3cb31ac9
+

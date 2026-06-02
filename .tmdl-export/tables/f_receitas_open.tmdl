@@ -1,0 +1,166 @@
+table f_receitas_open
+	lineageTag: 21d498ae-3ec9-44e7-a73c-8f2902f7d9f9
+
+	column grupo
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 823fb708-a347-44b7-8adb-402f5f3a942c
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: f789a870-c64a-4071-b8ce-684440028f66
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: b44f9f21-2f33-4637-9c4d-de37716ff8ea
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 583f1b49-a265-4989-a2cb-46a90c6c1b0a
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column numero_nf
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: e76417d8-e3fb-4e81-b974-4cf9fd5e463d
+		summarizeBy: none
+		sourceColumn: numero_nf
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_cliente
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 3dc389c2-f3c3-4c26-b672-49363d83ac5c
+		summarizeBy: none
+		sourceColumn: cnpj_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column nome_cliente
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: c53e309b-cde3-44ca-9011-546e1e2e5533
+		summarizeBy: none
+		sourceColumn: nome_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_cliente
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: efa451d2-6c9e-4f63-a3f8-0ac49781def2
+		summarizeBy: none
+		sourceColumn: chave_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_item
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 550b7185-5e90-4194-b270-214aa05886f3
+		summarizeBy: none
+		sourceColumn: descricao_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor_unitario
+		dataType: double
+		sourceProviderType: double
+		lineageTag: cdfee741-c2e2-449e-91d6-80e9ff668109
+		summarizeBy: sum
+		sourceColumn: valor_unitario
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_valor_total
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: 0d6b578f-e349-4961-a4c1-fee5ac548389
+		summarizeBy: sum
+		sourceColumn: total_valor_total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column quantidade
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 65741e82-ab39-4be2-bcf9-6b2e51ca9998
+		summarizeBy: sum
+		sourceColumn: quantidade
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column origem_operacao
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: e47d2621-2e05-4cf0-80cc-925477dc1890
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column uf
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 83bc07ce-819c-4e7b-82a5-edc8b7ec02c4
+		summarizeBy: none
+		sourceColumn: uf
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_base
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: ef76a1fc-6258-47e7-a73d-ca45d63ba599
+		summarizeBy: none
+		sourceColumn: data_base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition f_receitas_open = m
+		mode: directQuery
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    VIZ_Receitas_Open_View = BI_tratado_Schema{[Name="VIZ_Receitas_Open",Kind="View"]}[Data]
+				in
+				    VIZ_Receitas_Open_View
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

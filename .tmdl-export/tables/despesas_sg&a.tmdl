@@ -1,0 +1,48 @@
+table despesas_sg&a
+	lineageTag: 7510318e-871c-4946-9bea-abb76a66b791
+
+	column despesas_sg&a
+		lineageTag: 6d4b0203-e2ed-4cbb-b504-8c3f9ec59bcd
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'despesas_sg&a Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'despesas_sg&a Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'despesas_sg&a Campos'
+		isHidden
+		lineageTag: 57429d46-4ccc-43e9-bc36-662b321874de
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'despesas_sg&a Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'despesas_sg&a Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: fb183eb3-03f5-4282-9399-3f4290c762b7
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition despesas_sg&a = calculated
+		mode: import
+		source =
+				{
+				    ("desp_operac_ebit_actual_month", NAMEOF('Medidas_balancetenew'[desp_operac_ebit]), 1),
+				    ("desp_operac_ebit_menos_comerciais", NAMEOF('Medidas_balancetenew'[desp_operac_ebit_menos_comerciais]), 2)
+				}
+
+	annotation PBI_Id = 903e93bcb8b846cfbd51c72686126025
+

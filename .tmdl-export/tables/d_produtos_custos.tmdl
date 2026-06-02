@@ -1,0 +1,67 @@
+table d_produtos_custos
+	lineageTag: 27c69e2d-d29f-4c78-8365-b916668178c6
+
+	column cnpj
+		dataType: string
+		lineageTag: 18837f7c-5be1-4c89-9529-7f07ec94f20f
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_item
+		dataType: string
+		lineageTag: 04265097-0b7e-4355-9409-d3b912896254
+		summarizeBy: none
+		sourceColumn: descricao_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_produto
+		dataType: string
+		lineageTag: afbb93e5-b889-4774-b0c7-6217a0e3a166
+		summarizeBy: none
+		sourceColumn: grupo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_grupo
+		dataType: string
+		lineageTag: 78c98fb3-4269-4459-88a8-c8001186f480
+		summarizeBy: none
+		sourceColumn: chave_grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_produto
+		dataType: string
+		lineageTag: ca9fd0db-23e1-451d-9fd0-adca0ac68241
+		summarizeBy: none
+		sourceColumn: chave_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_produtos_custos = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Relatorio_Custos_Table = BI_tratado_Schema{[Name="-- VIZ_D_Produtos_Custos",Kind="Table"]}[Data],
+				    #"Linhas Filtradas" = Table.SelectRows(Relatorio_Custos_Table, each true),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Linhas Filtradas",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído3",{{"chave_produto", Text.Upper, type text}}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Texto em Maiúscula",",",".",Replacer.ReplaceText,{"descricao_item"}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Valor Substituído4"," ","",Replacer.ReplaceText,{"chave_grupo"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído"," ","",Replacer.ReplaceText,{"chave_produto"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído5", {"chave_produto"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

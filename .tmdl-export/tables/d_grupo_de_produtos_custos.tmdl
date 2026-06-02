@@ -1,0 +1,79 @@
+table d_grupo_de_produtos_custos
+	lineageTag: 234396d1-ca63-4078-8622-e96648fa9f96
+
+	column cnpj
+		dataType: string
+		lineageTag: 60e18c47-99b4-4ad4-ad79-79d6eee271a4
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_produto
+		dataType: string
+		lineageTag: be645de5-880e-4a0a-beff-e953150a8d04
+		summarizeBy: none
+		sourceColumn: grupo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Personalizar
+		dataType: string
+		lineageTag: 93236439-ec5f-493b-9772-ad415c603f4e
+		summarizeBy: none
+		sourceColumn: Personalizar
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_item
+		dataType: string
+		lineageTag: 955d332f-ed1b-4d83-a23e-a9d8d3bdfda9
+		summarizeBy: none
+		sourceColumn: descricao_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_grupo
+		dataType: string
+		lineageTag: 136aad7e-8adf-46d8-b991-04af9173104b
+		summarizeBy: none
+		sourceColumn: chave_grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_produto
+		dataType: string
+		lineageTag: e71e787b-7692-4642-a71f-6532b34868c9
+		summarizeBy: none
+		sourceColumn: chave_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_grupo_de_produtos_custos = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Relatorio_Custos_Table = BI_tratado_Schema{[Name="-- VIZ_D_Produtos_Custos",Kind="Table"]}[Data],
+				    #"Valor Substituído" = Table.ReplaceValue(Relatorio_Custos_Table,"nan","Sem Grupo de Produto",Replacer.ReplaceText,{"grupo_produto"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído", each true),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Linhas Filtradas",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído3", "Personalizar", each [cnpj] & " " & [grupo_produto]),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Personalização Adicionada"," ","",Replacer.ReplaceText,{"chave_grupo"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4"," ","",Replacer.ReplaceText,{"chave_produto"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5",",",".",Replacer.ReplaceText,{"descricao_item"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6",",",".",Replacer.ReplaceText,{"chave_produto"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído7",{{"Personalizar", Text.Upper, type text}, {"chave_grupo", Text.Upper, type text}, {"chave_produto", Text.Upper, type text}}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Texto em Maiúscula"," ","",Replacer.ReplaceText,{"chave_grupo"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído8", {"chave_grupo"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

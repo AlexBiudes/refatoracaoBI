@@ -1,0 +1,74 @@
+table 'despesas_controladas_mcd (2)'
+	lineageTag: e9c2b7de-ff61-496c-b79a-8edda267e760
+
+	column classificacao
+		dataType: string
+		lineageTag: 2838a895-4804-45e9-b166-c620bbc338af
+		summarizeBy: none
+		sourceColumn: classificacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: c6982f84-e40a-4027-a8ca-5b4f2c594c10
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column estabelecimento
+		dataType: string
+		lineageTag: bc9d1980-e367-46c9-b4a3-4c9b8a4f8534
+		summarizeBy: none
+		sourceColumn: estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column sigla_filial
+		dataType: string
+		lineageTag: 22e1f0b8-3135-4b04-b7e9-38476e0ac3fd
+		summarizeBy: none
+		sourceColumn: sigla_filial
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: fef8b4ac-40ef-489d-8d42-94c5fd5b3488
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_desp
+		dataType: string
+		lineageTag: 3548acaf-8400-4f7f-969b-a0050550f014
+		summarizeBy: none
+		sourceColumn: chave_desp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'despesas_controladas_mcd (2)' = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    despesas_controladas_mcd_COPIA_Table = BI_QA_Schema{[Name="VIZ_DESPESAS_CONTROLADAS_MCD",Kind="Table"]}[Data],
+				    #"Valor Substituído" = Table.ReplaceValue(despesas_controladas_mcd_COPIA_Table,".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído2", "chave_desp", each [cnpj]&[conta]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_desp", type text}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Tipo Alterado"," ","",Replacer.ReplaceText,{"chave_desp"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído3",{{"conta", Text.Upper, type text}}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Texto em Maiúscula", {"chave_desp"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

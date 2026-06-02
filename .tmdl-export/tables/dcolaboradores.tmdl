@@ -1,0 +1,32 @@
+table dcolaboradores
+	lineageTag: b082ea7a-4514-462d-813b-a3007634283b
+
+	column colaborador
+		dataType: string
+		lineageTag: a2da2027-11b1-4c15-a1a5-49ff20eda461
+		summarizeBy: none
+		sourceColumn: colaborador
+
+		annotation SummarizationSetBy = Automatic
+
+	column url
+		dataType: string
+		lineageTag: b58fc75c-2eb9-4d41-8b40-4302e9ca4a0f
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: url
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dcolaboradores = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("ddHdboIwGMbxW2k4tlRHtsyd+TFZDCZOzcY0HrzAK1ax1VJxeEe7jt3YWPhYstRT8n9+BbpaWTMZCcytlrXV+pg+McZtHgR2KFnmxNfjx4iVBQWBCc1QRWgfRWytW8UWOAhhHB/V9nPneaxKTOue0FJwScbKNgn5PM7UvMOqjIZchedE/kMWEHANpI9pCiZlukhzP/JZ2d1AeiJSyIFM+QGFNjqu85C5gwGDMr0BDTE5cAVkAup0xtQEdffXk+PNNKtaWrWN8ZwAF1gQIcfEJGyixcS/vIasLJvhWKbfX2QGB0i2qE3L9q7riLkbsyJFWpcNMCr+EQhJ+hyuUmtuIh7z2HHbG1a1tG4bxIVAFS9OXClCSDJMiYmJJ8u2yodv7OUcS+qhFKAi2SC/T0n91LT3l/d32dS5sOo42hz39zWoRHFbQOYSlPkuOvpd7/ezE6tbWralsf4B", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [colaborador = _t, url = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

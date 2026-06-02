@@ -1,53 +1,30 @@
-# Glossário do Projeto
+# Glossário e Dicionário de Dados
 
-Este glossário define os termos analíticos, técnicos e contábeis empregados em toda a documentação da Refatoração BI.
+Este documento mapeia os principais termos técnicos, acrônimos e nomes físicos extraídos do modelo de dados do BI, servindo como ponte entre a nomenclatura contábil, o desenvolvimento front-end e o código DAX.
 
----
+## Dicionário de Nomenclatura (Modelo PBIX)
 
-### EBITDA
-*Earnings Before Interest, Taxes, Depreciation, and Amortization* (Lucro Antes de Juros, Impostos, Depreciação e Amortização). É o indicador financeiro que representa a geração de caixa operacional da companhia.
+* **`balancetenew`**: A tabela fato central de lançamentos contábeis. Recebe os dados de transações originadas no BigQuery.
+* **`Query`**: Coluna chave na tabela `balancetenew` que mapeia a descrição contábil para as máscaras estruturais (`d_mascara_ebitda` e `d_plano_dre`). 
+* **`vlr`**: Coluna que armazena o valor financeiro do lançamento.
+* **`chave_primaria`**: Coluna calculada unindo `conta` e `cnpj`, usada para o relacionamento com a dimensão de "De/Para" (`d_Plano_Depara`).
+* **`Origem_Operacao`**: Coluna calculada via DAX indicando de onde a transação se originou (ex: sistema X ou Y).
+* **`d_mascara_ebitda` / `d_mascara_DRE`**: Tabelas de dimensão conhecidas como "Máscaras". Elas não possuem valores transacionais, apenas definem a estrutura, níveis hierárquicos, sinais e ordem de exibição das linhas nos visuais de DRE e EBITDA.
 
-### Receita
-Fluxo de entrada de recursos financeiros resultante da venda de produtos, mercadorias ou prestação de serviços da empresa.
-- **Receita Bruta**: Faturamento total das vendas antes de quaisquer deduções.
-- **Receita Líquida**: Receita bruta deduzida de devoluções, abatimentos, descontos comerciais e impostos sobre vendas (ICMS, PIS, COFINS, ISS, etc.).
+## Acrônimos de Negócio
 
-### Custo
-Gastos financeiros diretamente vinculados à produção de bens ou prestação de serviços comercializados pela companhia. Ex: matéria-prima, embalagem, frete de compras, salário dos operários de fábrica.
+* **BL**: Balanço Patrimonial (referenciado nas máscaras de ativo e passivo, ex: `d_mascara_ativo_BL`).
+* **CFS**: Cash Flow Statement (Fluxo de Caixa). O modelo possui uma tabela inteira de medidas para isso (`medidas_cfs`).
+* **CPV / CSP**: Custo de Produto Vendido / Custo de Serviço Prestado. Categoria chave no DRE e no cálculo da Margem Bruta.
+* **DFC**: Demonstração do Fluxo de Caixa (presente na `d_mascara_dfc`).
+* **DRE**: Demonstração do Resultado do Exercício. Tela foco de mapeamento junto com o EBITDA.
+* **EBITDA**: *Earnings Before Interest, Taxes, Depreciation, and Amortization* (Lucro Antes de Juros, Impostos, Depreciação e Amortização). Principal indicador operacional a ser exibido.
+* **MCD**: Abreviação para McDonalds, um grupo específico de lojas ou franquias monitorado no modelo (`d_lojas_mcd`, `medidas_mcd`).
+* **ROIC**: *Return on Invested Capital*. Retorno sobre o capital investido (presente em tabelas como `D_ROIC` e `estrutura_roic`).
+* **SG&A**: *Selling, General and Administrative Expenses* (Despesas Compras, Gerais e Administrativas). 
 
-### Despesa
-Gastos necessários para a manutenção da estrutura administrativa, comercial e corporativa da empresa, mas que não estão diretamente ligados ao processo produtivo. Ex: aluguel do escritório central, salários do time de vendas, contas de telefone/internet administrativa.
+## Termos Técnicos do Projeto
 
-### Margem
-Relação percentual entre um indicador de lucro e a receita de vendas.
-- **Margem EBITDA**: `EBITDA / Receita Líquida`
-- **Margem de Contribuição**: `(Receita Líquida - Custos Variáveis) / Receita Líquida`
-
-### Rentabilidade
-Percentual de retorno obtido sobre um determinado investimento ou atividade. Em BI, frequentemente refere-se à margem final obtida por filial, produto ou cliente.
-
-### Variação Absoluta
-A diferença numérica nominal entre dois valores de períodos ou cenários distintos.
-- *Fórmula*: `Valor Atual - Valor Anterior` ou `Valor Realizado - Valor Orçado`
-
-### Variação Percentual
-A variação proporcional de um indicador expressa em percentagem.
-- *Fórmula*: `(Valor Atual - Valor Anterior) / Valor Anterior * 100`
-
-### DAX
-*Data Analysis Expressions*. Linguagem de fórmulas e expressões utilizada para manipular e calcular dados em ferramentas de Business Intelligence da Microsoft (como Power BI, Analysis Services e Power Pivot).
-
-### Medida
-Uma fórmula de cálculo dinâmico declarada em DAX dentro do modelo semântico do Power BI, que se adapta dinamicamente aos filtros e segmentadores selecionados pelo usuário em tela.
-
-### Dataset (Modelo Semântico)
-Conjunto de tabelas, relacionamentos, colunas calculadas e medidas que servem de fonte de dados para estruturar os visuais de um relatório do Power BI.
-
-### Segmentador (Slicer)
-Filtro visual adicionado diretamente à tela do dashboard para permitir ao usuário final selecionar valores discretos (anos, filiais, gerentes) para filtrar os dados exibidos nos demais visuais.
-
-### Visual
-Qualquer elemento gráfico adicionado na tela do relatório para exibir informações (gráficos de pizza, tabelas, matrizes, cards de KPI, mapas).
-
-### KPI
-*Key Performance Indicator* (Indicador-Chave de Desempenho). Métrica quantificável utilizada para avaliar o sucesso de uma organização na busca por seus objetivos estratégicos e metas operacionais.
+* **MCP (Model Context Protocol)**: Tecnologia usada para o agente Antigravity conversar nativamente com ferramentas externas.
+* **TMDL (Tabular Model Definition Language)**: Formato de representação textual legível por humanos dos modelos do Analysis Services / Power BI, usado para ler o código DAX e relacionamentos.
+* **POC**: *Proof of Concept* (Prova de Conceito). A etapa atual de refatoração destas 3 telas para HTML/JS/CSS puros sem infraestrutura pesada.

@@ -1,0 +1,26 @@
+table poo_cfs_red_dias_estoque
+	lineageTag: fd5c556d-0a0b-43a0-9b5e-509119fc69e9
+
+	measure 'Valor poo_cfs_red_dias_estoque' = SELECTEDVALUE('poo_cfs_red_dias_estoque'[poo_cfs_red_dias_estoque], 1)
+		formatString: 0
+		lineageTag: 4df3205d-6038-427c-85de-6aa5d86e5e42
+
+	column poo_cfs_red_dias_estoque
+		formatString: 0
+		lineageTag: 3f85e62c-34dd-41ce-9ded-bdfa0c88d363
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition poo_cfs_red_dias_estoque = calculated
+		mode: import
+		source = GENERATESERIES(-20, 20, 1)
+
+	annotation PBI_Id = 1ef3c6a6be1449bca10ce1e07d54d4ad
+

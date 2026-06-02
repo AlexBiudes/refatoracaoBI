@@ -1,0 +1,48 @@
+table outras_receitas_despesas
+	lineageTag: b705d57b-493b-4e7c-99f5-be52247f0937
+
+	column outras_receitas_despesas
+		lineageTag: 3cbdbc15-65c8-453d-a918-6041b2cb6756
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'outras_receitas_despesas Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'outras_receitas_despesas Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'outras_receitas_despesas Campos'
+		isHidden
+		lineageTag: 47b6fe8a-1b8c-4e87-85bd-5cce7e65b460
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'outras_receitas_despesas Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'outras_receitas_despesas Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 4882e026-fcbe-45ce-8482-f77badcf2482
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition outras_receitas_despesas = calculated
+		mode: import
+		source =
+				{
+				    ("var_outras_despesas", NAMEOF('Medidas_balancetenew'[var_outras_despesas_ACU]), 0),
+				    ("var_outras_receitas", NAMEOF('Medidas_balancetenew'[var_outras_receitas]), 1)
+				}
+
+	annotation PBI_Id = 9b6222c42ba1481482a9085c963264d7
+

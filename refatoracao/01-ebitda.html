@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBITDA | Planning BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <!-- Símbolo radial (simplificado) -->
+                    <div class="radial-symbol"></div>
+                    <span class="logo-text">Planning</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="01-ebitda.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    EBITDA
+                </a>
+                <a href="02-rentabilidade.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    Rentabilidade
+                </a>
+                <a href="03-variacao-custos.html" class="nav-item">
+                    <span class="nav-icon">💸</span>
+                    Var. Custos
+                </a>
+            </nav>
+            <div class="tagline">
+                Building your company's future. <span class="highlight-today">Today.</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="executive-header">
+                <div class="header-titles">
+                    <h1>Visão Executiva de EBITDA</h1>
+                    <p class="subtitle">Análise consolidada de geração de caixa operacional</p>
+                </div>
+                <div class="header-filters">
+                    <select class="filter-dropdown">
+                        <option>Ano: 2023</option>
+                        <option>Ano: 2022</option>
+                    </select>
+                    <select class="filter-dropdown">
+                        <option>Empresa: Todas</option>
+                        <option>Empresa A</option>
+                        <option>Empresa B</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="gradient-line"></div>
+
+            <section class="kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-title">Receita Bruta</div>
+                    <div class="kpi-value">R$ 14.5M</div>
+                    <div class="kpi-trend positive">↑ 2.4% vs mês anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Receita Líquida</div>
+                    <div class="kpi-value">R$ 12.1M</div>
+                    <div class="kpi-trend positive">↑ 1.8% vs mês anterior</div>
+                </div>
+                <div class="kpi-card highlight-card">
+                    <div class="kpi-title">EBITDA Realizado</div>
+                    <div class="kpi-value">R$ 3.8M</div>
+                    <div class="kpi-trend positive">↑ 4.2% vs mês anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Margem EBITDA</div>
+                    <div class="kpi-value">31.4%</div>
+                    <div class="kpi-trend negative">↓ 0.5p.p vs mês anterior</div>
+                </div>
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-container">
+                    <h3>Evolução Mensal - Receita vs EBITDA</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="ebitdaChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Composição do EBITDA (Cascata)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="waterfallChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-container">
+                    <h3>Detalhamento por Linha de DRE (EBITDA_Grupo = "Sim")</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Conta Contábil</th>
+                                <th class="numeric">Mês Atual (R$)</th>
+                                <th class="numeric">Mês Anterior (R$)</th>
+                                <th class="numeric">Variação (%)</th>
+                                <th class="numeric">Impacto no EBITDA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Receita Líquida de Vendas</td>
+                                <td class="numeric">12.100.000</td>
+                                <td class="numeric">11.886.000</td>
+                                <td class="numeric positive">+1.8%</td>
+                                <td class="numeric positive">+214.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Custos dos Produtos Vendidos</td>
+                                <td class="numeric">-5.200.000</td>
+                                <td class="numeric">-5.100.000</td>
+                                <td class="numeric negative">+1.9%</td>
+                                <td class="numeric negative">-100.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Despesas Administrativas</td>
+                                <td class="numeric">-1.800.000</td>
+                                <td class="numeric">-1.750.000</td>
+                                <td class="numeric negative">+2.8%</td>
+                                <td class="numeric negative">-50.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Despesas Comerciais</td>
+                                <td class="numeric">-1.300.000</td>
+                                <td class="numeric">-1.350.000</td>
+                                <td class="numeric positive">-3.7%</td>
+                                <td class="numeric positive">+50.000</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>EBITDA Total</strong></td>
+                                <td class="numeric"><strong>3.800.000</strong></td>
+                                <td class="numeric"><strong>3.686.000</strong></td>
+                                <td class="numeric positive"><strong>+3.0%</strong></td>
+                                <td class="numeric positive"><strong>+114.000</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+            
+            <section class="insights-section">
+                <div class="insight-box">
+                    <span class="insight-icon">💡</span>
+                    <div class="insight-content">
+                        <strong>Análise Assistida:</strong> O EBITDA apresentou crescimento nominal, porém a Margem EBITDA teve leve retração devido ao aumento proporcional maior das Despesas Administrativas frente à Receita Líquida. Depreciação e Amortização foram corretamente removidas.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Init dummy charts for prototyping
+        const ctxEbitda = document.getElementById('ebitdaChart').getContext('2d');
+        new Chart(ctxEbitda, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [
+                    {
+                        type: 'line',
+                        label: 'Margem EBITDA (%)',
+                        data: [28, 29, 31, 30, 31, 31.4],
+                        borderColor: '#0AE18C',
+                        backgroundColor: '#0AE18C',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        type: 'bar',
+                        label: 'EBITDA (M)',
+                        data: [2.5, 2.8, 3.2, 3.1, 3.5, 3.8],
+                        backgroundColor: '#14C8FA',
+                        borderRadius: 4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Receita Líq (M)',
+                        data: [8.9, 9.6, 10.3, 10.3, 11.2, 12.1],
+                        backgroundColor: '#F2F2F2',
+                        borderRadius: 4,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Waterfall using simple bar chart representation
+        const ctxWaterfall = document.getElementById('waterfallChart').getContext('2d');
+        new Chart(ctxWaterfall, {
+            type: 'bar',
+            data: {
+                labels: ['Receita Líquida', 'CPV', 'Despesas ADM', 'Despesas COM', 'EBITDA'],
+                datasets: [{
+                    label: 'Impacto R$',
+                    data: [12.1, -5.2, -1.8, -1.3, 3.8],
+                    backgroundColor: (ctx) => {
+                        const val = ctx.raw;
+                        if (ctx.dataIndex === 0 || ctx.dataIndex === 4) return '#00BF63'; // Totals in dark green
+                        return val < 0 ? '#FF3131' : '#0AE18C';
+                    },
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { grid: { display: false } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

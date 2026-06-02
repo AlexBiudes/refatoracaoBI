@@ -1,0 +1,26 @@
+table POOreceita
+	lineageTag: b09247b6-74e4-4dec-bca5-479cd8c3bb95
+
+	measure 'Valor POOreceita' = SELECTEDVALUE('POOreceita'[POOreceita], 0.01)
+		formatString: 0%;-0%;0%
+		lineageTag: 69eb6dd5-868e-40b6-b42a-ad702d837f53
+
+	column POOreceita
+		formatString: 0%;-0%;0%
+		lineageTag: 6505422b-f15c-411e-9bc9-b66fbeedbb9f
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition POOreceita = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = b93522e13a3b43348c99b83d2b3bde5d
+

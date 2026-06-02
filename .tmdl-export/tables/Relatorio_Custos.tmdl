@@ -1,0 +1,189 @@
+table Relatorio_Custos
+	lineageTag: e4a89f12-dfce-4505-924a-c306b4c9c5a9
+
+	measure volumetria_custos_open =
+			
+			IF(NOT(ISBLANK([Volumetria_Por_Mes])), "🟢", "🔴")
+		lineageTag: eee37789-1f49-4e55-9715-142c298d170b
+
+	measure Volumetria_Por_Mes = ```
+			
+			CALCULATE(
+			    SUM(Relatorio_Custos[custo_total])
+			)
+			
+			
+			```
+		lineageTag: c1da81fe-eff7-474e-a0c2-47fe99a6711e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cnpj
+		dataType: string
+		lineageTag: 3cc681c6-701b-45dc-8ac5-02ad5d2b0e98
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 095592b6-b7f7-46f9-847c-adfacce5b675
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column numero_nf
+		dataType: string
+		lineageTag: 114b6635-932d-4cdf-b3db-46411490d04d
+		summarizeBy: none
+		sourceColumn: numero_nf
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_produto
+		dataType: string
+		lineageTag: 02cfd7f6-a2bd-450a-a9f6-a85c96bfba53
+		summarizeBy: none
+		sourceColumn: grupo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_produto
+		dataType: string
+		lineageTag: 787ada8d-1f1a-4d57-ad6e-646af13fe083
+		summarizeBy: none
+		sourceColumn: codigo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_item
+		dataType: string
+		lineageTag: 87a810ee-e73e-425b-9b33-2926cfd0439b
+		summarizeBy: none
+		sourceColumn: descricao_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantidade
+		dataType: double
+		formatString: 0
+		lineageTag: b3f606aa-dff8-4774-be65-3c729047604c
+		summarizeBy: sum
+		sourceColumn: quantidade
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column valor_unitario_venda
+		dataType: double
+		lineageTag: b9355207-68f9-4ce9-a946-d6fb0e06db02
+		summarizeBy: sum
+		sourceColumn: valor_unitario_venda
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column custo_unitario
+		dataType: double
+		lineageTag: 420e358e-0afd-4af2-bb5d-67a54a4e0cc5
+		summarizeBy: sum
+		sourceColumn: custo_unitario
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column custo_total
+		dataType: double
+		formatString: 0.00
+		lineageTag: c3a8e757-31d1-4a73-bb16-9f36ae3ee0aa
+		summarizeBy: sum
+		sourceColumn: custo_total
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor_total_venda = Relatorio_Custos[quantidade] * Relatorio_Custos[valor_unitario_venda]
+		lineageTag: 9cfbc4c4-7bfa-4fe1-910c-0f58bfb35e19
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column chave_produto
+		dataType: string
+		lineageTag: 0b004853-5989-4b56-835f-054090b85490
+		summarizeBy: none
+		sourceColumn: chave_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo
+		dataType: string
+		lineageTag: 8da5c715-abdc-4ebc-82fc-327f026233cc
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: bba315b0-9c18-439b-bbe9-1d4909e78523
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_base
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 35e3f76f-6ad3-4582-96da-85607e76e72c
+		summarizeBy: none
+		sourceColumn: data_base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column uaid
+		dataType: string
+		lineageTag: 8d6b243a-8e95-482a-bd22-861ef3ee8dc1
+		summarizeBy: none
+		sourceColumn: uaid
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Relatorio_Custos = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Relatorio_Custos_Table = BI_tratado_Schema{[Name="Relatorio_Custos",Kind="Table"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Relatorio_Custos_Table,{{"data", type date}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado","nan","Sem Grupo de Produto",Replacer.ReplaceText,{"grupo_produto"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído", each true),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Linhas Filtradas",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído3", "chave_produto", each [cnpj] & " " & [grupo_produto] & " "& [descricao_item]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_produto", type text}}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Tipo Alterado1",{{"chave_produto", Text.Upper, type text}}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Texto em Maiúscula",",",".",Replacer.ReplaceText,{"descricao_item"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4"," ","",Replacer.ReplaceText,{"chave_produto"}),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Valor Substituído5",{{"data_base", type date}})
+				in
+				    #"Tipo Alterado2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

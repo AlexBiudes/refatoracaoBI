@@ -1,0 +1,63 @@
+table d_grupo_contas_analise_espec
+	lineageTag: aef352b1-770c-41d7-bfd4-ad7c5fb2c6f2
+
+	column Query
+		dataType: string
+		lineageTag: 5b9a9437-b51c-4932-9ac2-d4fe2380df16
+		summarizeBy: none
+		sourceColumn: Query
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_cliente
+		dataType: string
+		lineageTag: d23389d3-e345-4f60-aab2-a912bbab8f52
+		summarizeBy: none
+		sourceColumn: descricao_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Demonstrativo
+		dataType: string
+		lineageTag: b90f7596-f321-4fc1-9058-6e20ea1baf65
+		summarizeBy: none
+		sourceColumn: Demonstrativo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo
+		dataType: string
+		lineageTag: b22ba3bd-1eb1-463e-af7e-6aabf3591909
+		summarizeBy: none
+		sourceColumn: Grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_grupo_contas_analise_espec = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    #"De-Para_Contas_Table" = BI_tratado_Schema{[Name="De-Para_Contas",Kind="Table"]}[Data],
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"De-Para_Contas_Table", "DE", "DE - Copiar"),
+				    #"Primeiros caracteres extraídos" = Table.TransformColumns(#"Coluna Duplicada", {{"DE - Copiar", each Text.Start(_, 3), type text}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Primeiros caracteres extraídos",{{"DE - Copiar", "Demonstrativo"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas","BL_","Balanço",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","rec","DRE",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","tot","Balanço",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","Cus","DRE",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído3","Ded","DFC",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","dre","DRE",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5","Ebt","DRE",Replacer.ReplaceText,{"Demonstrativo"}),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Valor Substituído6",{{"DE", "Query"}, {"PARA", "descricao_cliente"}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Colunas Renomeadas1", each ([Query] <> "1esperar_acontecer" and [Query] <> "2esperar_acontecer" and [Query] <> "4esperar_acontecer" and [Query] <> "DFC_Ajustes_Caixa_Operacional" and [Query] <> "DFC_Depreciacao_ativo" and [Query] <> "DFC_resultado_ajustado" and [Query] <> "DFC_Variacao_Contas_Patrimoniais" and [Query] <> "DFC_variacao_contas_patrimoniais")),
+				    #"Coluna Condicional Adicionada" = Table.AddColumn(#"Linhas Filtradas", "Grupo", each if [Query] = "Custo dos Produtos Vendidos" then "Custo" else if [Query] = "BL_ATCIR_Estoques" then "BL_ATCIR" else if [Query] = "BL_PL_Reservas" then "BL_PL" else if [Query] = "Deduções da Receita Bruta" then "Deduções" else if [Query] = "DRE_LO_antes_do_IR_e_CSLL" then "EBIT" else if [Query] = "DFC_VARPAT_Estoques" then "DFC_VARPAT" else if [Query] = "DFC_VARPAT_Provisoes_LP" then "DFC_VARPAT" else if [Query] = "BL_PASSCIR_Fornecedores" then "BL_PASSCIR" else if [Query] = "DRE_Lucro_bruto" then "Lucro Bruto" else if [Query] = "BL_ATCIR_Adiantamentos" then "BL_ATCIR" else if [Query] = "DFC_ATINVEST_Investimentos" then "DFC_ATINVEST" else if [Query] = "BL_ATNCIR_Investimentos" then "BL_ATNCIR" else if [Query] = "receita bruta" then "Faturamento" else if [Query] = "BL_ATNCIR_Ativo_Diferido" then "BL_ATNCIR" else if [Query] = "BL_PL_Capital_Social" then "BL_PL" else if [Query] = "DFC_VARPAT_Clientes_LP" then "FC_VARPAT" else if [Query] = "DRE_Desp_Operacionais_Tot_Desp_Operacionais" then "Total_Desp_Op" else if [Query] = "DFC_CXFINAN_Emprestimos" then "DFC_CXFINANC" else if [Query] = "DFC_VARPAT_Fornecedores" then "DFC_VARPAT" else if [Query] = "total AC" then "Total_ATCIR" else if [Query] = "BL_ATCIR_soma" then "Total_ATCIR2" else if [Query] = "BL_ATCIR_Contas_Receber" then "BL_ATCIR" else if [Query] = "BL_ATCIR_Outros_Creditos" then "BL_ATCIR" else if [Query] = "dre_Receita_liquida" then "Receita Líquida" else if [Query] = "total ativos" then "Total_Ativos" else if [Query] = "DFC_VARPAT_Adiantamentos" then "DFC_VARPAT" else if [Query] = "BL_PASSCIR_Debitos_Diversos" then "BL_PASSCIR" else if [Query] = "DFC_CXFINAN_Capital_Social" then "DFC_CXFINAN" else if [Query] = "BL_PL_Icentivos_Fiscais" then "BL_PL" else if [Query] = "DRE_Lucro_ou_Prejuizo_liquido" then "Lucro_Prej_Liq" else if [Query] = "BL_PASSCIR_soma" then "BL_PASSCIR" else if [Query] = "BL_PL_Patrimonio_Social" then "BL_PL" else if [Query] = "DFC_Resultado_Ajustado" then "DFC_Result_Ajust" else if [Query] = "BL_totPassivo" then "Total_Passivo" else if [Query] = "Custo dos Serviços" then "Cuto_Serviços" else if [Query] = "BL_PASSNCIR_Partes_Relacionadas" then "BL_PASSCIR" else if [Query] = "BL_ATCIR_Partes_Relacionadas" then "BL_ATCIR" else if [Query] = "DFC_VARPAT_Adiantamentos_LP" then "DFC_VARPAT" else if [Query] = "DFC_VARPAT_Contas_Receber" then "DFC_VARPAT" else if [Query] = "BL_ATNCIR_Ativo_Direito_Uso" then "BL_ATNCIR" else if [Query] = "BL_ATCIR_caixasequicaixas" then "BL_ATCIR" else if [Query] = "BL_ATNCIR_Depositos_Judiciais" then "BL_ATNCIR" else if [Query] = "BL_ATCIR_Despesas_Antecipadas" then "BL_ATCIR" else if [Query] = "BL_ATNCIR_Imobilizado_Liquido" then "BL_ATNCIR" else if [Query] = "BL_ATCIR_Impostos_recuperar" then "BL_ATCIR" else if [Query] = "BL_ATNCIR_Intangivel_Liquido" then "BL_ATNCIR" else if [Query] = "BL_PL_Soma" then "BL_PL" else if [Query] = "DRE_Despesa_financeira" then "Desp_Financ" else if [Query] = "DRE_Receita_financeira" then "Receita_Financ" else if [Query] = "DFC_Ativo_Dir_de_Uso" then "DFC_At_Dir_Uso" else if [Query] = "total ANC" then "Total_ATNCIR" else if [Query] = "BL_ATNCIR_soma" then "BL_ATNCIR" else if [Query] = "DRE_LO_antes_res_financeiro" then "Result_Op" else if [Query] = "Ebtida_despesa_depreciacao" then "EBITDA" else if [Query] = "DRE_Contribuicao_Social" then "CSLL" else if [Query] = "DRE_Imposto_de_Renda" then "IRPJ" else if [Query] = "BL_ATNCIR_Partes_Relacionadas" then "BL_ATNCIR" else if [Query] = "DFC_VARPAT_Partes_Relacionadas" then "DFC_VARPAT" else if [Query] = "BL_ATNCIR_Despesas_Antecipadas" then "BL_ATNCIR" else if [Query] = "DFC_Fluxo_Investimentos" then "Fluxo_Invest" else if [Query] = "BL_ATNCIR_Impostos_recuperar" then "BL_ATNCIR" else if [Query] = "BL_ATNCIR_Outras_Contas_Receber" then "BL_ATNCIR" else if [Query] = "BL_PASSNCIR_soma" then "BL_PASSNCIR" else if [Query] = "DFC_VARPAT_Despesas_Antecipadas" then "DFC_VARPAT" else if [Query] = "DFC_VARPAT_Impostos_recuperar" then "DFC_VARPAT" else if [Query] = "DFC_CXFINAN_Distribuicao_Lucros" then "DFC_CXFINAN" else if [Query] = "DFC_Fluxo_Financiamentos" then "Fluxo_Financ" else if [Query] = "BL_PASSCIR_Outras_Contas_Pagar" then "BL_PASSCIR" else if [Query] = "DFC_VARPAT_Outras_Contas_Pagar" then "DFC_VARPAT" else if [Query] = "DFC_VARPAT_Outras_Contas_Pagar_LP" then "DFC_VARPAT" else if [Query] = "BL_PASSCIR_Adiantamentos_Clientes" then "BL_PASSCIR" else if [Query] = "BL_PASSCIR_Obrigacoes_Trabalhistas" then "BL_PASSCIR" else if [Query] = "BL_PL_Lucro_Prejuizo_liquido" then "BL_PL" else if [Query] = "DRE_Desp_NAO_Operacionais_Receita_nao_operacional" then "Desp_n_Op" else if [Query] = "DFC_VARPAT_Impostos_recuperar_LP" then "DFC_VARPAT" else if [Query] = "BL_PL_Adto_Aumento_Capital" then "BL_PL" else if [Query] = "BL_PASSCIR_Obrigacoes_Tributarias" then "BL_PASSCIR" else "Desp_Op", type text)
+				in
+				    #"Coluna Condicional Adicionada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

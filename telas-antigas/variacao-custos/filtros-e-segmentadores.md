@@ -4,9 +4,9 @@
 
 | Filtro | Campo | Tabela | Tipo | Obrigatório | Observações |
 |---|---|---|---|---|---|
-| Centro de Custo | `CentroCusto[Nome]` | Dim_CentroCusto | Segmentador (Dropdown) | Não | Filtra por área de responsabilidade |
+| Centro de Custo | `CentroCusto[Nome]` | N/A | Segmentador (Dropdown) | Não | Filtra por área de responsabilidade |
 | Tipo de Custo | `Custo[Tipo]` | Dim_Custo_Tipo | Segmentador (Lista) | Não | Filtra Direto vs Indireto |
-| Período | `Calendario[Mes-Ano]` | Dim_Calendario | Filtro superior | Sim | Define o mês/ano de análise |
+| Período | `Calendario[Mes-Ano]` | dCalendario | Filtro superior | Sim | Define o mês/ano de análise |
 
 ## Segmentadores
 - Tipo de Custo utiliza botões de seleção rápida.

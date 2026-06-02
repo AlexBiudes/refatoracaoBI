@@ -7,7 +7,7 @@
 | Card 1 | KPI Card | EBITDA | N/A | `[EBITDA]` | Exibe o valor do EBITDA do mês atual |
 | Card 2 | KPI Card | Margem EBITDA | N/A | `[Margem EBITDA]` | Exibe a margem em % |
 | Gráfico 1 | Linhas e Colunas | Receita vs EBITDA | Eixo X: `Calendario[Mes-Ano]` | Eixo Y: `[Receita Líquida]`, `[EBITDA]` | Evolução temporal mensal |
-| Cascata 1 | Waterfall | DRE Resumido | Categoria: `Dim_Estrutura[Nivel]` | Valor: `[Valor_Lancamento]` | Da Receita Bruta ao EBITDA |
+| Cascata 1 | Waterfall | DRE Resumido | Categoria: `d_mascara_ebitda[nível 1]` | Valor: `[balancetenew[vlr]]` | Da Receita Bruta ao EBITDA |
 
 ## Hierarquia Visual Atual
 1. Cards de KPI no topo da tela.

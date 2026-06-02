@@ -1,0 +1,78 @@
+table d_origem_operacao_aging
+	lineageTag: ce446d85-4c90-43d2-b43b-088d923ba4be
+
+	column cnpj
+		dataType: string
+		lineageTag: 9c80ec29-4a45-4f79-9529-c760acc2baeb
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column origem_operacao
+		dataType: string
+		lineageTag: 487ef3c6-003d-49d0-91bd-ba57da471059
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Chave Primária'
+		dataType: string
+		lineageTag: 10e67734-43f7-47cd-926e-9d31278971a9
+		summarizeBy: none
+		sourceColumn: Chave Primária
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: 28b95be8-0c0a-422d-a246-827d8efe306f
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_origem_operacao_aging = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Aging_List_Contas_Receber_Table = BI_tratado_Schema{[Name="Aging_List_Contas_Receber",Kind="Table"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Aging_List_Contas_Receber_Table,{{"data_base", type date}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído2", each true),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Linhas Filtradas",null,0,Replacer.ReplaceValue,{"valor"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6",null,0,Replacer.ReplaceValue,{"valor_pago"}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Valor Substituído7","002702496000170","02702496000170",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído9" = Table.ReplaceValue(#"Valor Substituído8","nan","Geral",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Valor Substituído9", each true),
+				    #"Valor Substituído10" = Table.ReplaceValue(#"Linhas Filtradas1","00066871000","66871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído11" = Table.ReplaceValue(#"Valor Substituído10","66871000","00066871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Coluna Mesclada Inserida" = Table.AddColumn(#"Valor Substituído11", "Chave Primária", each Text.Combine({[cnpj], " ", [origem_operacao]}), type text),
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"Coluna Mesclada Inserida", "data_base", "data_base - Copiar"),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Coluna Duplicada",{{"data_base - Copiar", type text}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado2", "chave_secundaria", each [cnpj] & [nome_cliente_fornecedor] & [numero_titulo] & [#"data_base - Copiar"]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_secundaria", type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado1",{"grupo", "empresa", "numero_titulo", "data_base - Copiar"}),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"Colunas Removidas", "tipo_relatorio", each "aging_contas_receber"),
+				    #"Tipo Alterado3" = Table.TransformColumnTypes(#"Personalização Adicionada1",{{"tipo_relatorio", type text}}),
+				    #"Consulta Acrescentada" = Table.Combine({#"Tipo Alterado3", F_Aging_List_Adiantamentos_Clientes, F_Aging_List_Adiantamentos_Fornecedores, F_Aging_List_Contas_Pagar}),
+				    #"Outras Colunas Removidas" = Table.SelectColumns(#"Consulta Acrescentada",{"cnpj", "origem_operacao", "Chave Primária",  "tipo_relatorio"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Outras Colunas Removidas","outros","Outros",Replacer.ReplaceText,{"Chave Primária"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído5","09534517000135 Outros","9534517000135 Outros",Replacer.ReplaceText,{"Chave Primária"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído3","9534517000135 Outros","09534517000135 Outros",Replacer.ReplaceText,{"Chave Primária"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído4",{{"Chave Primária", Text.Upper, type text}}),
+				    #"Valor Substituído12" = Table.ReplaceValue(#"Texto em Maiúscula"," ","",Replacer.ReplaceText,{"Chave Primária"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído12", {"Chave Primária"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

@@ -1,0 +1,68 @@
+table d_mascara_passivo_bl
+	lineageTag: d7ff5baa-79ba-4094-87c3-d9f9bcdd8714
+
+	column descricaohubcount
+		dataType: string
+		lineageTag: dcc573c6-9e9e-43ce-acce-c7eb5c71f079
+		summarizeBy: none
+		sourceColumn: descricaohubcount
+		sortByColumn: ordem
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem
+		dataType: int64
+		formatString: 0
+		lineageTag: 43bf212c-bb85-4b6d-b213-1a674e6cb5d5
+		summarizeBy: none
+		sourceColumn: ordem
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo
+		dataType: string
+		lineageTag: b04c28be-5311-4b5b-857d-602c0853688e
+		summarizeBy: none
+		sourceColumn: Grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao
+		dataType: string
+		lineageTag: 404a19c9-a77d-45a9-8c03-17ec85739e5e
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: 75460524-203d-4e63-ad4c-331537d4051b
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column DMPL
+		dataType: string
+		lineageTag: 30d97a30-6d01-4882-8fff-1d820d4c59f7
+		summarizeBy: none
+		sourceColumn: DMPL
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_mascara_passivo_bl-6db89d61-d6d3-4402-85b2-5ffbb5dc2b52 = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("nVbLbtswEPwVItembSTnefDBtZvCgJEacW5BQNASmzKQRJeUfMjfFDkUOfTWfoF+rEvSsiSKotwcbMi7OzO7fIx1f3/0aYGXk9VqOr/Fn9ONoDJnKZf4mmUkixhJaZZzeXR8pJLlq8midhYtp1AQwGdJpGRbjqZMREVCspxCcBj8cNzq45qLjEY05tANgK2foUenVWqxfl0L9kgiTiW+E2RNku9M5kQxmkz5q/xLJbJyI49aP84nzdZFTgRzKatU+VPlzJKeHi7ehh6kj2fsGxUs5l6296hRdvamhhoUVmOTmAHB7iTgacLgQW9yK4Fiihq5c08T/ThLeQYbJUiuhqoeJSJoSR6JgNiFR6Nbby93AXkYh0MnEleUJopMtIKafb70LWsfzB6IrplaxBnbUiH1lZ2VrzqGGrEr32CdektD8pT04YMT+LrjOUlQzJGzZOzGNkRu7OuP51AhMhIxnhFmuwHqZIOmC92UL36LsPF2J0si4OjgW5qYklhfWhNFVjQIh5RdOFvxcAumHR+90S48GmpjmMVu6i32ZZo5HWrGz9BpxFyspeBbJhWkvh+tWHA2qNtBdfZepwjHX4gAHNMH35QD3waCqJEJzgd3vwfbM6PLPDomYBb54qBhXWBbe8rTDc0kiWBsw6hmq6KwSy/VzdYzXw4Ju5G2quUqXabgymUt3bqxh2UnmvN8V9GglBWnfr046cuM3YlqnAWekg2DNF5xuE+Jmt8E0D4QGnvKBUvLPxnjaFH+/lGY/9ZufR+zNsVHQRL2rA9HGwY7bOXD8D9UbXjdxDwCi1AjgzPJyPjtPKuCqA6GI6+eA1OLTJ4KmVNMtiCvz+FG8/DMLKBJqz92U2FOVrsmPPXKD1M0uolzjieF9sZqE/RbRs4/oM1HtEvpF419Njzz63vAtfItlVRstcs2HsNzL/W+suZZFJHgyjLpU8Ge4YlERQp3ItZH2mQRL9C+ALUKwguv4ADeamPfBU5YRaITTQKU1Arh5bC6G1srryp3cbKElrU4i8Z9+J2KMjA4pxKWeVFbkETv+ghHbo/pB4wPoH14+Ac=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [descricao = _t, descricaohubcount = _t, ordem = _t, Grupo = _t, sinal = _t, DMPL = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"descricaohubcount", type text}, {"ordem", Int64.Type}, {"Grupo", type text}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

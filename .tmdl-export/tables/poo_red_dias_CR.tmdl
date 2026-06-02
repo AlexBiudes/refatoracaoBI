@@ -1,0 +1,29 @@
+table poo_red_dias_CR
+	lineageTag: 21c1ca80-da34-442d-8d06-a6a18a1e3dac
+
+	measure 'Valor poo_red_dias_CR' = SELECTEDVALUE('poo_red_dias_CR'[poo_red_dias_CR], 0)
+		lineageTag: 0bc9a35c-fa8d-4332-af20-75373ae6c534
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column poo_red_dias_CR
+		formatString: 0
+		lineageTag: 9ee1fe80-284e-416c-a3cd-fb7528eb7597
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	partition poo_red_dias_CR = calculated
+		mode: import
+		source = GENERATESERIES(-20, 20, 1)
+
+	annotation PBI_Id = 971d99d28c6945b580a4b44fc7823cef
+

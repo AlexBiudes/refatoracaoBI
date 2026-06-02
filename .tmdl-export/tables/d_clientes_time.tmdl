@@ -1,0 +1,186 @@
+table d_clientes_time
+	lineageTag: 093f8bd8-402a-44f9-9678-dd4b57af26ab
+
+	column grupo
+		dataType: string
+		lineageTag: 2cf07aa3-0b20-4c1b-8eba-1b49d45b58ce
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: cb70e0dd-0243-472b-8fd2-7f02fe0dfeef
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: d92565b6-e10c-4faf-bf6e-bdfe38871f95
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column estabelecimento
+		dataType: string
+		lineageTag: 42d6ad10-dc7d-40ee-a482-fdb6e4449262
+		summarizeBy: none
+		sourceColumn: estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_analise
+		dataType: string
+		lineageTag: 039a1570-83e9-419d-8e62-4946a8de19dd
+		summarizeBy: none
+		sourceColumn: tipo_analise
+
+		annotation SummarizationSetBy = Automatic
+
+	column gerente
+		dataType: string
+		lineageTag: 4dad6e8d-da8d-494a-ac22-9af0929a1b53
+		summarizeBy: none
+		sourceColumn: gerente
+
+		annotation SummarizationSetBy = Automatic
+
+	column coordenador_supervisor
+		dataType: string
+		lineageTag: 9a17e8e4-daa5-4880-8f38-153801011cdf
+		summarizeBy: none
+		sourceColumn: coordenador_supervisor
+
+		annotation SummarizationSetBy = Automatic
+
+	column filtro
+		dataType: string
+		lineageTag: 8fa819ac-a8b7-4f19-af4d-7e07f87efcb4
+		summarizeBy: none
+		sourceColumn: filtro
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nome Fantasia'
+		dataType: string
+		lineageTag: 78f8d054-1dc5-407a-bde8-fcc5acb1494c
+		summarizeBy: none
+		sourceColumn: Nome Fantasia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nome Empresa + Filial'
+		dataType: string
+		lineageTag: 40574526-f945-4124-ac92-bf954539395d
+		summarizeBy: none
+		sourceColumn: Nome Empresa + Filial
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_mascara
+		dataType: string
+		lineageTag: 43b5f549-8fc5-4197-9a32-55b68caa9c89
+		summarizeBy: none
+		sourceColumn: cnpj_mascara
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_normalizado
+		dataType: string
+		lineageTag: 9b9795ff-6271-4599-a897-b6a6c2e1054d
+		summarizeBy: none
+		sourceColumn: cnpj_normalizado
+
+		annotation SummarizationSetBy = Automatic
+
+	column atividade_economica
+		dataType: string
+		lineageTag: b7905a05-5b4f-4950-bd42-cb98456f2b88
+		summarizeBy: none
+		sourceColumn: atividade_economica
+
+		annotation SummarizationSetBy = Automatic
+
+	column endereco
+		dataType: string
+		lineageTag: 63822333-22ca-4260-a307-3cc987ca76e9
+		summarizeBy: none
+		sourceColumn: endereco
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_aprovacao_dfs
+		dataType: string
+		lineageTag: b8a8430b-a7d1-4528-887e-49c10ad4522e
+		summarizeBy: none
+		sourceColumn: data_aprovacao_dfs
+
+		annotation SummarizationSetBy = Automatic
+
+	column nomeBI
+		dataType: string
+		lineageTag: 2e99de30-72cb-4921-af14-1a43ec538e61
+		summarizeBy: none
+		sourceColumn: nomeBI
+
+		annotation SummarizationSetBy = Automatic
+
+	column analise_estabelecimento
+		dataType: string
+		lineageTag: f964613f-172f-4f45-8466-9ad33bb6d346
+		summarizeBy: none
+		sourceColumn: analise_estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_entidade
+		dataType: string
+		lineageTag: 89a540c2-01b8-4b3e-94ca-f76a2c6ccc48
+		summarizeBy: none
+		sourceColumn: tipo_entidade
+
+		annotation SummarizationSetBy = Automatic
+
+	column serie
+		dataType: string
+		lineageTag: 789f3b3b-8388-492c-9d6d-3fde277e5d27
+		summarizeBy: none
+		sourceColumn: serie
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_clientes_time = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    clientes_auto_Table = BI_QA_Schema{[Name="clientes_bi",Kind="Table"]}[Data],
+				    #"Texto Inserido Antes do Delimitador" = Table.AddColumn(clientes_auto_Table, "Nome Fantasia", each Text.BeforeDelimiter([empresa], " ", 1), type text),
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"Texto Inserido Antes do Delimitador", "Nome Fantasia", "Nome Fantasia - Copiar"),
+				    #"Coluna Duplicada1" = Table.DuplicateColumn(#"Coluna Duplicada", "estabelecimento", "estabelecimento - Copiar"),
+				    #"Colunas Mescladas" = Table.CombineColumns(#"Coluna Duplicada1",{"Nome Fantasia - Copiar", "estabelecimento - Copiar"},Combiner.CombineTextByDelimiter(" ", QuoteStyle.None),"Nome Empresa + Filial"),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Mescladas","Raianny Silva","Raianny",Replacer.ReplaceText,{"gerente"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído","Rodney Silva","Rodney",Replacer.ReplaceText,{"gerente"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","Antonio Junior","Antonio Jr.",Replacer.ReplaceText,{"gerente"}),
+				    #"Linhas Classificadas" = Table.Sort(#"Valor Substituído3",{{"gerente", Order.Descending}}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Linhas Classificadas", {"cnpj"}),
+				    #"Consulta Acrescentada" = Table.Combine({#"Duplicatas Removidas", clientes_uau_bi}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Consulta Acrescentada", each true),
+				    #"Coluna Duplicada2" = Table.DuplicateColumn(#"Linhas Filtradas", "filtro", "filtro - Copiar"),
+				    #"Texto Extraído Antes do Delimitador" = Table.TransformColumns(#"Coluna Duplicada2", {{"filtro - Copiar", each Text.BeforeDelimiter(_, " "), type text}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Texto Extraído Antes do Delimitador",{{"filtro - Copiar", "cnpj_mascara"}}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Colunas Renomeadas","Jose","José",Replacer.ReplaceText,{"gerente"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído1","ANO_CIVIL","Ano Civil",Replacer.ReplaceText,{"tipo_analise"})
+				in
+				    #"Valor Substituído4"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

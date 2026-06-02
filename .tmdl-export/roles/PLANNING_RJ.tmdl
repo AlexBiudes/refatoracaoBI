@@ -1,0 +1,7 @@
+role PLANNING_RJ
+	modelPermission: read
+
+	tablePermission d_clientes_time = [gerente] == "José Ramalhete"
+
+	annotation PBI_Id = a1adecbfca2a4e37bef93fe6d9617203
+

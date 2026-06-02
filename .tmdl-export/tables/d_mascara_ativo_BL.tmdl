@@ -1,0 +1,60 @@
+table d_mascara_ativo_BL
+	lineageTag: da981b97-20fe-42e6-bb44-535263840173
+
+	column descricaohubcount
+		dataType: string
+		lineageTag: 256c501a-e898-4eee-84c8-bd49e1443ae4
+		summarizeBy: none
+		sourceColumn: descricaohubcount
+		sortByColumn: Ordem
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordem
+		dataType: int64
+		formatString: 0
+		lineageTag: da35720e-21ca-46bc-acdd-72b8ffa66fdd
+		summarizeBy: none
+		sourceColumn: Ordem
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo
+		dataType: string
+		lineageTag: 3d22885f-5f32-4dc5-a9e3-ada2a7de8aad
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao
+		dataType: string
+		lineageTag: a1ad1e7b-9072-47a9-ae7d-378a2b1306d3
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: 90b22a2a-efb3-4690-a8b9-50381595ae53
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_mascara_ativo_BL-792517fc-9dd4-4f08-bbd9-f902001d0624 = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("lZW9btswFEZfhfCcIZLzO3RwnQRwoaZGknYJAoKR2ICALCokZRR5nQ5Fh0xBn0Av1stLSZZlOWQGA7bEc0SR30ff30/mTPxihJPL50qsWc4Lw/XkYBLBZ2bEWpK5UGmVM7gOlz4ndHY3X9zQ1GKaA+S+wb3JwwHoZGGYJj9EYaEMb8Qe11zxTBipKcK0YwdORm54yh+5gutTnxIRugFQ9K0yCkQjviOPz5F7tF9h+vWf+h+3zitmKsXsvWOP02Kp5JpuENTNMgFD2Qq2QoLwtn5LhbTreOIR9kFNb2WD7UjtxdOPuEYl9l2lKmApMqkwM2cfmt8AxgdcaiOfK/x97pH1hiK6WJVSu2nB9lQldysaHXo8LUdVj0LjBdcl1xCUGSCpKJs0R75qtBzd5tC5ZAr6BTPMGexO0Sp9DXEYHWBdpuGt56r+iyWyOl87HNP1bqBaFGuujei2PgopB+iGnIvMLhf5iqHlynb/02j5SbK0jk0XruvfY6Lr3WOAIuqmVeZwcDWlzThJZPEkyVKxF2ntp0F2J8EKZ5yigraKJkFl/abtEpMvFZRdMIELehakB1oiTPuw5yCLzoPc755nY8F3yx4fBs58fwPGetrIoyD5/sIOAxjHYcKx3C5W8lHk4oVlkiT1K/zPZXZb42ngHDuaJqKFmzyvSl5omz3grcpmPT4KzLODUyZpi/ZqdiEUh8DYQH/XON3jsCDbEbShqUO3tD+5at4/rHetsOOa/TGseKpf1zzfWtOwtjlaADxc0pFDtUlUWNHeOV33wXFYzbZOsjtpWE4yiD6C9hnTTZ/wLvwyOIq1IwB9+A8=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [descricaohubcount = _t, Ordem = _t, grupo = _t, descricao = _t, sinal = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Ordem", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

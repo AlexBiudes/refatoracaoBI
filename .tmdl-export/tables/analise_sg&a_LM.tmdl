@@ -1,0 +1,48 @@
+table analise_sg&a_LM
+	lineageTag: cc66604a-8ad4-4c52-b8a9-96c8fcd95eb9
+
+	column analise_sg&a_LM
+		lineageTag: 32b8002e-57ac-486d-85a4-0bfaaefb0fb4
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'analise_sg&a_LM Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'analise_sg&a_LM Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'analise_sg&a_LM Campos'
+		isHidden
+		lineageTag: cfaee806-860a-46cc-a146-4be89b969ae0
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'analise_sg&a_LM Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'analise_sg&a_LM Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 432cc06a-560b-4817-baad-8b02ee8a7896
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition analise_sg&a_LM = calculated
+		mode: import
+		source =
+				{
+				    ("analise_g&a_LM", NAMEOF('Medidas_balancetenew'[analise_g&a_LM]), 1),
+				    ("analise_sg&a_LM", NAMEOF('Medidas_balancetenew'[analise_sg&a_LM]), 2)
+				}
+
+	annotation PBI_Id = c74ce0396e7b434abe2c85d23c7dd8f6
+

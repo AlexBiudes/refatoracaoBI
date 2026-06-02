@@ -1,0 +1,145 @@
+table lucro_de_caixa
+	lineageTag: bd47d002-2b28-4c9d-b17b-91a2be40b5a3
+
+	measure switch_cfs_lucro_de_caixa =
+			
+			SWITCH(
+			    SELECTEDVALUE(lucro_de_caixa[lucro de caixa]),
+			"Receita", [MReceita_bruta],
+			"Margem Bruta", [MMargem_bruta],
+			// "Lucro de Caixa Operacional", [rresultado_operacional],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec_simulado],
+			" ", " ",
+			 "Custos Diretos", [cfs_custos_diretos] *-1)
+		formatString: #,0
+		lineageTag: 154acae7-2302-4985-ab37-8a036b8f678c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_lucro_de_cx_oper =
+			
+			[MReceita_bruta] -
+			 [cfs_custos_diretos] -
+			 [gastos_gerais$]
+		formatString: #,0
+		lineageTag: 837f5a9c-cb38-4426-8788-34785a1e5517
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure switch_cfs_lucro_de_caixa_simulado =
+			
+			SWITCH(
+			    SELECTEDVALUE(lucro_de_caixa[lucro de caixa]),
+			"Receita", [receita_bruta_simulado],
+			"Margem Bruta", [lucro_bruto_simulado],
+			// "Lucro de Caixa Operacional", [rresultado_operacional],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec_simulado],
+			" ", " ",
+			 "Custos Diretos", [cfs_custos_diretos_simulado] *-1)
+		formatString: #,0
+		lineageTag: f3c643c2-1861-4f40-a138-de18423b8000
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_custos_diretos_simulado = ```
+			
+			VAR vimpostos_deduc =
+			[receita_bruta_simulado] - [receita_liquida_simulado]
+			VAR vcustos = [custo_simulado]
+			
+			RETURN
+			
+			vimpostos_deduc + 
+			vcustos
+			```
+		lineageTag: ae6d26d2-9948-4e2d-934f-4af8180f01eb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_lucro_de_cx_oper_simulado =
+			
+			[receita_bruta_simulado] -
+			 [cfs_custos_diretos_simulado] -
+			 [gastos_gerais-deprec_simulado]
+		formatString: #,0
+		lineageTag: 942effd6-a6c7-441f-998f-e2653d9853be
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure switch_cfs_lucro_de_caixa_simulado_ACU =
+			
+			SWITCH(
+			    SELECTEDVALUE(lucro_de_caixa[lucro de caixa]),
+			"Receita", [receita_bruta_simulado_acu],
+			"Margem Bruta", [lucro_bruto_simulado_ACU],
+			// "Lucro de Caixa Operacional", [rresultado_operacional],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec_simulado_ACU],
+			" ", " ",
+			 "Custos Diretos", [cfs_custos_diretos_simulado_ACU] *-1)
+		formatString: #,0
+		lineageTag: afdef20d-71b2-43d0-bbb6-7be770abd7e6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_custos_diretos_simulado_ACU = ```
+			
+			VAR vimpostos_deduc =
+			[receita_bruta_simulado_acu] - [receita_liquida_simulado_ACU]
+			VAR vcustos = [custo_simulado_ACU]
+			
+			RETURN
+			
+			vimpostos_deduc + 
+			vcustos
+			```
+		lineageTag: 57892415-2f66-48c8-a9dd-c3c79d62f17b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_lucro_de_cx_oper_simulado_ACU =
+			
+			[receita_bruta_simulado_acu] -
+			 [cfs_custos_diretos_simulado_ACU] -
+			 [gastos_gerais-deprec_simulado_ACU]
+		formatString: #,0
+		lineageTag: be9159a7-e60b-45d1-8460-72e451777478
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'lucro de caixa'
+		dataType: string
+		lineageTag: 668941dd-327b-4cb3-b8a7-97d999a01110
+		summarizeBy: none
+		sourceColumn: lucro de caixa
+		sortByColumn: ordem_lc
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_lc
+		dataType: string
+		lineageTag: 499dbfa3-403d-4550-8d1a-220509e57e87
+		summarizeBy: none
+		sourceColumn: ordem_lc
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: cbe9309a-bd3f-4e18-8c49-a7dee67ad936
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition lucro_de_caixa = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCkpNTs0sSVTSUTIEYm2lWJ1oJefS4pL8YgWXzKJUIA0UNgJiXbCUb2JRemquglNRKViPMRDbgiUUgCwTuDL3RLAJ7qlFiZnFChrFQC0pqQVFqcmZiYeXH16cr4mi2qc0uSgfqEDBOTGzIlHBvwCoLTkzPy8xB6jEFGJFLAA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"lucro de caixa" = _t, ordem_lc = _t, sinal = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

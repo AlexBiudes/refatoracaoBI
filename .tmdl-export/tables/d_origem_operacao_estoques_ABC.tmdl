@@ -1,0 +1,90 @@
+table d_origem_operacao_estoques_ABC
+	lineageTag: 149f4549-3976-408c-b0f7-a4cce9a38b0e
+
+	column CNPJ
+		dataType: string
+		lineageTag: 00e15e9a-b357-4a00-b756-b54954dbb6b7
+		summarizeBy: none
+		sourceColumn: CNPJ
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Origem Operação'
+		dataType: string
+		lineageTag: 47a1ced1-88d5-45c9-996e-d9b71dbef475
+		summarizeBy: none
+		sourceColumn: Origem Operação
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_origem
+		dataType: string
+		lineageTag: c6b39a8a-9ef9-479b-a504-af9ca450ff91
+		summarizeBy: none
+		sourceColumn: chave_origem
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_primaria
+		dataType: string
+		lineageTag: ee32b0e8-66d9-4dd2-a59a-a33e31424c8d
+		summarizeBy: none
+		sourceColumn: chave_primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: 12f1e076-6706-4186-b02b-52dc0bd968d6
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_origem_operacao_estoques_ABC = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    balancetenew_Table = BI_tratado_Schema{[Name="Viz_Ranking_Estoque_d_Origem_op",Kind="Table"]}[Data],
+				    #"Colunas Renomeadas" = Table.RenameColumns(balancetenew_Table,{{"cnpj", "CNPJ"}, {"origem_operacao", "Origem Operação"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas",".","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído2",{{"Origem Operação", Text.Upper, type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Texto em Maiúscula", each ([Origem Operação] <> "NAN")),
+				    #"Valor Substituído19" = Table.ReplaceValue(#"Linhas Filtradas","OPERAÇÕES","OPERACOES",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Texto em Maiúscula","ACESSÓRIOS ORIGINAIS","ACESSORIOS GENUINOS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","ACESSORIOS GENUINOS/ORIGINAIS","ACESSORIOS GENUINOS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5","ACESSÓRIOS ORIGINAIS","ACESSORIOS ORIGINAIS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6","OUTROS PRODUTOS E PECAS","OUTROS PRODUTOS E PEÇAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Valor Substituído7","PEÇAS - GENUINAS","PEÇAS GENUINAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído9" = Table.ReplaceValue(#"Valor Substituído8","PECAS GENUINAS/ORIGINAIS","PEÇAS GENUINAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído10" = Table.ReplaceValue(#"Valor Substituído9","PEÇAS ORIGINAIS","PEÇAS GENUINAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído11" = Table.ReplaceValue(#"Valor Substituído10","ACESSÓRIOS OUTRAS MARCAS","ACESSORIOS OUTRAS MARCAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído12" = Table.ReplaceValue(#"Valor Substituído11","VEÍCULOS USADOS","VEICULOS USADOS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído13" = Table.ReplaceValue(#"Valor Substituído12","VEÍCULOS NOVOS","VEICULOS USADOS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído14" = Table.ReplaceValue(#"Valor Substituído13","OUTROS PRODUTOS PECAS","OUTROS PRODUTOS E PEÇAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído15" = Table.ReplaceValue(#"Valor Substituído14","OUTROS PRODUTOS PEÇAS","OUTROS PRODUTOS E PEÇAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído16" = Table.ReplaceValue(#"Valor Substituído15","ACESSORIOS E OUTRAS MARCAS","ACESSORIOS OUTRAS MARCAS",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído17" = Table.ReplaceValue(#"Valor Substituído16","GERAL","OUTRAS OPERAÇÕES",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Valor Substituído17", each ([Origem Operação] <> "NAN") and ([CNPJ] <> "66871000108")),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Linhas Filtradas1", "Personalizar", each [CNPJ] & " " & [Origem Operação]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"Personalizar", type text}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Tipo Alterado","NOVOS ","NOVOS",Replacer.ReplaceText,{"Personalizar"}),
+				    #"Valor Substituído18" = Table.ReplaceValue(#"Valor Substituído3","USADOS ","USADOS",Replacer.ReplaceText,{"Personalizar"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído18", {"Personalizar"}),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Duplicatas Removidas",{{"Personalizar", "chave_primaria"}}),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"Colunas Renomeadas1", "tipo_relatorio", each "estoque_abc"),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada1",{{"tipo_relatorio", type text}}),
+				    #"Linhas Filtradas2" = Table.SelectRows(#"Tipo Alterado1", each ([chave_primaria] <> null)),
+				    #"Valor Substituído20" = Table.ReplaceValue(#"Linhas Filtradas2","-"," - ",Replacer.ReplaceText,{"Origem Operação"})
+				in
+				    #"Valor Substituído20"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

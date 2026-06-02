@@ -1,0 +1,26 @@
+table simulador_preco
+	lineageTag: b449b694-363f-4e22-aaaa-52ddab8ed554
+
+	measure 'Valor Preço' = SELECTEDVALUE('simulador_preco'[Preço], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: 4fe8c4c9-1463-4e0f-b903-82bc72c25b25
+
+	column Preço
+		formatString: 0%;-0%;0%
+		lineageTag: 124d5ae5-9d8c-468d-a7a4-39cacb443aeb
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_preco = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 2aa8aa0599d1474f965a21bcd4a4a7b7
+

@@ -1,0 +1,26 @@
+table simulador_desp_gerais_acumulado
+	lineageTag: 86bd0420-30ff-4218-a60c-001b9b1d6d6d
+
+	measure 'Valor simulador_desp_gerais_acumulado' = SELECTEDVALUE('simulador_desp_gerais_acumulado'[simulador_desp_gerais_acumulado], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: d416ff8a-18d1-430c-91bc-51ecdc0a7fd5
+
+	column simulador_desp_gerais_acumulado
+		formatString: 0%;-0%;0%
+		lineageTag: 9eadfc05-45ca-4ec8-b790-b4854aab1770
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_desp_gerais_acumulado = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 81e82dabb21a4e1e992266c9f16e594c
+

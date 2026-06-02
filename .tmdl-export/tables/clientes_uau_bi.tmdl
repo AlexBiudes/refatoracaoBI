@@ -1,0 +1,90 @@
+table clientes_uau_bi
+	lineageTag: 19e94c09-5a98-4c77-aa32-d891850fc875
+
+	column grupo
+		dataType: string
+		lineageTag: 033d6a3f-5809-496b-9125-507e7f8f7a7c
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: d918db55-d405-45e5-b398-9bf6b56e488a
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 857bd900-51d6-41cc-a3b3-d326fb12a81f
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column estabelecimento
+		dataType: string
+		lineageTag: a707e425-6807-4545-b66e-e6172fc82c95
+		summarizeBy: none
+		sourceColumn: estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_analise
+		dataType: string
+		lineageTag: 67c82923-1e3f-4d43-aaad-ed13a023c4be
+		summarizeBy: none
+		sourceColumn: tipo_analise
+
+		annotation SummarizationSetBy = Automatic
+
+	column gerente
+		dataType: string
+		lineageTag: 3ccfc6eb-286d-46ae-a5bb-bd24d77d23b1
+		summarizeBy: none
+		sourceColumn: gerente
+
+		annotation SummarizationSetBy = Automatic
+
+	column coordenador_supervisor
+		dataType: string
+		lineageTag: e6370673-9915-45e6-b7cf-49b12c94dbc4
+		summarizeBy: none
+		sourceColumn: coordenador_supervisor
+
+		annotation SummarizationSetBy = Automatic
+
+	column filtro
+		dataType: string
+		lineageTag: 7142d4a7-b2b0-4abb-b354-42765b947b29
+		summarizeBy: none
+		sourceColumn: filtro
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_normalizado
+		dataType: string
+		lineageTag: 54dca1bb-c919-4414-b43b-d0cbba254b60
+		summarizeBy: none
+		sourceColumn: cnpj_normalizado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition clientes_uau_bi = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_QA",Kind="Schema"]}[Data],
+				    clientes_uau_bi_View = BI_QA_Schema{[Name="clientes_uau_bi",Kind="View"]}[Data]
+				in
+				    clientes_uau_bi_View
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navegação
+

@@ -1,0 +1,143 @@
+table 'metadados medidas'
+	lineageTag: eedc79fa-19d7-40b2-85c0-d4d17011b478
+
+	column ID
+		formatString: 0
+		lineageTag: 00c97206-d0bb-4f72-ac3d-f59b55a2c0ce
+		summarizeBy: count
+		isNameInferred
+		sourceColumn: [ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		lineageTag: c9b84c47-c359-4f8c-9836-cd4cef2fb094
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Table
+		lineageTag: 869f2f03-f1e2-47c9-b55a-9708f6b654a6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Table]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		lineageTag: 32a42100-c344-460f-81da-3d110cdee450
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Description]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataType
+		lineageTag: e5283e66-04b0-440c-b304-7bd28f5e3a83
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DataType]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Expression
+		lineageTag: 7019c14a-1aba-4fc0-94e9-845f7821c8f4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Expression]
+
+		annotation SummarizationSetBy = Automatic
+
+	column FormatString
+		lineageTag: 7b62106c-50a6-465f-b0dc-c98c9fc5d256
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FormatString]
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ae2b22d1-7739-4e7b-8665-97a8c06c596d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsHidden]
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		lineageTag: f881e85f-ce2e-43ed-bfc9-3e339eafc162
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [State]
+
+		annotation SummarizationSetBy = Automatic
+
+	column KPIID
+		formatString: 0
+		lineageTag: 7668fdfd-7ee6-47d2-a2fc-8384ddeb0ea0
+		summarizeBy: count
+		isNameInferred
+		sourceColumn: [KPIID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsSimpleMeasure
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 598963b6-e544-4e1d-8922-fba0e7d6885f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsSimpleMeasure]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DisplayFolder
+		lineageTag: fd128c9d-d369-4127-8ae5-055bcd7b3cc8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DisplayFolder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DetailRowsDefinition
+		lineageTag: 896b46fa-80b3-4025-9d89-70c0cf3a42a7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DetailRowsDefinition]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataCategory
+		lineageTag: 91f9a20a-41df-46bd-9fb7-45d7936fed8b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DataCategory]
+
+		annotation SummarizationSetBy = Automatic
+
+	column FormatStringDefinition
+		lineageTag: 950ae0e7-0c2d-432f-8a54-3e20d50fd049
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FormatStringDefinition]
+
+		annotation SummarizationSetBy = Automatic
+
+	column LineageTag
+		lineageTag: 3aab8cc7-d612-46ea-b20c-2b3ca4abf9d1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [LineageTag]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'metadados medidas' = calculated
+		mode: import
+		source =
+				
+				INFO.VIEW.MEASURES()
+
+	annotation PBI_Id = 34c3d60c699947fe8cad6e7c068f2242
+

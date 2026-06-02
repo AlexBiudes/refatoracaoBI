@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | Canal de Vendas | `Canal[Descricao]` | Dim_Canal | Segmentador (Lista) | Não | Filtra Varejo, Atacado, E-commerce |
 | Categoria Produto | `Produto[Categoria]` | Dim_Produto | Segmentador (Dropdown) | Não | Filtra grupos de produtos |
-| Período | `Calendario[Mes-Ano]` | Dim_Calendario | Filtro superior | Sim | Seleção de intervalo temporal |
+| Período | `Calendario[Mes-Ano]` | dCalendario | Filtro superior | Sim | Seleção de intervalo temporal |
 
 ## Segmentadores
 - O canal de vendas é selecionado por meio de caixas de seleção na lateral.

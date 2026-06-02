@@ -1,0 +1,57 @@
+table despesas_controladas_mcd_COPIA
+	lineageTag: 46fc7f3d-3590-44dc-a265-dbc24d1af050
+
+	column classificacao
+		dataType: string
+		lineageTag: eb8b3e6b-85ff-4c44-9d27-771806ffcb12
+		summarizeBy: none
+		sourceColumn: classificacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: 795ab28f-4ac2-45f2-82b2-1dced9485e08
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column estabelecimento
+		dataType: string
+		lineageTag: edc99edd-ab9b-4c28-8543-c63290fd0574
+		summarizeBy: none
+		sourceColumn: estabelecimento
+
+		annotation SummarizationSetBy = Automatic
+
+	column sigla_filial
+		dataType: string
+		lineageTag: 76fd9465-b536-4450-8ea3-6a70ce35b8f7
+		summarizeBy: none
+		sourceColumn: sigla_filial
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: int64
+		formatString: 0
+		lineageTag: e3b16670-b606-4acd-818a-ed47536bc01e
+		summarizeBy: sum
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	partition despesas_controladas_mcd_COPIA = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-planning-367317"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_QA",Kind="Schema"]}[Data],
+				    despesas_controladas_mcd_COPIA_Table = BI_QA_Schema{[Name="despesas_controladas_mcd_COPIA",Kind="Table"]}[Data]
+				in
+				    despesas_controladas_mcd_COPIA_Table
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,9 @@
+role 'R3 REQUINTE'
+	modelPermission: read
+
+	tablePermission d_clientes_time = [cnpj] == "10641901000116"
+
+	tablePermission balancetenew = [cnpj] == "10641901000116"
+
+	annotation PBI_Id = 4d5120cbe319403d848e5739ea4e73c9
+

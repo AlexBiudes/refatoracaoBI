@@ -1,0 +1,26 @@
+table simulador_qtd_acumulado
+	lineageTag: 38c4113a-c71e-4eed-9c8a-01d5f675e255
+
+	measure 'Valor simulador_qtd_acumulado' = SELECTEDVALUE('simulador_qtd_acumulado'[simulador_qtd_acumulado], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: e370b2ba-2bd8-4d7b-a83d-181721071048
+
+	column simulador_qtd_acumulado
+		formatString: 0%;-0%;0%
+		lineageTag: b7b00b03-be7e-42f1-ac30-e4c46a8fe26e
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_qtd_acumulado = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = af2b01a04d7f4b06bc23cee948d1c943
+

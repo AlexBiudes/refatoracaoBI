@@ -1,0 +1,91 @@
+table VIZ_DIMENSAO_ORIGEM_OPERACAO
+	lineageTag: 9cd56773-5ae0-4d59-9ad6-91cecac14ff4
+
+	column origem_operacao
+		dataType: string
+		lineageTag: 3d455cbf-b94c-4efb-a972-d24637f27dd2
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 302706f4-6998-46c6-887e-1d94526a2502
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column Chave_Primaria
+		dataType: string
+		lineageTag: 15b43de5-efd5-47dd-ae0b-d7e48dbdd14e
+		summarizeBy: none
+		sourceColumn: Chave_Primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: d6d8ab2b-341f-45e6-b814-7ecd7d4197a4
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_relatorio
+		dataType: string
+		lineageTag: 779a8359-c653-4dcc-9f4f-4aeda8aae02b
+		summarizeBy: none
+		sourceColumn: chave_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition VIZ_DIMENSAO_ORIGEM_OPERACAO = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    VIZ_DIMENSAO_ORIGEM_OPERACAO_View = BI_QA_Schema{[Name="VIZ_DIMENSAO_ORIGEM_OPERACAO",Kind="View"]}[Data],
+				    #"Texto em Maiúscula" = Table.TransformColumns(VIZ_DIMENSAO_ORIGEM_OPERACAO_View,{{"origem_operacao", Text.Upper, type text}, {"Chave_Primaria", Text.Upper, type text}}),
+				    #"Valor Substituído9" = Table.ReplaceValue(#"Texto em Maiúscula","Í","I",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Valor Substituído9",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído2", each true),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Linhas Filtradas", each ([origem_operacao] <> null)),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Linhas Filtradas1", "chave_relatorio", each [Chave_Primaria] & " " & [tipo_relatorio]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_relatorio", type text}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Tipo Alterado",".","",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído3","/","",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","-","",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5",".","",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6","/","",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Valor Substituído7","-","",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído12" = Table.ReplaceValue(#"Valor Substituído8","  "," ",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído13" = Table.ReplaceValue(#"Valor Substituído12","09534517000135","9534517000135",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído14" = Table.ReplaceValue(#"Valor Substituído13","9534517000135","09534517000135",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído15" = Table.ReplaceValue(#"Valor Substituído14","00066871","66871",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído16" = Table.ReplaceValue(#"Valor Substituído15","66871","00066871",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído17" = Table.ReplaceValue(#"Valor Substituído16","09534517000135","9534517000135",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído18" = Table.ReplaceValue(#"Valor Substituído17","9534517000135","09534517000135",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Valor Substituído19" = Table.ReplaceValue(#"Valor Substituído18","00066871","66871",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído20" = Table.ReplaceValue(#"Valor Substituído19","66871","00066871",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído21" = Table.ReplaceValue(#"Valor Substituído20","09534517000135","9534517000135",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído22" = Table.ReplaceValue(#"Valor Substituído21","9534517000135","09534517000135",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído10" = Table.ReplaceValue(#"Valor Substituído22","00066871","66871",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído11" = Table.ReplaceValue(#"Valor Substituído10","66871","00066871",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído23" = Table.ReplaceValue(#"Valor Substituído11","095345170001350","09534517000135",Replacer.ReplaceText,{"cnpj"}),
+				    #"Linhas Filtradas2" = Table.SelectRows(#"Valor Substituído23", each ([origem_operacao] <> "NAN")),
+				    #"Valor Substituído24" = Table.ReplaceValue(#"Linhas Filtradas2","Í","I",Replacer.ReplaceText,{"chave_relatorio"}),
+				    #"Valor Substituído25" = Table.ReplaceValue(#"Valor Substituído24","Í","I",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído25", {"chave_relatorio"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

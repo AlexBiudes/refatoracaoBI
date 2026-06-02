@@ -1,0 +1,270 @@
+table F_Aging_List_Contas_Receber
+	lineageTag: 770e0f45-a166-42e0-b0ab-5281fde7f7e4
+
+	measure soma_aging_contas_receber =
+			
+			SUM(F_Aging_List_Contas_Receber[valor])
+		formatString: #,0
+		lineageTag: 0e2fe311-70c4-4174-b018-9e46ca15767f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure volumetria_aging_contas_receber =
+			
+			IF(NOT(ISBLANK([soma_aging_contas_receber])), "🟢", "🔴")
+		lineageTag: bb24b760-abbc-41d1-ad93-dada99ecd7c6
+
+	column empresa_filial
+		dataType: string
+		lineageTag: e895551c-2c04-4d37-88d7-10892492a722
+		summarizeBy: none
+		sourceColumn: empresa_filial
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: c2b2351b-3c52-43f4-9ad0-139cc136a5bd
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column nome_cliente_fornecedor
+		dataType: string
+		lineageTag: 96df7cc0-61ed-405d-b85d-b1710b08a5e4
+		summarizeBy: none
+		sourceColumn: nome_cliente_fornecedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_titulo
+		dataType: string
+		lineageTag: 6167c0b2-321f-4439-b4f7-bde3a21072d8
+		summarizeBy: none
+		sourceColumn: tipo_titulo
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_emissao
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4a197b31-21c6-4549-9ce4-db272b2b320b
+		summarizeBy: none
+		sourceColumn: data_emissao
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column data_vencimento
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 50e8e582-d5d4-4fa1-a357-c36cdf49f685
+		summarizeBy: none
+		sourceColumn: data_vencimento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column data_pagamento
+		dataType: string
+		lineageTag: 5eb1dffc-cfcc-4b75-aba2-77f2ca302fef
+		summarizeBy: none
+		sourceColumn: data_pagamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: double
+		lineageTag: 548620a1-7ad2-4045-ad00-c7e85b564094
+		summarizeBy: sum
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column valor_pago
+		dataType: double
+		lineageTag: 553573f2-f9b6-46ca-8564-3081785ea08d
+		summarizeBy: sum
+		sourceColumn: valor_pago
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column valor_pendente
+		dataType: double
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 70f808b7-d407-4055-9aa0-ce60ed12a8c3
+		summarizeBy: sum
+		sourceColumn: valor_pendente
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column data_base
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 2214d20f-519f-4dcd-b5f7-b38cdc9280b4
+		summarizeBy: none
+		sourceColumn: data_base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column origem_operacao
+		dataType: string
+		lineageTag: 2242a259-c280-444b-9fd3-c8ca8b36741a
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column diferença_data_base = ```
+			// Calcula a diferença de dias entre a data de vencimento e a data base.
+			
+			DATEDIFF(
+			    F_Aging_List_Contas_Receber[data_vencimento], 
+			    F_Aging_List_Contas_Receber[data_base], 
+			    DAY
+			)
+			```
+		formatString: 0
+		lineageTag: ed0f131f-3cc5-46f0-8f07-f527ca89f637
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status_data_base = ```
+			// Determina se o título está vencido ou a vencer com base na diferença de dias.
+			IF(
+			    F_Aging_List_Contas_Receber[diferença_data_base] > 0, 
+			    "Vencido", 
+			    "A Vencer"
+			)
+			```
+		lineageTag: 70adab90-ae46-4009-942f-97fca8b4145f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria_atraso_data_base = ```
+			// Classifica o título em uma das categorias da tabela de dimensões "d_aging_list_dbase".
+			var diferenca = DATEDIFF(
+			                            F_Aging_List_Contas_Receber[data_vencimento], F_Aging_List_Contas_Receber[data_base], DAY
+			                        )   
+			RETURN
+			IF(F_Aging_List_Contas_Receber[Status_data_base] = "Vencido",
+			  IF(diferenca <= 30, "Vencidos de 0 a 30 dias",
+			        IF(diferenca <= 60, "Vencidos de 31 a 60 dias",
+			            IF(diferenca <= 90, "Vencidos de 61 a 90 dias",
+			                IF(diferenca <= 120, "Vencidos de 91 a 120 dias",
+			                    IF(diferenca <= 180, "Vencidos de 121 a 180 dias",
+			                        IF(diferenca <= 360, "Vencidos de 181 a 360 dias",
+			                            IF(diferenca > 360, "Vencidos acima de 360 dias"
+			                            )
+			                        )
+			                    )
+			                )
+			            )
+			        )
+			    ), "A Vencer"
+			)
+			
+			```
+		lineageTag: 9777abc8-18b9-4616-8b56-8ec0b877a21d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Chave Primária'
+		dataType: string
+		lineageTag: dc36c105-770f-48c2-a964-ed21fdbc86d5
+		summarizeBy: none
+		sourceColumn: Chave Primária
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_secundaria
+		dataType: string
+		lineageTag: 0ab3a975-ab57-4896-a6cf-517c2cdb89d9
+		summarizeBy: none
+		sourceColumn: chave_secundaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: 60a80749-2c07-421d-a44b-b2eaaa566abf
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_operacao
+		dataType: string
+		lineageTag: a7679aff-8ac1-42ff-9c67-7662f639bc4d
+		summarizeBy: none
+		sourceColumn: chave_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column uaid
+		dataType: string
+		lineageTag: 72790ed8-c883-4c6f-ac34-0cf63a7301a7
+		summarizeBy: none
+		sourceColumn: uaid
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Aging_List_Contas_Receber = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Aging_List_Contas_Receber_Table = BI_tratado_Schema{[Name="Aging_List_Contas_Receber",Kind="Table"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Aging_List_Contas_Receber_Table,{{"data_base", type date}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído2", each true),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Linhas Filtradas",null,0,Replacer.ReplaceValue,{"valor"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6",null,0,Replacer.ReplaceValue,{"valor_pago"}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Valor Substituído7","002702496000170","02702496000170",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído9" = Table.ReplaceValue(#"Valor Substituído8","nan","Geral",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Valor Substituído9", each true),
+				    #"Valor Substituído10" = Table.ReplaceValue(#"Linhas Filtradas1","00066871000","66871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído11" = Table.ReplaceValue(#"Valor Substituído10","66871000","00066871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Coluna Mesclada Inserida" = Table.AddColumn(#"Valor Substituído11", "Chave Primária", each Text.Combine({[cnpj], " ", [origem_operacao]}), type text),
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"Coluna Mesclada Inserida", "data_base", "data_base - Copiar"),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Coluna Duplicada",{{"data_base - Copiar", type text}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado2", "chave_secundaria", each [cnpj] & [nome_cliente_fornecedor] & [numero_titulo] & [#"data_base - Copiar"]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_secundaria", type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado1",{"grupo", "empresa", "numero_titulo", "data_base - Copiar"}),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"Colunas Removidas", "tipo_relatorio", each "aging_contas_receber"),
+				    #"Tipo Alterado3" = Table.TransformColumnTypes(#"Personalização Adicionada1",{{"tipo_relatorio", type text}}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Tipo Alterado3",{{"Chave Primária", Text.Upper, type text}}),
+				    #"Personalização Adicionada2" = Table.AddColumn(#"Texto em Maiúscula", "chave_operacao", each [Chave Primária] & " " & [tipo_relatorio]),
+				    #"Tipo Alterado4" = Table.TransformColumnTypes(#"Personalização Adicionada2",{{"chave_operacao", type text}}),
+				    #"Texto em Maiúscula1" = Table.TransformColumns(#"Tipo Alterado4",{{"origem_operacao", Text.Upper, type text}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Texto em Maiúscula1","Í","I",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Valor Substituído3"," 00:00:00","",Replacer.ReplaceText,{"data_emissao"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4"," 00:00:00","",Replacer.ReplaceText,{"data_vencimento"}),
+				    #"Tipo Alterado5" = Table.TransformColumnTypes(#"Valor Substituído5",{{"data_emissao", type date}, {"data_vencimento", type date}}),
+				    #"Valor Substituído12" = Table.ReplaceValue(#"Tipo Alterado5"," ","_",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído13" = Table.ReplaceValue(#"Valor Substituído12"," ","",Replacer.ReplaceText,{"Chave Primária"})
+				in
+				    #"Valor Substituído13"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

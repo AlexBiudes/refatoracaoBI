@@ -1,0 +1,80 @@
+expression Parâmetro1 = #"Arquivo de Amostra" meta [IsParameterQuery=true, BinaryIdentifier=#"Arquivo de Amostra", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 8e580f9e-466d-4063-8056-39e9cfe47388
+	queryGroup: 'Transformar Arquivo de Consulta1\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar o Arquivo de Exemplo' =
+		let
+		    Fonte = Excel.Workbook(Parâmetro1, null, true),
+		    Múltiplos_Sheet = Fonte{[Item="Múltiplos",Kind="Sheet"]}[Data]
+		in
+		    Múltiplos_Sheet
+	lineageTag: b6586b69-814c-47c8-b4a6-592ea7442b96
+	queryGroup: 'Transformar Arquivo de Consulta1'
+
+	annotation PBI_ResultType = Table
+
+expression 'Arquivo de Amostra' =
+		let
+		    Fonte = SharePoint.Files("https://planningassessoriaetributos.sharepoint.com/sites/BIPerformance", [ApiVersion = 15]),
+		    #"Linhas Superiores Removidas" = Table.Skip(Fonte,1),
+		    Navegação1 = #"Linhas Superiores Removidas"{0}[Content]
+		in
+		    Navegação1
+	lineageTag: 43e9808b-4498-4a7d-bc4e-3035b898609a
+	queryGroup: 'Transformar Arquivo de Consulta1\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar Arquivo' =
+		let
+		    Fonte = (Parâmetro1 as binary) => let
+		    Fonte = Excel.Workbook(Parâmetro1, null, true),
+		    Múltiplos_Sheet = Fonte{[Item="Múltiplos",Kind="Sheet"]}[Data]
+		in
+		    Múltiplos_Sheet
+		in
+		    Fonte
+	lineageTag: 268bcdcd-36ef-4736-8c55-74df7257a29e
+	queryGroup: 'Transformar Arquivo de Consulta1\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression VIZ_BALANCETE_AUTO_BI_UAU =
+		/*let
+		    Fonte = GoogleBigQuery.Database(),
+		    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+		    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_QA",Kind="Schema"]}[Data],
+		    VIZ_BALANCETE_AUTO_BI_UAU_View = BI_QA_Schema{[Name="VIZ_BALANCETE_AUTO_BI_UAU",Kind="View"]}[Data]
+		in
+		    VIZ_BALANCETE_AUTO_BI_UAU_View*/
+		
+		let
+		    Fonte = Value.NativeQuery(GoogleBigQuery.Database(){[Name="bi-performance"]}[Data], "SELECT * FROM bi-performance.BI_QA.VIZ_BALANCETE_AUTO_COMPLETA_UAU_NEW", null, [EnableFolding=true]),
+		    #"Colunas Removidas" = Table.RemoveColumns(Fonte,{"chave"}),
+		    #"Tipo Alterado" = Table.TransformColumnTypes(#"Colunas Removidas",{{"data", type date}}),
+		    #"Colunas Removidas1" = Table.RemoveColumns(#"Tipo Alterado",{"is_delete"})
+		
+		in #"Colunas Removidas1"
+	lineageTag: a2948d18-953a-46be-b78f-0111ea6c6e8b
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
+expression VIZ_VALIDACAO_BALANCETE_DEPARA_UAU =
+		let
+		    Fonte = GoogleBigQuery.Database(),
+		    #"bi-performance_Database" = Fonte{[Name="bi-performance",Kind="Database"]}[Data],
+		    BI_PROD_Schema = #"bi-performance_Database"{[Name="BI_PROD",Kind="Schema"]}[Data],
+		    VIZ_VALIDACAO_BALANCETE_DEPARA_UAU_View = BI_PROD_Schema{[Name="VIZ_VALIDACAO_BALANCETE_DEPARA_UAU",Kind="View"]}[Data],
+		    #"Tipo Alterado" = Table.TransformColumnTypes(VIZ_VALIDACAO_BALANCETE_DEPARA_UAU_View,{{"data_base", type date}})
+		in
+		    #"Tipo Alterado"
+	lineageTag: ba0fc7d5-d655-4a4d-a89f-2ad45c934165
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

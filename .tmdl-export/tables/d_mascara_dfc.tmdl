@@ -1,0 +1,66 @@
+table d_mascara_dfc
+	lineageTag: bac07566-fbf2-40d1-998f-d365ae94e4c7
+
+	column cod_dfc
+		dataType: string
+		lineageTag: aa74395c-08ed-45f6-b881-0fa5095f04be
+		summarizeBy: none
+		sourceColumn: cod_dfc
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: 209e3838-e47e-4292-b27b-b8511bfdbe74
+		summarizeBy: none
+		sourceColumn: conta
+		sortByColumn: ordem
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column classificação
+		dataType: string
+		lineageTag: 34a9fcc0-4585-4f15-92ba-2ba3ac6da569
+		summarizeBy: none
+		sourceColumn: classificação
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem
+		dataType: int64
+		formatString: 0
+		lineageTag: 5a11ea52-c7da-4fd2-946c-bf3a144025eb
+		summarizeBy: none
+		sourceColumn: ordem
+
+		annotation SummarizationSetBy = Automatic
+
+	column marcador
+		dataType: string
+		lineageTag: 35425a82-2492-4514-b5bc-1a61561ff16a
+		summarizeBy: none
+		sourceColumn: marcador
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao
+		dataType: string
+		lineageTag: e0bcb8d0-7eca-4ff3-8187-416627b2f5a2
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_mascara_dfc-e0cb88b3-5a51-427d-a3ba-0f773b7b255f = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("jVfLbuM2FP0VwdtmnEh+JFl0oSYOECCIjYwbFAgCgpbplANZdPQwgvzNoItBC2TZL/CP9T4oiRI9QRdxJN5zz70k70tPT4NwGA5OBndVkpvAVMEiV9+qw8e7CdLDx2ul1wakKUrFDkX63YhUv8Iiqv0Kf9c3V4LUhanEwsGQ8vPJ0+DyDGDxt6ooVRF8Ce4Pf5lAblQpt4EJEqnfZGB2KpeJNplMASsZKzJpBAMFwUAUwZ81WqNIJFwGNBoOR4hT4HWi5eEHGlWB3Jq81O/8DvJ1I5f4OmrZa0mCPpR6byzrGPfisgRrExy+v2jUl/xvzDShKtCpXMjEZKVKVG45JiBsDro4pdMrApnRT6lybXJVAAZ+q7SUa/AgqbZVKuk2Jq2TrNmcetHiCmtqCsiHmiZYq2AG97KX6eGfDDYXLGSZ663JNJ17a08xSiFI7AgE8mlrueEUMxfq8rUOzKsS3IQHQw/1zcHCOTNGPzmpjvMUQXwErXXZLl44AdkCGq0mEh9lXgfEWhbBFViEf63nGh3bgzMJSez2G8llewiP8cMiXorlfBnfEX80xPj85fRLzSqDB9jNCvZzMrB0ebMQnnlUrCZqJeYcWc54rSE85FZlJZ2m7L2HocfXVUG6Y1zB3aJPJ9IdMkafMwpQZB/Hlvd2uzMFUtLOK7pVEGm7jLtvFsORx37r45h/+gk/u++bsHsY/w8r7UbOraEZAF4rClLVPoYTj6wBsv6F1b/GkC4kZ3SidxJijQpOsRPdpXDqcdbKInaQzH9p+W9MnkGUrG2p2HRfw3OPs6PAXBSASDZf5foFc+JfqNBlLlcy/VND2lDOkiwxUGl7kvDCMzJvwUsXbO2Fx+3pVVUevkNWevZQIq0g9DOvY67FWmt1Li5kjp0nVyk3CD72Ha2K3mrk5ySrQ046QGuhzkwscG0pwbL6QhFuaL0tJLwa+XnKBHX6s7q1Me7aMKshGCAqjntrg46NTXDcR37uHrHSBj6FNpWuVENyK1sVEvtmSf2UreEOU52si9zsh0yzg0dL4ecj4nRhOhx1HsbQe4fBtc6H2L1+L6jNYj8Wa52Lit4jJytjkgEeOrhAOPGB8IoGjTs71cAcMu/MHDxFwNgiurNINHXaCnGIOwDNe+MGdZabtHrDeaAIbrM9VA3dlOYNSoTurUZOlpKu6Ooh8YhaSgxOF9omDJzDSmUFDh7Ql1Y6hVFkbU413Gr2cvjYK5qhSINSwwGhUSdr4+Xt/ePsK1bEBiJ+y6vSWNt4V/29eLu4PEZ4ZCOTZhRoz6d054I+88gm4/j4eDA6dqt9b9t79djDozfre9672xudSRx2epe76S+Pov7t9jSRe9xMDLPtLj/8jZZJW8Grat5GTt5d/XFzex/fi5mDYCoEcX8eQoXIZbCpygrmelltKXsSudMlT9gbmSDt2KeN1yVMTRX5CMfCGsxPsy9LMPiuGjpLLAqT8CQ5mvjEFi6+Mogp65igyuY0BVvievWNSj3ST316W9yoJTgVdEyjwzW0IWwQ2s59KqBvGurILBLNwujcJ2/08XOAp25mPxaCXoC0MegHiTu1tkF4JFIm9KHGxjLI/OzwAfUH70G9qTzht8aYznR9FU56kqzA4Z6fGhgbiFwD6Gr6M3oSYmaefULOIKIedMZue1aSg4g/7HDgxhOqP/TGbnb2qQfPz/8B", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [cod_dfc = _t, conta = _t, classificação = _t, ordem = _t, marcador = _t, descricao = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

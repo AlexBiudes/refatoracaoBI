@@ -4,10 +4,10 @@
 
 | Filtro | Campo | Tabela | Tipo | Obrigatório | Observações |
 |---|---|---|---|---|---|
-| Ano | `Calendario[Ano]` | Dim_Calendario | Segmentador (Lista) | Sim | Filtro de ano fiscal |
-| Mês | `Calendario[Mes_Nome]` | Dim_Calendario | Segmentador (Lista) | Não | Filtro de seleção múltipla de meses |
-| Empresa | `Empresa[Nome_Empresa]` | Dim_Empresa | Segmentador (Dropdown) | Não | Filtro para seleção de subsidiárias |
-| Centro de Custo | `CentroCusto[Cod_Nome]` | Dim_CentroCusto | Filtro lateral | Não | Filtro de apoio técnico |
+| Ano | `dCalendario[Ano]` | dCalendario | Segmentador (Lista) | Sim | Filtro de ano fiscal |
+| Mês | `dCalendario[Mês]` | dCalendario | Segmentador (Lista) | Não | Filtro de seleção múltipla de meses |
+| Empresa | `balancetenew[Origem_Operacao]` | d_Plano_Depara (Origem_Operacao) | Segmentador (Dropdown) | Não | Filtro para seleção de subsidiárias |
+| Centro de Custo | `CentroCusto[Cod_Nome]` | N/A | Filtro lateral | Não | Filtro de apoio técnico |
 
 ## Segmentadores
 - O ano é selecionado através de uma caixa de seleção horizontal.

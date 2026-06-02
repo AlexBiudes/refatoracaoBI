@@ -1,0 +1,21 @@
+table d_Lucratividade
+	lineageTag: 89cf38aa-df88-454b-b669-650bf129d68f
+
+	column Lucratividade
+		dataType: string
+		lineageTag: 53e67487-1cf5-4f74-83ad-93fec5dcc437
+		summarizeBy: none
+		sourceColumn: Lucratividade
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_Lucratividade = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCkpNTs0sSVSK1YGzFVTBPN/EovTUXAWnolKoNLIAVI17YnFJfrGCe2pRYmYxpghUlU9pclG+gn8BUCw5Mz8vMQe7KFS1q5NniIsjkhKfw2sLSzNT8rEIgbTEAgA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Lucratividade = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

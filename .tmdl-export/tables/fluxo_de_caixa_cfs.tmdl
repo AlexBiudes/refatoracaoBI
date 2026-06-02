@@ -1,0 +1,270 @@
+table fluxo_de_caixa_cfs
+	lineageTag: 0dc243d5-c417-496b-ae80-7e6a011b17c5
+
+	measure switch_cfs_fluxo_de_caixa =
+			
+			SWITCH(
+			    SELECTEDVALUE(fluxo_de_caixa_cfs[Fluxo de Caixa]),
+			"Caixa Oriundo dos Clientes", [cfs_caixa_clientes],
+			"Caixa Para Fornecedores", [cfs_caixa_fornecedores] *-1,
+			"Lucro Bruto de Caixa", [cfs_lucro_bruto_de_caixa],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec]
+			//"Fluxo de Caixa Operacional", [cfs_fluxo_caixa_operac]
+			)
+		formatString: #,0
+		lineageTag: 8bcefba8-f290-4102-801d-80399bdf799b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_caixa_clientes = ```
+			
+			VAR vvariacao_caixa =
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			        balancetenew[vlr])
+			
+			VAR vcaixa_receita = [MReceita_bruta] + vvariacao_caixa
+			
+			RETURN
+			vcaixa_receita
+			
+			
+			```
+		formatString: #,0
+		lineageTag: 9652702f-4a8c-4bbd-84b2-364a6ae9e1ab
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_caixa_fornecedores = ```
+			
+			VAR vfornecedores =
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores"),
+			        balancetenew[vlr])
+			
+			VAR vestoque =
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DFC_VARPAT_Estoques"),
+			    balancetenew[vlr]
+			)
+			
+			VAR v_variacao_fornec =
+			vfornecedores 
+			//+ vestoque
+			
+			RETURN
+			[cfs_custos_diretos] - v_variacao_fornec
+			```
+		lineageTag: 42d6c31c-5598-4da4-a2d8-0116f6abca22
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_lucro_bruto_de_caixa =
+			
+			[cfs_caixa_clientes] - [cfs_caixa_fornecedores]
+		lineageTag: ed872bc9-067a-45d0-9785-62e01c314456
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_fluxo_caixa_operac =
+			
+			[cfs_lucro_bruto_de_caixa] - [gastos_gerais$]
+		formatString: #,0
+		lineageTag: 04a0811e-3ce6-4c66-ad14-2de753fdfc83
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure gastos_gerais-deprec = ```
+			
+			VAR vdiferenca_margem_lucro =
+			[MMargem_bruta_actual_month] - [rresultado_operacional] + [Ebitda_despesa_depreciacao]
+			 
+			RETURN
+			vdiferenca_margem_lucro
+			```
+		lineageTag: 27418646-75b1-4a5a-9cc9-900d1f942517
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure gastos_gerais-deprec_simulado = ```
+			
+			VAR vdiferenca_margem_lucro =
+			[lucro_bruto_simulado] - [ebitda_simulado] + [Ebitda_despesa_depreciacao]
+			 
+			RETURN
+			vdiferenca_margem_lucro
+			```
+		lineageTag: 0e377841-3c58-4b7e-a3ea-627093b79a02
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure switch_cfs_fluxo_de_caixa_simulado =
+			
+			SWITCH(
+			    SELECTEDVALUE(fluxo_de_caixa_cfs[Fluxo de Caixa]),
+			"Caixa Oriundo dos Clientes", [cfs_caixa_clientes_simulado],
+			"Caixa Para Fornecedores", [cfs_caixa_fornecedores_simulado] *-1,
+			"Lucro Bruto de Caixa", [cfs_lucro_bruto_de_caixa_simulado],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec_simulado]
+			//"Fluxo de Caixa Operacional", [cfs_fluxo_caixa_operac]
+			)
+		formatString: #,0
+		lineageTag: 692dfc9d-c122-4823-a0d8-38d28d4fc919
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_caixa_clientes_simulado = ```
+			
+			VAR vvariacao_caixa =
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			        balancetenew[vlr])
+			
+			VAR vcaixa_receita = [receita_bruta_simulado]
+			
+			RETURN
+			vcaixa_receita + medidas_simulador[dfc_contas_receber_actual_month]
+			
+			
+			```
+		lineageTag: 3886a090-8747-45c6-ba8f-6673328f3547
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_caixa_fornecedores_simulado =
+			
+			[cfs_custos_diretos_simulado] - [dfc_contas_pagar_actual_month]
+		lineageTag: 75f7d7e1-adb2-47c0-8646-9a35a0f242e2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_lucro_bruto_de_caixa_simulado =
+			
+			[cfs_caixa_clientes_simulado] - [cfs_caixa_fornecedores_simulado]
+		formatString: #,0
+		lineageTag: 53aad3a9-7bf0-4a72-8d61-15ed99d6f27a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_fluxo_caixa_operac_simulado =
+			
+			[cfs_lucro_bruto_de_caixa_simulado] - [gastos_gerais-deprec_simulado]
+		formatString: #,0
+		lineageTag: d6214d00-602c-4603-a300-409353a60995
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure gastos_gerais-deprec_simulado_ACU = ```
+			
+			VAR vdiferenca_margem_lucro =
+			[lucro_bruto_simulado_ACU] - [ebitda_simulado_ACU] + [Ebitda_despesa_depreciacao_ACU]
+			 
+			RETURN
+			vdiferenca_margem_lucro
+			```
+		lineageTag: 5a8050c2-96a7-47e8-9774-4685d71616f8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure switch_cfs_fluxo_de_caixa_simulado_ACU =
+			
+			SWITCH(
+			    SELECTEDVALUE(fluxo_de_caixa_cfs[Fluxo de Caixa]),
+			"Caixa Oriundo dos Clientes", [cfs_caixa_clientes_simulado_ACU],
+			"Caixa Para Fornecedores", [cfs_caixa_fornecedores_simulado_ACU] *-1,
+			"Lucro Bruto de Caixa", [cfs_lucro_bruto_de_caixa_simulado_ACU],
+			"Gastos Gerais (sem depreciação)", [gastos_gerais-deprec_simulado_ACU]
+			//"Fluxo de Caixa Operacional", [cfs_fluxo_caixa_operac]
+			)
+		formatString: #,0
+		lineageTag: 17cd50ca-49d8-45bc-84a1-190d26f4f6c6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_caixa_clientes_simulado_ACU =
+			
+			VAR vvariacao_caixa =
+			CALCULATE(
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			        balancetenew[vlr]),
+			        DATESYTD(dCalendario[data]))
+			
+			VAR vcaixa_receita = [receita_bruta_simulado_acu]
+			
+			RETURN
+			vcaixa_receita + medidas_simulador[dfc_contas_receber_ACU]
+		lineageTag: 4ec36cfd-d919-4fcd-98f5-9be2b0c8fa51
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_caixa_fornecedores_simulado_ACU =
+			
+			[cfs_custos_diretos_simulado_ACU] - [dfc_contas_pagar_ACU]
+		lineageTag: 43dd56f3-3065-41a6-b920-505a4e1f1a49
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_lucro_bruto_de_caixa_simulado_ACU =
+			
+			[cfs_caixa_clientes_simulado_ACU] - [cfs_caixa_fornecedores_simulado_ACU]
+		lineageTag: 0bdf97db-aa22-4bd5-b7f1-0b441801f88b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_fluxo_caixa_operac_simulado_ACU =
+			
+			[cfs_lucro_bruto_de_caixa_simulado_ACU] - [gastos_gerais-deprec_simulado_ACU]
+		formatString: #,0
+		lineageTag: be1eaf9f-b825-40de-bc86-3b71c9119b1a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Fluxo de Caixa'
+		dataType: string
+		lineageTag: f69d320f-7543-4f53-82ee-055dc6eb8b81
+		summarizeBy: none
+		sourceColumn: Fluxo de Caixa
+		sortByColumn: ordem_fluxo_cx
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_fluxo_cx
+		dataType: int64
+		formatString: 0
+		lineageTag: 921d83d5-bc7f-48a2-ad6d-7aa84a730cbf
+		summarizeBy: sum
+		sourceColumn: ordem_fluxo_cx
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: d5d1cd0c-8ffd-4b60-9c3d-ceecab0e5c77
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fluxo_de_caixa_cfs = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("RY09DsIwDEavYmUCUYbyM7JQqV2Qyl51sBIPkUpcOYnU+zBwkF4MKwgY3uT3PQ+DadAvCL34HByD4wjN5CkkiqYytbIzY/XV7igILUsgS46lOAdlX5xbtsJwlZw0RFAmejwqlyJ0GJM+6EjQR9hEeqg3C1mP62t98lbN0y/XTnn5h6CfdWY9B5xUOX+i4xs=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Fluxo de Caixa" = _t, ordem_fluxo_cx = _t, sinal = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem_fluxo_cx", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

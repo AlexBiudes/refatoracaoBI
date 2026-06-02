@@ -1,0 +1,52 @@
+table d_mascara_ebitda
+	lineageTag: efdfb626-2e60-4a83-83f9-19a8aab47504
+
+	column descricao
+		dataType: string
+		lineageTag: 9ce59f18-9c18-4684-9b6f-0782f2ede02a
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'nível 1'
+		dataType: string
+		lineageTag: a3fe1bfd-988b-4b0e-beb9-4b9c27098655
+		summarizeBy: none
+		sourceColumn: nível 1
+		sortByColumn: ordem_ebitda
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_ebitda
+		dataType: int64
+		formatString: 0
+		lineageTag: bb972edd-4830-429a-800a-da4768c5e34f
+		summarizeBy: none
+		sourceColumn: ordem_ebitda
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: 4e4cc91d-b638-4082-93b3-e4440b7261b1
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_mascara_ebitda = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45Wcglyjffxj0/MK0ktji8C4rTMvMS85NTMonwlHaWg1OLSnJLElHwF/4LUosTkzPy8xByguCEQa9hqKsXqQExISS0oSk3OTEzOTy0GSWlrKrhAhQ4vP7w4XyFVwTE3v6gkswrCB6oxAmK4/tSkzJKURIihCq5OniEujgpBKkC+MZpFuYlF6am5WNWrArkmMOWxAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [descricao = _t, #"nível 1" = _t, ordem_ebitda = _t, sinal = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem_ebitda", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

@@ -1,0 +1,57 @@
+table 'Resultado Financeiro'
+	lineageTag: bf8bc4b5-ea24-43ec-a3be-645cfdf6dc9f
+
+	measure SelectedTipoResultado = SELECTEDVALUE('Resultado Financeiro'[Tipo Resultado])
+		lineageTag: 529715a5-baeb-41b6-8a82-5146a09fb6ab
+
+	measure FraseTipoResultado =
+			
+			VAR TipoResultadoSelecionado = SELECTEDVALUE('Resultado Financeiro'[Tipo Resultado], "Em Branco")
+			RETURN
+			SWITCH(
+			    TipoResultadoSelecionado,
+			    "Despesa Financeira", "<div style='text-align:left;'>As principais contas e operações que compõem o saldo de <br><b>Despesa Financeira</b></div>",
+			    "Receita Financeira", "<div style='text-align:left;'>As principais contas e operações que compõem o saldo de <br><b>Receita Financeira</b></div>",
+			    "Em Branco", "<div style='text-align:left;'>As principais contas e operações que compõem o saldo do <br><b>Resultado Financeiro</b></div>",
+			    "<div style='text-align:left;'>As principais contas e operações que compõem o saldo de <br><b>" & TipoResultadoSelecionado & "</b></div>"
+			)
+		lineageTag: 1eee8bf8-82a8-492f-bbe4-35171e296577
+
+	measure tipo_resultado_card =
+			
+			IF(NOT(ISBLANK([SelectedTipoResultado])), [SelectedTipoResultado], "Resultado Financeiro")
+		lineageTag: 1a512447-8bf1-4199-b406-7964e45b718d
+
+	measure HTMLFraseTipoResultado = ```
+			
+			"<div style='text-align:left;'>" & [FraseTipoResultado] & "</div>"
+			
+			```
+		lineageTag: d963613c-c9d8-46d1-91b4-513bcb12eb20
+
+	column Query
+		dataType: string
+		lineageTag: 1653267c-a25b-4247-824e-118044e50b6e
+		summarizeBy: none
+		sourceColumn: Query
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo Resultado'
+		dataType: string
+		lineageTag: 4c478541-2bef-4f3e-a561-f0c5ce5f8f1d
+		summarizeBy: none
+		sourceColumn: Tipo Resultado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resultado Financeiro' = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WcglyjXdJLS5ILU6MT8vMS8xLTs0sSlTSUYIKFiu4wUWLlWJ1IDqCUoECJWg6oIJoOmIB", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Query = _t, #"Tipo Resultado" = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

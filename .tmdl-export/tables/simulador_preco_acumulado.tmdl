@@ -1,0 +1,26 @@
+table simulador_preco_acumulado
+	lineageTag: 7b8a666f-8639-4c1e-af1a-5b346e05e756
+
+	measure 'Valor simulador_preco_acumulado' = SELECTEDVALUE('simulador_preco_acumulado'[simulador_preco_acumulado], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: a5e83991-76b6-4516-88c6-1423892af01e
+
+	column simulador_preco_acumulado
+		formatString: 0%;-0%;0%
+		lineageTag: 70e052f4-084a-4ae4-bff2-79fca0fad5c8
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_preco_acumulado = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 47da5ad8e316419d9a3d7c4025a48f13
+

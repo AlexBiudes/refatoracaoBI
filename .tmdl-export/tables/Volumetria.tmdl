@@ -1,0 +1,54 @@
+table Volumetria
+	lineageTag: 538b0383-7f47-4afd-be9f-e01eeec75c02
+
+	column Volumetria
+		lineageTag: b8de6d79-d0ce-4de4-a03b-0f85e3c93ceb
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Volumetria Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'Volumetria Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Volumetria Campos'
+		isHidden
+		lineageTag: 3a104db2-3d31-4bee-b5ea-0a41caedadee
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Volumetria Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Volumetria Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 1d46ab8c-ccc1-4e9b-851a-096fca7727a6
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Volumetria = calculated
+		mode: import
+		source =
+				{
+				    ("Aging Adto. de Clientes", NAMEOF('F_Aging_List_Adiantamentos_Clientes'[Aging Adto Clientes Volumetria]), 0),
+				    ("Aging Adto a Fornecedores", NAMEOF('F_Aging_List_Adiantamentos_Fornecedores'[volumetria_aging_adto_forn]), 1),
+				    ("Aging Contas a Pagar", NAMEOF('F_Aging_List_Contas_Pagar'[volumetria_aging_contas_pagar]), 2),
+				    ("Aging Contas a Receber", NAMEOF('F_Aging_List_Contas_Receber'[volumetria_aging_contas_receber]), 3),
+				    ("Receitas detalhadas", NAMEOF('medidas_receitas_open'[volumetria_receitas_open]), 4),
+				    ("Balancete", NAMEOF('Medidas_balancetenew'[volumetria_balancetenew]), 5),
+				    ("Estoque ABC", NAMEOF('medidas_estoque_ABC'[volumetria_estoque_abc]), 6),
+				    ("Custos Detalhados", NAMEOF('Relatorio_Custos'[volumetria_custos_open]), 7)
+				}
+
+	annotation PBI_Id = 6aa6a52811394749a5ad644a1dfed4cf
+

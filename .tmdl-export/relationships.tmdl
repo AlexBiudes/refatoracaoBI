@@ -1,0 +1,283 @@
+relationship c6c7ba46-f8c5-45bf-b965-1f28b002d358
+	fromColumn: balancetenew.Query
+	toColumn: d_mascara_ativo_BL.descricao
+
+relationship 1606e29f-4d4e-4449-874b-2fab5b289b09
+	fromColumn: balancetenew.Query
+	toColumn: d_mascara_dfc.descricao
+
+relationship 00a7a208-68ac-4c2d-9e31-4b0a1c49ddbf
+	fromColumn: balancetenew.Query
+	toColumn: d_plano_dre.descricao
+
+relationship 67a6cb60-4237-424c-bf46-ddb5a31607f4
+	fromColumn: F_Aging_List_Contas_Receber.categoria_atraso_data_base
+	toColumn: 'd_aging List_dbase'.atributo
+
+relationship d2171f76-8455-402b-abc1-5f958cc93d5b
+	fromColumn: d_clientes_time.grupo
+	toColumn: dlogo_cliente.grupo
+
+relationship ee2d543b-2dde-4cbb-8ea5-cbc6a7256ee1
+	fromColumn: F_Aging_List_Contas_Pagar.categoria_atraso_data_base
+	toColumn: 'd_aging List_dbase'.atributo
+
+relationship cc203233-5d27-4e1e-a994-83320e380b91
+	fromColumn: F_analise_especialistas.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship fdc4f33d-ac3a-4cfd-9b52-9c1e52c63b2d
+	fromColumn: d_clientes_time.gerente
+	toColumn: dcolaboradores.colaborador
+
+relationship 84137534-c15f-45c6-8578-f66bb27242d3
+	fromColumn: balancetenew.Query
+	toColumn: d_mascara_ebitda.descricao
+
+relationship ea2bb094-753e-47e6-ab87-cf7fd133289e
+	fromColumn: d_plano_dre.'nível 1'
+	toColumn: d_mascara_DRE.'NÍVEL 1'
+
+relationship 35b86b47-25dd-4e1c-b726-b969a9723996
+	fromColumn: d_contas_analise_espec.Query
+	toColumn: d_grupo_contas_analise_espec.Query
+
+relationship 5c6d1277-7fcf-440b-a396-af16b03eea70
+	fromColumn: balancetenew.Query
+	toColumn: d_mascara_passivo_pl_teste.descricao
+
+relationship bdc65720-0548-4d49-91d5-82ed919f7e0e
+	fromColumn: Valuation.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 9f13e594-046e-44fb-8b0c-15533fd563fd
+	fromColumn: F_Aging_List_Adiantamentos_Clientes.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 6fe36af5-716b-45f2-a1cd-2d59318b3b74
+	fromColumn: F_Aging_List_Adiantamentos_Fornecedores.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship ab05d67c-4cca-403e-b7aa-fb1c8e60f5a5
+	crossFilteringBehavior: bothDirections
+	fromColumn: Relatorio_Custos.chave_produto
+	toColumn: d_produtos_custos.chave_produto
+
+relationship 7fda7eac-f868-4942-ab26-8fd7388f4335
+	crossFilteringBehavior: bothDirections
+	fromColumn: d_produtos_custos.chave_grupo
+	toColumn: d_grupo_de_produtos_custos.chave_grupo
+
+relationship 0166f348-f459-4c42-9cd3-9d2b3f933c86
+	fromColumn: F_Aging_List_Contas_Receber.'Chave Primária'
+	toColumn: d_origem_operacao_aging.'Chave Primária'
+
+relationship b520c171-bc4f-45eb-bf44-dc581998652d
+	fromColumn: F_Aging_List_Contas_Pagar.'Chave Primária'
+	toColumn: d_origem_operacao_aging.'Chave Primária'
+
+relationship 59a1ecd2-8131-4f37-9a5a-09a1f166dd25
+	fromColumn: F_Aging_List_Adiantamentos_Fornecedores.'Chave Primária'
+	toColumn: d_origem_operacao_aging.'Chave Primária'
+
+relationship 04a35ff6-d15f-4f89-ae27-cb6e83fc889e
+	fromColumn: F_Aging_List_Adiantamentos_Clientes.'Chave Primária'
+	toColumn: d_origem_operacao_aging.'Chave Primária'
+
+relationship ac70cb86-2eef-46fc-9431-d53011725d36
+	fromColumn: F_Aging_List_Contas_Receber.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 8480b5c0-0b53-4337-b8c5-9de70e2de180
+	fromColumn: F_Aging_List_Contas_Pagar.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 6f26f5bc-c1fe-4f7d-8b9b-bb1926161c48
+	fromColumn: F_estoques_ABC.CNPJ
+	toColumn: d_clientes_time.cnpj
+
+relationship a9947eaf-55dc-4101-b0b7-c15fed90c34c
+	fromColumn: VIZ_DIMENSAO_ORIGEM_OPERACAO.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship bff05231-4ee5-4218-ae70-26a56ae55aac
+	fromColumn: F_Aging_List_Adiantamentos_Fornecedores.categoria_atraso_data_base
+	toColumn: d_aging_list_adto.atributo
+
+relationship a285b98d-abed-4dc8-8f2e-0dbca14e2565
+	fromColumn: F_Aging_List_Adiantamentos_Clientes.categoria_atraso_data_base
+	toColumn: d_aging_list_adto.atributo
+
+relationship 018061ec-285f-4d39-8990-7fae67a86177
+	fromColumn: F_estoques_ABC.tipo_ranking
+	toColumn: d_estoque_analise.tipo_ranking
+
+relationship 29388e07-f1a4-4f93-83f2-41d979bf520c
+	fromColumn: F_estoques_ABC.chave_produto
+	toColumn: d_produtos_estoques_ABC.chave_produto
+
+relationship 3f263c0f-ec87-4fe2-81d8-ef674dec866a
+	fromColumn: f_receitas_open.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 0cf031e7-65a6-4707-833e-15d1147c21db
+	fromColumn: f_receitas_open.chave_cliente
+	toColumn: d_clientes_receitas_open.cnpj_nome_concatenado
+
+relationship 35fc1eea-abe8-4e76-8887-b5ab65e1395c
+	fromColumn: F_estoques_ABC.ABC
+	toColumn: d_classe_abc.Classe
+
+relationship 1b6ebe1c-d7be-4436-ae47-0503b54042d8
+	fromColumn: F_analise_especialistas.ID
+	toColumn: d_contas_analise_espec.ID
+
+relationship acc642d4-34fb-40cd-b9d1-a1ec3d1fc302
+	crossFilteringBehavior: bothDirections
+	fromColumn: balancetenew.cnpj
+	toColumn: d_lojas_mcd.cnpj
+
+relationship fdc960a7-e970-4ee4-9de5-eedf1e57a585
+	fromColumn: f_receitas_open.cnpj
+	toColumn: d_lojas_mcd.cnpj
+
+relationship 99c088ea-8ff1-43bd-8ac6-fa9235e989be
+	fromColumn: Relatorio_Custos.cnpj
+	toColumn: d_lojas_mcd.cnpj
+
+relationship 7fff5325-8d9d-4fe6-9ae3-a39dceee92e0
+	fromColumn: F_Aging_List_Contas_Pagar.cnpj
+	toColumn: d_lojas_mcd.cnpj
+
+relationship 57454dcd-a7f2-419a-89d5-769ca1c2c04c
+	fromColumn: balancetenew.descricao_cliente
+	toColumn: despesas_controladas_MCD.descricao_cliente
+
+relationship b12c58fa-73f6-4ad3-8c00-02fc4dc936f6
+	fromColumn: F_Despesas_McD.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship dc7fe123-4ae9-4d8a-bc2d-0c52f1bca781
+	crossFilteringBehavior: bothDirections
+	fromColumn: F_Despesas_McD.chave_desp
+	toColumn: despesas_nao_controladas_mcd.chave_desp
+
+relationship 522d3a06-66e8-4364-b51a-43a3eb82cd73
+	crossFilteringBehavior: bothDirections
+	fromColumn: F_Despesas_McD.chave_desp
+	toColumn: 'despesas_controladas_mcd (2)'.chave_desp
+
+relationship cc828209-3189-c490-96ba-1e9bd2a3859a
+	fromColumn: balancetenew.Query
+	toColumn: 'Resultado Financeiro'.Query
+
+relationship 8c2a2909-07cb-3f9c-12d8-4e7711c45264
+	fromColumn: balancetenew.Query
+	toColumn: d_mascara_passivo_bl.descricao
+
+relationship e311fe96-2cfd-f08a-c3d5-521582601647
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: analise_sg&a_mes.'analise_sga_mes Pedido'
+	toColumn: analises_sga.num
+
+relationship c5007217-d375-4c8e-83e6-d4c5e995dc6e
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: analise_sg&a_LM.'analise_sg&a_LM Pedido'
+	toColumn: analises_sga.num
+
+relationship 0d76d4ab-ec26-23cc-d973-a35eef62484e
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: despesas_sg&a.'despesas_sg&a Pedido'
+	toColumn: analises_sga.num
+
+relationship e003e232-eb26-4125-1af4-f6422fbd709f
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: analise_sg&a_ACU.'ana_sg&a_ACU Pedido'
+	toColumn: analises_sga.num
+
+relationship 280062b7-17f4-49c5-9510-423d46f3dc75
+	fromColumn: balancetenew.data
+	toColumn: dCalendario.data
+
+relationship 75f9427c-ef93-4033-a58a-81733794408b
+	fromColumn: F_Aging_List_Contas_Receber.data_base
+	toColumn: dCalendario.data
+
+relationship b85f3c14-7558-41db-b4a7-aebe72dcffae
+	fromColumn: F_Aging_List_Contas_Pagar.data_base
+	toColumn: dCalendario.data
+
+relationship 464473d7-4417-49ab-9ecf-871ab933171c
+	fromColumn: F_analise_especialistas.periodo
+	toColumn: dCalendario.data
+
+relationship 4d1b3422-10ce-4025-8acd-45bc99dbe0d9
+	fromColumn: F_estoques_ABC.'Data Base'
+	toColumn: dCalendario.data
+
+relationship c34f3d34-b78b-4a68-b67d-e740e06578de
+	fromColumn: Valuation.data
+	toColumn: dCalendario.data
+
+relationship 44c44016-62ab-4798-90f4-d7d476e052d9
+	fromColumn: F_Aging_List_Adiantamentos_Fornecedores.data_base
+	toColumn: dCalendario.data
+
+relationship 521c035e-9322-45cc-9098-ca853ebbf8f8
+	fromColumn: F_Aging_List_Adiantamentos_Clientes.data_base
+	toColumn: dCalendario.data
+
+relationship 6cbaacd5-425e-4e28-b702-442bee2aeb38
+	fromColumn: f_receitas_open.data_base
+	toColumn: dCalendario.data
+
+relationship a6f937fa-aba2-4bf4-887c-5baa3a82afe0
+	fromColumn: F_Despesas_McD.data
+	toColumn: dCalendario.data
+
+relationship 03078643-c12d-19dc-0d25-447be6539213
+	crossFilteringBehavior: bothDirections
+	fromColumn: VIZ_VALIDACAO_BALANCETE_DEPARA.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship 3cf6fd8b-1516-e23b-ec6d-506fbfac4907
+	fromColumn: VIZ_VALIDACAO_BALANCETE_DEPARA.data_base
+	toColumn: dCalendario.data
+
+relationship 6f156b25-c6de-9434-d275-fae7317978d0
+	fromColumn: D_ROIC.query
+	toColumn: d_plano_dre.descricao
+
+relationship c8168938-e932-6e27-68b9-6869819c3340
+	fromColumn: D_ROIC.nome
+	toColumn: estrutura_roic.nome
+
+relationship 15a2fe28-8f01-c4d0-2199-8d282f738d29
+	fromColumn: Relatorio_Custos.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship be8014d6-77fc-a354-9945-55c5d979a624
+	fromColumn: balancetenew.cnpj
+	toColumn: d_clientes_time.cnpj
+
+relationship b6140286-bc29-7b02-5591-93491459804a
+	fromColumn: balancetenew.chave_primaria
+	toColumn: d_Plano_Depara.chave_primaria
+
+relationship 7b8d5b6d-579c-7430-a9c9-6099ade14306
+	fromColumn: Relatorio_Custos.data_base
+	toColumn: dCalendario.data
+
+relationship c7568926-4134-685c-2236-34c0f8249136
+	fromColumn: F_Aging_List_Contas_Pagar.'Chave Primária'
+	toColumn: d_origem_operacao_geral.Chave_Primaria
+
+relationship 6dcafcb8-5071-1b20-8be9-9d4133ca0a21
+	crossFilteringBehavior: bothDirections
+	fromColumn: F_Aging_List_Contas_Receber.'Chave Primária'
+	toColumn: d_origem_operacao_geral.Chave_Primaria
+

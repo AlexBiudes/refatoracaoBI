@@ -1,0 +1,30 @@
+table circulo_resultado
+	lineageTag: d3e6d4f9-2b09-4ceb-9c9a-34be87f2bdc5
+
+	column circulo
+		dataType: string
+		lineageTag: a1aa2cda-033f-463b-8035-b91482813dc0
+		summarizeBy: none
+		sourceColumn: circulo
+
+		annotation SummarizationSetBy = Automatic
+
+	column url
+		dataType: string
+		lineageTag: b0f7502f-a32e-41bc-9409-95d9614e7d9b
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: url
+
+		annotation SummarizationSetBy = Automatic
+
+	partition circulo_resultado = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WSs4sSi7NyVcoSy3KTc3JyFfSUcooKSkottLXz9TLTErSS87XDzBNNnELcdKHqtWFqdUryEtXitWBGgI2IyUVmwGmhlHuTuEB+gE5iXl5mXnpuu5Bjm6ewb7+wbqORSVJ+YlFKbqGBrpB7k4QI2MB", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [circulo = _t, url = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

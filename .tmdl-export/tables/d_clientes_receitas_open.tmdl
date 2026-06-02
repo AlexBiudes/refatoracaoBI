@@ -1,0 +1,49 @@
+table d_clientes_receitas_open
+	lineageTag: 97df6642-41c3-4570-bd67-b578db462d31
+
+	column nome_cliente
+		dataType: string
+		lineageTag: e1820bd2-fd9d-49ec-b2f1-ce1e72443432
+		summarizeBy: none
+		sourceColumn: nome_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_nome_concatenado
+		dataType: string
+		lineageTag: 0711169a-b1e2-4e56-8a79-489729515368
+		summarizeBy: none
+		sourceColumn: cnpj_nome_concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj_cliente
+		dataType: string
+		lineageTag: a7696916-dad2-4caa-9fa6-876eff69a419
+		summarizeBy: none
+		sourceColumn: cnpj_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_clientes_receitas_open = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    balancetenew_Table = BI_tratado_Schema{[Name="VIZ_D_CLIENTES_RECEITAS_OPEN",Kind="Table"]}[Data],
+				    #"Texto em Maiúscula" = Table.TransformColumns(balancetenew_Table,{{"nome_cliente", Text.Upper, type text}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Texto em Maiúscula","  "," ",Replacer.ReplaceText,{"nome_cliente"}),
+				    #"Texto em Maiúscula1" = Table.TransformColumns(#"Valor Substituído",{{"cnpj_nome_concatenado", Text.Upper, type text}}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Texto em Maiúscula1"," ","",Replacer.ReplaceText,{"cnpj_nome_concatenado"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído1", {"cnpj_nome_concatenado"}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Duplicatas Removidas",{{"cnpj_cliente_limpo", "cnpj_cliente"}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Colunas Renomeadas", each [cnpj_nome_concatenado] <> null and [cnpj_nome_concatenado] <> "")
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

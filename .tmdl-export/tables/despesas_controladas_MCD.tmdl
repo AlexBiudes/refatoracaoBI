@@ -1,0 +1,29 @@
+table despesas_controladas_MCD
+	lineageTag: f1a91dd7-666f-4d04-b191-62021bc0beb9
+
+	column Classificação
+		dataType: string
+		lineageTag: 91cebfaa-2f16-4ea2-bca3-ad35a8d75dd9
+		summarizeBy: none
+		sourceColumn: Classificação
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_cliente
+		dataType: string
+		lineageTag: 192cf2eb-a447-410f-9444-7ced70ff33ae
+		summarizeBy: none
+		sourceColumn: descricao_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition despesas_controladas_MCD = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("pVhLkuM2DL2Kyqvuqul4KovsYQqSmZYINT+enunMMXKCLOZgfbE8UpIt2xItJYup8ogAiM/DA9gfH7uSXceOXKHEeCsNleR2X3ZPL8+FslxqLziptHEFNaEO3BT8FnRHLRsvu59fPnY4C624Qjq2pLQY0gsWZiWjieB1o0uCL/OKbl+wYVtrKrhhb7WipKek1c59/iOLaq2Cprdc9worou30/wo1qm+PM2ptDXLQuYkwGF2Jbc834K4Yq+BHcTm7c4bqgGsLdrUMsS6kakwNzJ1Yq9Agzq7JZYecY+fEahxxu5ycA6nXQqpKK4bW9H9X7uDiljxbTckJhGeRDViPSnLQhtxmhWWnJggYLJng2SiK2upI3XDbtEj9b5JYHc9V8VIosp5SCYbibdIp+bBOBdWVMit3kqCObFeEJm1nr5KHMvNbYbkjC/l2lQ1TM3AjllF5qFZW18gvPtxBVSHtx9vKXSNv+Fyo/bk/O22KjsoVWvFzG/8dgvP6BN0zelMfeEr4HJC8xpZl+C+8WicWX0wZkJtRxbE96c9fciuHbgYqL7SzwvRJU43mWulLZ/kBOc0y0UKDc5bzshC5OhwwtXTLVBQgJEQhKZ0rrnE+VFt4oZLEmM7TW0ADClh2o7aSLvYMTuBDydaQkoF4FwKsLHs+59EAJttyie7yuEnHtq1041Oj0Ry3HrnpYnSvADFCDJaMB5DdtztUHsXARmoNKk+iyGv449bKgZNuEZnLmwbnxFER0xaZITTJ5EwEl8Ah6kIn1keeLKhrANYREwttMFHOkUA22S2AkSYHDjDbTihdrrZDyDrJg0PF6Tsnc5mZP3gweKdKDXLLP2i5TR/ZGIhA/rsFtGsr6XsDXLRkX9lrU2d1MSzVWILFi6dAlOD7sTUkdWko3sphqCg5oBFUUqLyO5utSkDZic0I2A2KjiqLTeJ7DrR3Ji6nqwB7q58n2yi9JeWQSZ+UDJ4RqEhWkBZ2isAGB+Ni0cUFSR641wGLgt1in3hO3B77TyNm2d+Evc9ffTV6IKL7G/kz+yyAayhSmtyk36l46v76++vX3/9onrdo5WcytiLWk51guhRZCeN+OU34OdNkkdoTkgX6k32pazDY/WZxFk+bBRmX2BKUdxgWwSVhLGTgRyt5IUHOm0hHNLfW3IjGwBNRY7msc6ElcYs9KA0DD/apLVUzk2eqMZLcBYFZ8TZEFkb/sRp2yCXJDjiiWrs2b9DCkEVYe+Cw6wdM5Ot30JyPS3BW2XEdEiP0TNJDRGyaaipOxdWFfSn6VQIXW1rWarGlAKsocEzB5An5WPry5pzQa7bPL3YymIO8jXuD0dhK7kj0LBbRgKFiSp0uu/InxxoOA7vRP+J6AKbwcSfrq3begVbEAde4HfSG90xcnmZ2lHEtwW2YYZ0Ux2/3e7an92RMN6GFe4kIwqEZN+5rWcRdieEYsOAJsyiBVqzAPDPnESXDazA+LNdxdPzlYGWUtVau/xBwvZrP+FXPrqFDQRN8WRlpBC+O7PtFV2yjVz09AOWrpcu0cwEsLQZtlo8lHO7f2g/bIJIpQJlv8Ral8b/1qxR+IvSnQrd4uBlXxEctgfeL58cmsGr3yI/ckLRw789/AQ==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Classificação = _t, descricao_cliente = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

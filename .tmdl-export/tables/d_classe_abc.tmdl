@@ -1,0 +1,42 @@
+table d_classe_abc
+	lineageTag: 228160ef-390d-46a4-a74e-8fc7206eab33
+
+	column Classe
+		dataType: string
+		lineageTag: a66a92de-634f-4228-a603-2eb654133f1f
+		summarizeBy: none
+		sourceColumn: Classe
+
+		annotation SummarizationSetBy = Automatic
+
+	column limite_inf
+		dataType: double
+		lineageTag: 051de7ce-26a9-4243-98fd-c6f2856c45ac
+		summarizeBy: none
+		sourceColumn: limite_inf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column limite_superior
+		dataType: double
+		lineageTag: 73339ca1-b688-4109-b6ca-9793596e1c58
+		summarizeBy: none
+		sourceColumn: limite_superior
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition d_classe_abc = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WclTSUTIAYR0LpVidaCUnKBtEWoJFnKFsHSVDpdhYAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Classe = _t, limite_inf = _t, limite_superior = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"limite_inf", type number}, {"limite_superior", type number}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

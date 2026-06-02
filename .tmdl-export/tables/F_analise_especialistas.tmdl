@@ -1,0 +1,155 @@
+table F_analise_especialistas
+	lineageTag: c128ec40-0f4b-4eee-9e91-5440cb9a1f0d
+
+	measure analise_espec_geral = ```
+			
+			VAR MesMaisRecente = MAX('dcalendario'[Data])
+			VAR GrupoSelecionado = VALUES(d_grupo_contas_analise_espec[Grupo])
+			RETURN
+			    IF(
+			        COUNTROWS(
+			            FILTER(
+			                'F_analise_especialistas',
+			                'F_analise_especialistas'[periodo] = MesMaisRecente &&
+			                F_analise_especialistas[comentario] = GrupoSelecionado
+			            )
+			        ) > 0,
+			        CONCATENATEX(
+			            FILTER(
+			                'F_analise_especialistas',
+			                'F_analise_especialistas'[periodo] = MesMaisRecente
+			            ),
+			            'F_analise_especialistas'[Comentario],
+			            ", "
+			        ),
+			        "Não há comentários para este período."
+			    )
+			
+			```
+		lineageTag: d950e6ee-6b4f-46c4-821c-249d559c6931
+
+	measure analise_espec_PASSCIR = ```
+			
+			VAR MesMaisRecente = MAX('dcalendario'[Data])
+			VAR GrupoSelecionado = FILTER(d_grupo_contas_analise_espec, d_grupo_contas_analise_espec[Grupo] = "BL_PASSCIR")
+			RETURN
+			    IF(
+			        COUNTROWS(
+			            FILTER(
+			                'F_analise_especialistas',
+			                'F_analise_especialistas'[periodo] = MesMaisRecente &&
+			                GrupoSelecionado
+			            )
+			        ) > 0,
+			        CONCATENATEX(
+			            FILTER(
+			                'F_analise_especialistas',
+			                'F_analise_especialistas'[periodo] = MesMaisRecente &&
+			                GrupoSelecionado
+			            ),
+			            'F_analise_especialistas'[Comentario],
+			            ", "
+			        ),
+			        "Não há comentários para o grupo BL_PASSCIR neste período."
+			    )
+			
+			
+			```
+		lineageTag: f8a2c526-013f-48bc-a9f6-15157144558f
+
+	column cnpj
+		dataType: string
+		lineageTag: 7a1e096d-3161-482d-a4be-b4400af46e71
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: 77d06127-d37e-41c4-b9c9-597b4cc85826
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_conta
+		dataType: string
+		lineageTag: 3ed5fd02-fc6d-4a3d-bb8c-502f4fee4c82
+		summarizeBy: none
+		sourceColumn: grupo_conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: 60c4c577-f2ba-4a30-b182-d263d14169cc
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column comentario
+		dataType: string
+		lineageTag: 0c2d38f5-a351-49d7-abdb-0cf4d6155dbf
+		summarizeBy: none
+		sourceColumn: comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	column periodo
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 75cf3782-3fa2-4251-aaf7-3bafe481494b
+		summarizeBy: none
+		sourceColumn: periodo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column query
+		dataType: string
+		lineageTag: d8c1dd80-130d-4086-b599-cb88551e44c1
+		summarizeBy: none
+		sourceColumn: query
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 1c552cd0-43c6-4213-967b-6fb6f450018f
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_analise_especialistas = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-planning-367317"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_tratado",Kind="Schema"]}[Data],
+				    Observacoes_Contas_Table = BI_tratado_Schema{[Name="Observacoes_Contas",Kind="Table"]}[Data],
+				    #"Colunas Removidas" = Table.RemoveColumns(Observacoes_Contas_Table,{"periodo_formatado"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Colunas Removidas", each ([periodo] <> null)),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Linhas Filtradas",{{"periodo", type date}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado",".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Valor Substituído2",{{"periodo", type date}}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Tipo Alterado1","","Sem Conta Selecionada",Replacer.ReplaceValue,{"conta"}),
+				    #"Coluna Duplicada" = Table.DuplicateColumn(#"Valor Substituído3", "cnpj", "cnpj - Copiar"),
+				    #"Coluna Duplicada1" = Table.DuplicateColumn(#"Coluna Duplicada", "conta", "conta - Copiar"),
+				    #"Colunas Mescladas" = Table.CombineColumns(#"Coluna Duplicada1",{"cnpj - Copiar", "conta - Copiar"},Combiner.CombineTextByDelimiter(" ", QuoteStyle.None),"ID"),
+				    #"Coluna Duplicada2" = Table.DuplicateColumn(#"Colunas Mescladas", "query", "query - Copiar"),
+				    #"Colunas Mescladas1" = Table.CombineColumns(#"Coluna Duplicada2",{"ID", "query - Copiar"},Combiner.CombineTextByDelimiter(" ", QuoteStyle.None),"ID.1"),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Colunas Mescladas1",{{"ID.1", "ID"}}),
+				    #"Texto em Minúscula" = Table.TransformColumns(#"Colunas Renomeadas",{{"comentario", Text.Lower, type text}, {"ID", Text.Lower, type text}}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Texto em Minúscula"," ","",Replacer.ReplaceText,{"ID"})
+				in
+				    #"Valor Substituído4"
+
+	annotation PBI_ResultType = Table
+

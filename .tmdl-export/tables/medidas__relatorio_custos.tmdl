@@ -1,0 +1,818 @@
+table medidas__relatorio_custos
+	lineageTag: c7054f2b-02e4-452c-b664-5349f2b468b5
+
+	measure Vendas_Mes_Atual = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			RETURN
+			CALCULATE(
+			    SUM(Relatorio_Custos[valor_total_venda]),
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre
+			)
+			
+			
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: a1c0ca7a-c892-494c-afde-c00fa7300b24
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure custo_mes_atual = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			RETURN
+			COALESCE(
+			CALCULATE(
+			    SUM(Relatorio_Custos[custo_total]),
+			    dCalendario[data] >= UltimoMesTrimestre && 
+			        dCalendario[data] <= UltimoDiaTrimestre
+			), 0)
+			
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: c3d73459-c491-47a5-b7e2-46804dd79404
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Vendas_Acumulado =
+			
+			CALCULATE(
+			    SUM(Relatorio_Custos[valor_total_venda]), DATESYTD(dCalendario[data]))
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: f423b4a8-102f-4487-a6a5-82915df2fd5b
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure custo_acumulado =
+			
+			CALCULATE(
+			    SUM(Relatorio_Custos[custo_total]), DATESYTD(dCalendario[data]))
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 1c0947e3-188e-4bb8-a0a7-b5d7ea381080
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure %margem_lucro_por_produto =
+			
+			DIVIDE(
+			    [lucro_bruto_medio_por_produto],
+			    [venda_media_por_produto_actual_month]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 4a0f5277-657a-4c12-9c9a-84fce448beab
+
+	measure lucro_bruto_medio_por_produto =
+			
+			[venda_media_por_produto_actual_month] - [custo_medio_por_produto_actual_month]
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 194f4f81-d298-46c4-9624-87820ddb2a3f
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure venda_por_produto = SUM(Relatorio_Custos[valor_unitario_venda])
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: e259ab4d-08b7-4ff9-a8c4-3cb95f654926
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure custo_por_produto =
+			
+			SUM(Relatorio_Custos[custo_unitario])
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: a443da3f-d7c5-4618-a911-b874aa9a2e37
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure ponto_de_equilibrio =
+			
+			DIVIDE(
+			    medidas__relatorio_custos[custo_por_produto],
+			medidas__relatorio_custos[%margem_lucro_por_produto]
+			)
+		lineageTag: 84f4f1b6-cedf-4384-bc94-a6c420b18371
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Ponto_de_Equilibrio_por_Produto = ```
+			
+			DIVIDE(
+			    medidas__relatorio_custos[custo_medio_por_produto_actual_month], 
+			    DIVIDE(medidas__relatorio_custos[custo_medio_por_produto_actual_month], medidas__relatorio_custos[venda_por_produto] - medidas__relatorio_custos[custo_medio_por_produto_actual_month])
+			)
+			
+			```
+		lineageTag: ed6c880d-3f8b-49ef-85b6-3fdf120cc6fd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure custo_medio_por_produto_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			    RETURN
+			COALESCE(
+			    CALCULATE(
+			    SUMX(
+			    VALUES(Relatorio_Custos[descricao_item]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[custo_total]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        )
+			    )
+			), dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			, 0)
+			
+			
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 015bd449-6ed2-402e-9d18-1a6cfaeef7f5
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure venda_media_por_produto_ACU =
+			
+			CALCULATE(
+			SUMX(
+			    VALUES(Relatorio_Custos[descricao_item]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[valor_unitario_venda]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        )
+			    )
+			), DATESYTD(dCalendario[data]))
+		lineageTag: 68e14f58-98e2-4c59-8749-bf8dc5274b9e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure custo_mes_anterior = ```
+			
+			COALESCE( 
+			CALCULATE(
+			    [custo_mes_atual], DATEADD(dCalendario[data], -1, MONTH)
+			)
+			, 0)
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 23594256-0fd0-4610-951c-f52fd9fd7c1c
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variação_custos_totais = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [custo_mes_atual] - [custo_mes_anterior],
+			            [custo_mes_anterior]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [custo_mes_atual] - [custo_mes_anterior]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#0,0B;R$ -#,#0,0B",
+			        v_variacao_din >= 1000000, "R$ #,#0,M;R$ -#,#0M",
+			        v_variacao_din >= 1000, "R$ #,#0,K;R$ -#,#0K",
+			        "R$ #,#0,0;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑",
+			        v_seta = "🡓"
+			    )
+			
+			RETURN
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			& " | " &
+			FORMAT(v_variacao_din, V_formato_moeda)
+			```
+		lineageTag: 49d939d2-780f-4477-945e-b1876bd52796
+
+	measure %custos_totais_sobre_receita_actual_month =
+			
+			DIVIDE(
+			    medidas__relatorio_custos[custo_mes_atual],
+			    medidas__relatorio_custos[Vendas_Mes_Atual]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a28c9866-a57d-4712-b31a-6ecc1e3fa46e
+
+	measure %custos|receita_MEDIA_por_produto_actual_month = ```
+			
+			
+			    DIVIDE(
+			            [custo_medio_por_produto_actual_month],
+			            [venda_media_por_produto_actual_month]
+			    )
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 119acf88-0107-4320-9d0a-4e8516379d99
+
+	measure custo_medio_por_grupo_produto =
+			
+			SUMX(
+			    VALUES(Relatorio_Custos[grupo_produto]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[custo_total]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        )
+			    )
+			)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 061df489-7477-415c-943e-1c328ff2bf2b
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure custo_medio_por_produto_LM =
+			
+			CALCULATE(
+			    [custo_medio_por_produto_actual_month], DATEADD(dCalendario[data], -1, MONTH)
+			)
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 0dc8ee34-618c-4af2-9a5d-89135b3cea35
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao_custo_medio_por_produto =
+			
+			DIVIDE(
+			    [custo_medio_por_produto_actual_month] - [custo_medio_por_produto_LM],
+			    [custo_medio_por_produto_LM]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: e9e05b98-b49b-4483-8ca6-a661f9ca16f2
+
+	measure venda_por_produto_LM =
+			
+			CALCULATE(
+			    [venda_por_produto], DATEADD(dCalendario[data], -1, MONTH))
+		lineageTag: 1554c6b7-bf0e-40b6-a170-550c0c1d079c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_venda_media_por_produto =
+			
+			DIVIDE(
+			    [venda_media_por_produto_ACU] - [venda_media_por_produto_LM],
+			    [venda_media_por_produto_LM])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a34bc1b9-5283-46e0-8eef-6a359cbdf08c
+
+	measure variacao%_custo_por_produto = ```
+			
+			CALCULATE(
+			    IF(
+			        [custo_mes_anterior] = 0,
+			        IF(
+			            [custo_mes_atual] = 0,
+			            BLANK(),
+			            1
+			        ),
+			        DIVIDE(
+			            [custo_mes_atual] - [custo_mes_anterior],
+			            [custo_mes_anterior]
+			        )
+			    )
+			)
+			
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: d694202f-d1c6-4184-abd4-d5e08cfa6122
+
+	measure venda_media_por_produto_LM =
+			
+			CALCULATE(
+			    [venda_media_por_produto_ACU], DATEADD(dCalendario[data], -1, MONTH))
+		lineageTag: c8e6822a-34b1-4da6-989f-6ed2933ad1b0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure venda_media_por_produto_actual_month =
+			
+			SUMX(
+			    VALUES(Relatorio_Custos[descricao_item]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[valor_total_venda]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        )
+			    )
+			)
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: d59c9c72-ab0f-408b-90ba-36ba6a7bf356
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure quantidade_venda = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			    RETURN
+			    CALCULATE(
+			SUM(
+			    Relatorio_Custos[quantidade]),
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: #,0
+		lineageTag: e825a9cc-d35a-4973-ad07-98a1723b5a36
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao$_custo =
+			
+			VAR vcusto =
+			[custo_mes_atual] - [custo_mes_anterior]
+			
+			RETURN
+			IF(ABS(vcusto) < 0.0001, 0, vcusto)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: b0bedcce-b661-4be3-85cc-31637b041140
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure margem_bruta$ =
+			
+			[Vendas_Mes_Atual] - medidas__relatorio_custos[custo_mes_atual]
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 0725b699-c2c3-4dbd-91e7-43ea0d521bdc
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure margem_bruta% =
+			
+			DIVIDE(
+			    [Vendas_Mes_Atual] - [custo_mes_atual],
+			    [Vendas_Mes_Atual])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c1fe18c6-e82c-4aed-a860-5a3f12d6bf84
+
+	measure margem_bruta%_mes_anterior =
+			
+			CALCULATE([margem_bruta%], DATEADD(dCalendario[data], -1, MONTH))
+		lineageTag: 3bef6ccc-92ac-41f6-aafc-1bd337bb09e1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure margem_bruta$_mes_anterior =
+			
+			CALCULATE([margem_bruta$], DATEADD(dCalendario[data], -1, MONTH))
+		lineageTag: 48ebea7f-445e-4cdc-973e-c22ed3ff604f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure vendas_mes_anterior =
+			
+			CALCULATE([Vendas_Mes_Atual], DATEADD(dCalendario[data], -1, MONTH))
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 5fae99e9-68c3-41a8-8c94-95d47187f5bd
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao$_vendas =
+			
+			[Vendas_Mes_Atual] - [vendas_mes_anterior]
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 6c45c21c-7ef7-4956-a5c4-7db2f8ac5e89
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao%_vendas =
+			
+			DIVIDE(
+			    [Vendas_Mes_Atual] - [vendas_mes_anterior],
+			    [vendas_mes_anterior])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 029c4645-0906-4cd2-9d11-a8799d982e7d
+
+	measure variacao%_custos =
+			
+			DIVIDE([custo_mes_atual] - [custo_mes_anterior],
+			[custo_mes_anterior])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 20a83fb0-a70f-4702-9296-548c0d6169b6
+
+	measure variacao%_margem =
+			
+			DIVIDE(
+			    [margem_bruta$] - [margem_bruta$_mes_anterior],
+			    [margem_bruta$_mes_anterior]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 436388a5-ed1b-4903-af44-14cadbcb9f9e
+
+	measure custo_acumuladoLY =
+			
+			CALCULATE(
+			    [custo_acumulado], DATEADD(dCalendario[data], -1, YEAR))
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: a10cce87-a013-409b-857f-dcfe7234bf3a
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao%_custo_por_produto_ACU =
+			
+			CALCULATE(
+			    IF(
+			        [custo_acumulado] = 0,
+			        IF(
+			            [custo_acumuladoLY] = 0,
+			            BLANK(),
+			            1
+			        ),
+			        DIVIDE(
+			            [custo_acumulado] - [custo_acumuladoLY],
+			            [custo_acumuladoLY]
+			        )
+			    )
+			)
+		formatString: #,0.00%;-#,0.00%;#,0.00%
+		lineageTag: 459b1eb8-0567-4888-a9bd-d21d84009c2a
+
+	measure variacao$_custo_por_produto_ACU = ```
+			
+			CALCULATE(
+			    IF(
+			        [custo_acumuladoLY] = 0,
+			        IF(
+			            [custo_acumulado] = 0,
+			            BLANK(),
+			            1
+			        ),
+			            [custo_acumulado] - [custo_acumuladoLY]
+			        
+			    )
+			)
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: b1e4e1d0-1e21-4bfd-ae9b-56dcca6d7cd0
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variação_custos_ACU_video = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [custo_acumulado] - [custo_acumuladoLY],
+			            [custo_acumuladoLY]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [custo_acumulado] - [custo_acumuladoLY]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#0,0B;R$ -#,#0,0B",
+			        v_variacao_din >= 1000000, "R$ #,#0,M;R$ -#,#0M",
+			        v_variacao_din >= 1000, "R$ #,#0,K;R$ -#,#0K",
+			        "R$ #,#0,.00;R$ -#,#0,0.00"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑",
+			        v_seta = "🡓"
+			    )
+			
+			RETURN
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			& " | " &
+			FORMAT(v_variacao_din, V_formato_moeda)
+			```
+		lineageTag: b68b5df7-d50a-455c-a7ca-533764304ba1
+
+	measure variação_custos_ACU = ```
+			
+			    CALCULATE(
+			        DIVIDE(
+			            [custo_acumulado] - [custo_acumuladoLY],
+			            [custo_acumuladoLY]
+			        )
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 96eadb1a-66e7-43c8-9eaf-8bc8da010fac
+
+	measure %custos_totais_sobre_receita_ACU =
+			
+			DIVIDE(
+			    medidas__relatorio_custos[custo_acumulado],
+			    Medidas_balancetenew[MReceita_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 35274893-11dd-4c3d-a098-3c1bca3ceba3
+
+	measure variacao_custo_ACU_video% =
+			
+			[custo_acumulado]
+		lineageTag: 6ea31b84-25e9-4493-bf9b-cf4aa12600b4
+
+		formatStringDefinition = ```
+				VAR V_variacao_reais = [custo_acumulado] - [custo_acumuladoLY]
+				VAR V_variacao = DIVIDE([custo_acumulado] - [custo_acumuladoLY], [custo_acumuladoLY])
+				VAR V_formato = 
+				SWITCH(
+				    TRUE(),
+				    V_variacao_reais >= 1000000000, "R$ #,#0,0B;R$ -#,#0,0B",
+				    V_variacao_reais >= 1000000, "R$ #,#0,M; R$ -#,#0,M",
+				    V_variacao_reais >= 1000, "R$ #,#0,K;R$ -#,#0,K",
+				    "R$ #,#0,.00;R$ -#,#0,0.00"
+				)
+				VAR V_icone = 
+				IF(V_variacao > 0, " ⇡", " ⇣")
+				RETURN
+				"""" & FORMAT(V_variacao_reais, V_formato) & " | " &
+				"""" & FORMAT(V_variacao, "0%;-0%") &
+				V_icone
+				```
+
+	measure custo_total =
+			
+			COALESCE(
+			CALCULATE(
+			    SUM(Relatorio_Custos[custo_total])
+			), 0)
+		formatString: #,0
+		lineageTag: 996f14e8-56ae-4b54-9b6f-8178eb4d8ca7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure %custos_totais|receita_bruta = ```
+			
+			VAR vreceita =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "Receita Bruta"
+			        ),
+			        balancetenew[vlr]
+			    )
+			)
+			RETURN
+			DIVIDE([custo_total], vreceita)
+			
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a6412af2-05b5-443e-b5e6-6af238968da1
+
+	measure custo_mes_atual_apagar = ```
+			
+			CALCULATE(
+			    SUMX(Relatorio_Custos,
+			        Relatorio_Custos[custo_total])
+			   )
+			
+			```
+		formatString: #,0
+		lineageTag: 99ec7fc1-d17f-4142-b413-c785dba4565d
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure custo_medio_por_produto =
+			
+			COALESCE(
+			    CALCULATE(
+			    SUMX(
+			    VALUES(Relatorio_Custos[descricao_item]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[custo_total]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[descricao_item])
+			        )
+			    )
+			)
+			)
+			,0)
+		lineageTag: e1aaad4d-aa1c-4769-9881-56a34074aae4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure %custos|receita_MEDIA_por_grupo_produto_ACU = ```
+			
+			
+			    DIVIDE(
+			            [custo_medio_por_grupo_produto],
+			            [venda_media_por_grupo_produto_ACU]
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f7223e23-510c-4eff-a06a-86f84d5d4534
+
+	measure venda_media_por_grupo_produto_ACU =
+			
+			CALCULATE(
+			SUMX(
+			    VALUES(Relatorio_Custos[grupo_produto]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[valor_unitario_venda]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        )
+			    )
+			), DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: acc448ae-ac66-468a-8156-3c045ab88117
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure custo_medio_por_grupo_produto_actual_month = ```
+			
+			/*VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			
+			CALCULATE(
+			SUMX(
+			    VALUES(Relatorio_Custos[grupo_produto]),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM('Relatorio_Custos'[custo_total]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        ),
+			        CALCULATE(
+			            SUM(Relatorio_Custos[quantidade]),
+			            ALLEXCEPT('Relatorio_Custos', 'Relatorio_Custos'[grupo_produto])
+			        )
+			    )
+			),
+			dCalendario[data] >= UltimoMesTrimestre && 
+			dCalendario[data] <= UltimoDiaTrimestre
+			)*/
+			
+			DIVIDE(
+			    [custo_mes_atual],
+			    [quantidade_venda]
+			)
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 2e00cc37-391f-434d-a020-eaa14c2d0a6e
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure custo_medio_por_grupo_produto_LM =
+			
+			CALCULATE(
+			    [custo_medio_por_grupo_produto_actual_month],
+			    DATEADD(dCalendario[data],
+			    -1,
+			    MONTH
+			    )
+			)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: fb828488-f4e3-4f04-961a-84e292929f91
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao$_custo_medio_grupo_prod_Actual_Month =
+			
+			VAR vcusto =
+			[custo_medio_por_grupo_produto_actual_month] - [custo_medio_por_grupo_produto_LM]
+			
+			RETURN
+			IF(ABS(vcusto) < 0.0001, 0, vcusto)
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 165041ef-8bf8-4dd4-8282-46bf9705107c
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao%_custo_medio_grupo_prod_Actual_Month =
+			
+			DIVIDE(
+			    [custo_mes_atual] - [custo_mes_anterior],
+			[custo_mes_anterior]
+			)
+		formatString: #,0.00%;-#,0.00%;#,0.00%
+		lineageTag: 636f675f-43c6-4414-b217-b21e451eb404
+
+	measure variacao$_custo_medio_prduto_actual_Month =
+			
+			[custo_medio_por_produto_actual_month] -
+			[custo_medio_por_produto_LM]
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 979ab60b-7cb2-42d3-93de-d008dcd72e51
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao%_custo_medio_prduto_actual_Month =
+			
+			DIVIDE(
+			[custo_medio_por_produto_actual_month] -
+			[custo_medio_por_produto_LM],
+			[custo_medio_por_produto_LM]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 2f1b5732-aea3-4bec-a5f3-fc81bc905784
+
+	column Column
+		formatString: 0
+		lineageTag: 3c7eadcf-e793-4a0a-b3a3-546f24dab32f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas__relatorio_custos = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 91ce515745ea44f1971420e83e7c2575
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

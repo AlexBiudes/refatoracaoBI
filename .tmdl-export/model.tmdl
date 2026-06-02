@@ -1,0 +1,130 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: pt-BR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup 'Transformar Arquivo de Consulta1'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transformar Arquivo de Consulta1\Consultas Auxiliares'
+
+	annotation PBI_QueryGroupOrder = 0
+
+annotation PBI_QueryOrder = ["balancetenew","VIZ_BALANCETE_AUTO_BI_UAU","d_mascara_passivo_bl","d_mascara_passivo_pl_teste","d_Plano_Depara","d_clientes_time","d_mascara_ativo_BL","d_mascara_dfc","d_mascara_DRE","d_mascara_ebitda","d_plano_dre","d_despesas_clientes","d_aging List_dbase","d_aging_list_adto","d_custos_aginglist","d_origem_operacao_aging","d_origem_operacao_estoques_ABC","d_origem_operacao_geral","VIZ_DIMENSAO_ORIGEM_OPERACAO","dcolaboradores","dlogo_cliente","F_Aging_List_Adiantamentos_Clientes","F_Aging_List_Adiantamentos_Fornecedores","F_Aging_List_Contas_Pagar","F_Aging_List_Contas_Receber","d_grupo_contas_analise_espec","d_contas_analise_espec","F_analise_especialistas","d_classe_abc","d_produtos_estoques_ABC","F_estoques_ABC","d_clientes_receitas_open","f_receitas_open","Parâmetro1","Transformar o Arquivo de Exemplo","Arquivo de Amostra","Transformar Arquivo","Valuation","Relatorio_Custos","d_grupo_de_produtos_custos","d_produtos_custos","d_estoque_analise","d_Lucratividade","VIZ_Lucratividade","d_lojas_mcd","lucro_de_caixa","lucro_de_caixa_outros","fluxo_de_caixa_cfs","fluxo_de_caixa_outros","despesas_controladas_MCD","despesas_controladas_mcd (2)","despesas_nao_controladas_mcd","F_Despesas_McD","medidas_mcd","medidas_simulador","circulo_resultado","clientes_uau_bi","Resultado Financeiro","despesas_controladas_mcd_COPIA","despesas_nao_controladas_mcd_COPIA","analises_sga","VIZ_VALIDACAO_BALANCETE_DEPARA","VIZ_VALIDACAO_BALANCETE_DEPARA_UAU","D_ROIC","estrutura_roic"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["CalcGroup","TMDLView_Desktop"]
+
+ref table Medidas_balancetenew
+ref table dCalendario
+ref table balancetenew
+ref table d_mascara_passivo_bl
+ref table d_mascara_passivo_pl_teste
+ref table d_mascara_ativo_BL
+ref table d_mascara_dfc
+ref table d_plano_dre
+ref table d_despesas_clientes
+ref table 'd_aging List_dbase'
+ref table d_aging_list_adto
+ref table F_Aging_List_Adiantamentos_Clientes
+ref table F_Aging_List_Adiantamentos_Fornecedores
+ref table F_Aging_List_Contas_Pagar
+ref table F_Aging_List_Contas_Receber
+ref table d_clientes_time
+ref table dlogo_cliente
+ref table F_analise_especialistas
+ref table dcolaboradores
+ref table d_mascara_ebitda
+ref table d_grupo_contas_analise_espec
+ref table medidas_aginglist
+ref table d_custos_aginglist
+ref table d_mascara_DRE
+ref table F_estoques_ABC
+ref table medidas_estoque_ABC
+ref table d_classe_abc
+ref table d_contas_analise_espec
+ref table d_clientes_receitas_open
+ref table Valuation
+ref table Relatorio_Custos
+ref table medidas__relatorio_custos
+ref table d_grupo_de_produtos_custos
+ref table d_produtos_custos
+ref table Volumetria
+ref table d_origem_operacao_aging
+ref table VIZ_DIMENSAO_ORIGEM_OPERACAO
+ref table d_produtos_estoques_ABC
+ref table d_origem_operacao_estoques_ABC
+ref table d_estoque_analise
+ref table f_receitas_open
+ref table medidas_receitas_open
+ref table custos_gastos
+ref table d_Lucratividade
+ref table VIZ_Lucratividade
+ref table 'Grupo de cálculo'
+ref table d_lojas_mcd
+ref table lucro_de_caixa
+ref table lucro_de_caixa_outros
+ref table fluxo_de_caixa_cfs
+ref table fluxo_de_caixa_outros
+ref table compras_mesXAcum
+ref table POOreceita
+ref table medidas_cfs
+ref table POOcustos
+ref table POOmargem
+ref table POOgastos
+ref table poo_red_dias_CR
+ref table poo_cfs_aumento_dias_CP
+ref table poo_cfs_red_dias_estoque
+ref table despesas_controladas_MCD
+ref table 'despesas_controladas_mcd (2)'
+ref table despesas_nao_controladas_mcd
+ref table F_Despesas_McD
+ref table medidas_mcd
+ref table simulador_quantidade
+ref table simulador_preco
+ref table Simulador
+ref table simulador_custos
+ref table simulador_despesas_gerais
+ref table medidas_simulador
+ref table Simulador_PMR
+ref table 'Simulador PMP'
+ref table Simulador_PME
+ref table circulo_resultado
+ref table simulador_qtd_acumulado
+ref table simulador_preco_acumulado
+ref table simulador_custo_acumulado
+ref table simulador_desp_gerais_acumulado
+ref table clientes_uau_bi
+ref table 'Resultado Financeiro'
+ref table despesas_controladas_mcd_COPIA
+ref table despesas_nao_controladas_mcd_COPIA
+ref table analises_sga
+ref table analise_sg&a_mes
+ref table analise_sg&a_ACU
+ref table despesas_sg&a
+ref table analise_sg&a_LM
+ref table outras_receitas_despesas
+ref table 'metadados tabelas'
+ref table 'metadados relacionamentos'
+ref table 'metadados medidas'
+ref table 'metadados colunas'
+ref table VIZ_VALIDACAO_BALANCETE_DEPARA
+ref table D_ROIC
+ref table estrutura_roic
+ref table d_Plano_Depara
+ref table d_origem_operacao_geral
+
+ref role CBF
+ref role PLANNING_RJ
+ref role 'R3 REQUINTE'
+ref role GERAL
+ref role 'TRUCK ME'
+
+ref cultureInfo pt-BR
+

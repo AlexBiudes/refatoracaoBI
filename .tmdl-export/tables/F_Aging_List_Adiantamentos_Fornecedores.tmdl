@@ -1,0 +1,256 @@
+table F_Aging_List_Adiantamentos_Fornecedores
+	lineageTag: 05695915-cb04-4ee9-b598-96c980590df7
+
+	measure soma_valor_agin_adto_forn =
+			
+			SUM(F_Aging_List_Adiantamentos_Fornecedores[valor])
+		lineageTag: 6fdadb35-906d-4fdb-87bf-0d86a37770b3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure volumetria_aging_adto_forn =
+			
+			IF(NOT(ISBLANK([soma_valor_agin_adto_forn])), "🟢", "🔴")
+		lineageTag: 1dffd14a-7ad8-404f-bb0b-eca022e2d2a2
+
+	column cnpj
+		dataType: string
+		lineageTag: 01604ab3-a485-4059-a84d-4bf5fed31efa
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column nome_cliente_fornecedor
+		dataType: string
+		lineageTag: cb383df6-5ff7-4796-8e51-37b1c01fec98
+		summarizeBy: none
+		sourceColumn: nome_cliente_fornecedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_titulo
+		dataType: string
+		lineageTag: be48168a-7f53-418f-b783-53eadd67ad06
+		summarizeBy: none
+		sourceColumn: tipo_titulo
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_emissao
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 98c4c459-158e-4ab6-aa44-9335e3762935
+		summarizeBy: none
+		sourceColumn: data_emissao
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column data_vencimento
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fb6216e1-89b5-432e-b7de-28c1ecacef15
+		summarizeBy: none
+		sourceColumn: data_vencimento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column data_pagamento
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2c5ef7bf-c960-49f5-93a5-8be878d70cb0
+		summarizeBy: none
+		sourceColumn: data_pagamento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column valor
+		dataType: double
+		formatString: #,0
+		lineageTag: cc548130-0ae9-4b33-9492-9b8cf77f1f2a
+		summarizeBy: sum
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column valor_pago
+		dataType: double
+		formatString: #,0
+		lineageTag: 515c9d9f-c11c-467d-b2af-101257df7548
+		summarizeBy: sum
+		sourceColumn: valor_pago
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column valor_pendente
+		dataType: double
+		formatString: #,0
+		lineageTag: 88754daf-0037-4927-95d7-25b1d9da55ae
+		summarizeBy: sum
+		sourceColumn: valor_pendente
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column data_base
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e84d84aa-b232-4984-8abc-f59f7e9ce988
+		summarizeBy: none
+		sourceColumn: data_base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column origem_operacao
+		dataType: string
+		lineageTag: be35fa09-cdd7-41e9-b14d-8e10c21d0aff
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_DB = ```
+			
+			IF(
+			    F_Aging_List_Adiantamentos_Fornecedores[diferenca_data_base] >= 0, 
+			    "Adiantado", 
+			    "Em Aberto"
+			)
+			```
+		lineageTag: b5f7c1d5-e255-43ec-aa72-92e9c646d563
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column diferenca_data_base =
+			
+			VAR dif_emissao =
+			DATEDIFF(
+			    F_Aging_List_Adiantamentos_Fornecedores[data_emissao],
+			    F_Aging_List_Adiantamentos_Fornecedores[data_base],
+			    DAY
+			)
+			
+			VAR dif_vencimento =
+			DATEDIFF(
+			    F_Aging_List_Adiantamentos_Fornecedores[data_vencimento],
+			F_Aging_List_Adiantamentos_Fornecedores[data_base],
+			DAY
+			)
+			
+			RETURN
+			IF(ISBLANK(dif_emissao), dif_vencimento, dif_emissao)
+		formatString: 0
+		lineageTag: 95a5a9eb-c668-4916-938d-592b7e555d91
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Chave Primária'
+		dataType: string
+		lineageTag: ff649183-036f-4ae0-a8a7-27cdcf84fe3d
+		summarizeBy: none
+		sourceColumn: Chave Primária
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: afb80c25-8753-4c34-aa86-82647187a12c
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_operacao
+		dataType: string
+		lineageTag: 584fb3b4-03e9-44f5-a561-34d33453ce01
+		summarizeBy: none
+		sourceColumn: chave_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria_atraso_data_base = ```
+			// Classifica o título em uma das categorias da tabela de dimensões "d_aging_list_dbase".
+			var diferenca = DATEDIFF(
+			                            F_Aging_List_Adiantamentos_Fornecedores[data_vencimento], F_Aging_List_Adiantamentos_Fornecedores[data_base], DAY
+			                        )   
+			RETURN
+			IF(F_Aging_List_Adiantamentos_Fornecedores[status_DB] = "Adiantado",
+			  IF(diferenca <= 30, "Adiantados entre 0 e 30 dias",
+			        IF(diferenca <= 60, "Adiantados entre 31 e 60 dias",
+			            IF(diferenca <= 90, "Adiantados entre 61 e 90 dias",
+			                IF(diferenca <= 120, "Adiantados entre 91 e 120 dias",
+			                    IF(diferenca <= 180, "Adiantados entre 121 e 180 dias",
+			                        IF(diferenca <= 360, "Adiantados entre 181 e 360 dias",
+			                            IF(diferenca > 360, "Adiantados acima de 360 dias"
+			                            )
+			                        )
+			                    )
+			                )
+			            )
+			        )
+			    ), "Em Aberto"
+			)
+			```
+		lineageTag: 208a9ea4-40d9-4685-855f-4396913cd9dd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column uaid
+		dataType: string
+		lineageTag: 5d4497b8-58e6-439c-a0f5-e4b3215c0e05
+		summarizeBy: none
+		sourceColumn: uaid
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Aging_List_Adiantamentos_Fornecedores = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Aging_List_Adiantamentos_Fornecedores_Table = BI_tratado_Schema{[Name="Aging_List_Adiantamentos_Fornecedores",Kind="Table"]}[Data],
+				    #"Valor Substituído" = Table.ReplaceValue(Aging_List_Adiantamentos_Fornecedores_Table,".","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2",null,"Geral",Replacer.ReplaceValue,{"origem_operacao"}),
+				    #"Coluna Mesclada Inserida" = Table.AddColumn(#"Valor Substituído3", "Chave Primária", each Text.Combine({[cnpj], " ", [origem_operacao]}), type text),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Coluna Mesclada Inserida","00066871000","66871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","66871000","00066871000",Replacer.ReplaceText,{"cnpj"}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Valor Substituído5",{"grupo", "empresa", "empresa_filial", "numero_titulo"}),
+				    #"Literal inserido" = Table.AddColumn(#"Colunas Removidas", "tipo_relatorio", each "aging_adto_fornecedores", type text),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Literal inserido",{{"tipo_relatorio", type text}}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Tipo Alterado",{{"Chave Primária", Text.Upper, type text}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Texto em Maiúscula", "chave_operacao", each [Chave Primária] & " " & [tipo_relatorio]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"chave_operacao", type text}}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Tipo Alterado1","09534517000135","9534517000135",Replacer.ReplaceText,{"cnpj"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6","9534517000135","09534517000135",Replacer.ReplaceText,{"cnpj"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído7", each ([cnpj] <> "")),
+				    #"Texto em Maiúscula1" = Table.TransformColumns(#"Linhas Filtradas",{{"origem_operacao", Text.Upper, type text}}),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Texto em Maiúscula1",{{"data_base", type date}, {"data_emissao", type date}, {"data_vencimento", type date}, {"data_pagamento", type date}}),
+				    #"Erros Substituídos" = Table.ReplaceErrorValues(#"Tipo Alterado2", {{"data_pagamento", #date(1900, 1, 1)}}),
+				    #"Valor Substituído8" = Table.ReplaceValue(#"Erros Substituídos"," ","",Replacer.ReplaceText,{"Chave Primária"})
+				in
+				    #"Valor Substituído8"
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navegação
+

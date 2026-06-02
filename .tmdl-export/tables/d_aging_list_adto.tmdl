@@ -1,0 +1,34 @@
+table d_aging_list_adto
+	lineageTag: 7e5bf919-4b1a-4a77-bed8-1c3f3c28dce4
+
+	column atributo
+		dataType: string
+		lineageTag: b5f06471-4215-4500-8724-b88465a18055
+		summarizeBy: none
+		sourceColumn: atributo
+		sortByColumn: ordem_aging
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_aging
+		dataType: int64
+		formatString: 0
+		lineageTag: 56123472-dd95-44c9-8c78-0cee79259b03
+		summarizeBy: sum
+		sourceColumn: ordem_aging
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_aging_list_adto = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("dc6xCoAgFEDRX3m8uSG1zMZ+okUcJN/QkIH2/6QFRmHr5QxXa5zcav1h3R6B/BEIWiAQLaQcsUGGpqkgwZKSRfG6klmNRYm6GrNivLCuzhi/nCqu/3EqO/HMya+zy7pZcC803Ahm8guFFBQacwI=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [atributo = _t, ordem_aging = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem_aging", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

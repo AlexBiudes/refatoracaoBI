@@ -1,0 +1,244 @@
+table dCalendario
+	lineageTag: b2b23fad-5164-4023-ba9d-ffb3ff28e8eb
+	dataCategory: Time
+
+	measure ContagemLinhas = ```
+			COUNTROWS(dCalendario)
+			
+			```
+		formatString: 0
+		lineageTag: 777bbe39-3ab4-4670-beac-5c91bb0ee6bd
+
+	column data
+		isKey
+		formatString: Short Date
+		lineageTag: 513fcce9-4e77-4631-b429-26bbcbce3203
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ano
+		formatString: 0
+		lineageTag: 242300fe-886a-4e0c-aefd-6ab3a7dfdff3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês Num'
+		formatString: 0
+		lineageTag: 0418eccf-b140-4429-95e8-d04dfd720eac
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Mês Num]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trim
+		lineageTag: 8a540a02-2500-430f-b5a7-0866ff50bf97
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Trim]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Semana Ano'
+		formatString: 0
+		lineageTag: 62825fdc-d85e-43db-a910-b30d86ee46bc
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Semana Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia Semana'
+		formatString: 0
+		lineageTag: 57bc768a-da13-4b47-938c-cf932f0e23a8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Dia Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mês
+		lineageTag: 1679e334-fcce-464a-9528-dba5dbd39c9b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês]
+		sortByColumn: 'Mês Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês Completo'
+		lineageTag: 48963728-b96e-4d88-98a0-297ec00a0289
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês Completo]
+		sortByColumn: 'Mês Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trim-Ano
+		lineageTag: 255a5a72-324d-423e-9f09-7a12b870d1ce
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Trim-Ano]
+		sortByColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia_Semana
+		lineageTag: e7e147cc-9d1a-4e36-88b0-4247381de251
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Dia_Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Com Hora'
+		formatString: General Date
+		lineageTag: 484faefe-7a79-442f-97e3-e75c41cad6dd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Data Com Hora]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano_Anterior
+		formatString: 0
+		lineageTag: c3012b08-56f8-4f19-86fa-740f0791ca03
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Ano_Anterior]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês e Ano'
+		lineageTag: b0d7c452-48b1-429b-ae4a-b0057da0daa6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês e Ano]
+		sortByColumn: 'Mês Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordenação
+		formatString: 0
+		lineageTag: fdc2d574-418e-4614-8da2-8b6708b83427
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Ordenação]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NuMês/Ano
+		lineageTag: 3ab346e5-f2ea-43bd-9569-92feae2a06da
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [NuMês/Ano]
+		sortByColumn: contagem_inv
+
+		annotation SummarizationSetBy = Automatic
+
+	column NoMês/Ano
+		lineageTag: 5e4ed05c-a469-47eb-878a-37e0f8d985ab
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [NoMês/Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês e Ano Abreviado'
+		lineageTag: 6befb129-4bb2-4f51-9d55-0bf17b5ae85d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês e Ano Abreviado]
+		sortByColumn: Ordenação
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mês_Ano_Anterior
+		formatString: 0
+		lineageTag: ae5e721b-78f0-47f3-b0db-90af65054305
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Mês_Ano_Anterior]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês e Ano Ano Anterior'
+		lineageTag: cd6baf87-f45e-4669-9ff6-9a17b2a29819
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês e Ano Ano Anterior]
+		sortByColumn: Ordenação
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ordenação Mês Ano Anterior'
+		formatString: 0
+		lineageTag: 505da98f-5367-4a6d-a2a7-bdf6d77d6e4c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Ordenação Mês Ano Anterior]
+
+		annotation SummarizationSetBy = Automatic
+
+	column contagem_inv =
+			
+			VAR MaxDate = MAXX(ALL(dCalendario), [data])
+			
+			    RETURN DATEDIFF([data], MaxDate, MONTH) + 1
+		formatString: 0
+		lineageTag: e5a7ed42-8cda-460c-b680-0e6ca8d627db
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês e Ano Abreviado Invert'
+		lineageTag: a0c0a5b7-ebaa-46e6-b150-82642a8425a2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mês e Ano Abreviado Invert]
+		sortByColumn: contagem_inv
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dCalendario-5647c0b9-a269-475d-b0c3-ccb1bf91bd4a = calculated
+		mode: import
+		source =
+				
+				ADDCOLUMNS(
+				     FILTER(
+				        CALENDAR(DATE(2010, 1, 1), DATE(YEAR(TODAY())+1, 12, 31)),
+				        YEAR([Date]) >= 2010 && YEAR([Date]) <= YEAR(TODAY())+1),
+				    "Data Com Hora", DATE(YEAR([Date]), MONTH([Date]), DAY([Date])),
+				    "Ano", YEAR([Date]),
+				    "Mês Num", MONTH([Date]),
+				    "Trim", FORMAT([Date], "q"),
+				    "Semana Ano", WEEKNUM([Date]),
+				    "Dia Semana", WEEKDAY([Date]),
+				    "Mês", FORMAT([Date], "mmm"),
+				    "Mês Completo", CONCATENATE(UPPER(LEFT(FORMAT([Date], "mmmm"), 1)), RIGHT(FORMAT([Date], "mmmm"), LEN(FORMAT([Date], "mmmm"))-1)),
+				    "NuMês/Ano", FORMAT([Date],"mm/yyyy"),
+				    "NoMês/Ano", UPPER(FORMAT([Date], "mmm/yyyy")),
+				    "Trim-Ano", FORMAT([Date], "q") & "T" & YEAR([Date]),
+				    "Dia_Semana", FORMAT([Date], "ddd"),
+				    "Ano_Anterior", YEAR([Date]) - 1,
+				    "Mês_Ano_Anterior", MONTH([Date]) -12,
+				    "Mês e Ano", FORMAT([Date], "mmmm / yyyy"),
+				    "Ordenação", YEAR([Date]) * 100 + MONTH([Date]),// Criando uma coluna para ordenação
+				    "Ordenação Mês Ano Anterior", YEAR([Date]) * 12 + MONTH([Date]) - 1,
+				    "Mês e Ano Abreviado", UPPER(((FORMAT([Date], "Mmm yyyy")))),
+				    "Mês e Ano Abreviado Invert", UPPER(((FORMAT([Date], "Mmm yyyy")))),
+				    "Mês e Ano Ano Anterior", UPPER(FORMAT(DATE(YEAR([Date]) - 1, MONTH([Date]), 1), "mmm yyyy"))
+				
+				
+				)
+
+	annotation PBI_Id = a2ddf2e1482d40f488be882466157f10
+

@@ -1,0 +1,26 @@
+table simulador_quantidade
+	lineageTag: 1d35f807-ada0-46fc-865f-fc711ef6edc1
+
+	measure 'Valor Var Qtd' = SELECTEDVALUE('simulador_quantidade'[Var Qtd], 0)
+		formatString: 0%;-0%;0%
+		lineageTag: ed113544-d88a-48a0-9bca-1dd8cb9911d4
+
+	column 'Var Qtd'
+		formatString: 0%;-0%;0%
+		lineageTag: cbc64352-992b-4d8b-bef7-2a707a489695
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition simulador_quantidade = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 04df81e8f33145b4afbe2108d03bc406
+

@@ -1,0 +1,45 @@
+table d_custos_aginglist
+	lineageTag: 2b29a991-98d5-458c-afab-75784beba063
+
+	column descricao
+		dataType: string
+		lineageTag: dd884083-1a20-4c73-ac46-762989548295
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao_cliente
+		dataType: string
+		lineageTag: d725a169-b866-42bb-bcf0-7961b8ac73e3
+		summarizeBy: none
+		sourceColumn: descricao_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Origem Operação'
+		dataType: string
+		lineageTag: 4fd031a2-96a9-4696-9c99-5da7cf817929
+		summarizeBy: none
+		sourceColumn: Origem Operação
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cliente
+		dataType: string
+		lineageTag: f5256736-7cca-4d0c-9df9-23d532d06f14
+		summarizeBy: none
+		sourceColumn: Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_custos_aginglist = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("rVZBbtswEPwK4XMco+gL1tTK2oIiVa5EFAlyCOocjBY1kMTP6iv6sQ6pBPChQIuSF4OSoeFyZnaW9/cbe3l5PZvj+cVMz+fj5RWL9PTjeMKbzc2GJ9ny50UmGtnPwXRslA9LJG8Jf799gtXwePr2+IxPT18v3/Hpw83foCPbyGQpGDacMroa8TNHHyqRbfBzlP0iNnDGVK0EdMs+Si+WUJ6agJX42uNPbEnNiF8v1VzaRTN9icUuDgvlUXxIIR88Pf36ueL8D3JinReKklVavPQhjtxMHmjfH+ZadZRjgtSazQn7WJaIhx7VOhReS61SRlnRgWkl+PJcK38MSZRKR/WMMmsBbRhFNRueTafRYINumSXVNhN9gre4HF98btN8+ibeb6VQMX+uL3KhdJtuF6WuXqJS5Z4cfFoJlcjBm0hNnUKcaxuILEPpYspGWQQz3jIiPR5yeOw+fDTvtm9XahMiV00OBCrnNsa5Ss02iUmqgo5BUhDivasP96KOuZKnSV6sTK4Dt0WF72HWzjt/zvVtq5k50px5dIYmB7QuvCX8mkm7CdTssNWuWLiWIJq3hpzkS1S58iAL0A8Ddo21HQbmA9Ie2RcgZ8de7gDbxB2Ui63GGkIEFn/BmWt5jIyZBrh1GlmwiQGnZgi+q7WDw5V2KNPTUs934ofqayiuToTYU7hr58Glq0/qa0zzb5gPvwE=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [descricao = _t, descricao_cliente = _t, #"Origem Operação" = _t, Cliente = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,4516 @@
+table medidas_simulador
+	lineageTag: 2a9a6632-8f0d-431a-85c1-327935a501bc
+
+	measure receita_bruta_simulado = ```
+			
+			VAR variacao_qtd =
+			([lucro_bruto_actual_month] * (1 + simulador_quantidade[Valor Var Qtd])) - [lucro_bruto_actual_month]
+			 
+			 VAR variacao_preco =
+			 [MReceita_bruta] * (1 + simulador_preco[Valor Preço] )
+			
+			 RETURN
+			 variacao_qtd + variacao_preco
+			```
+		formatString: #,0
+		lineageTag: 15de1317-af88-4281-bc32-65a0dc53d83b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_quantidade =
+			
+			[MMargem_bruta]
+		formatString: #,0
+		lineageTag: 2c504d21-f803-4933-8c89-e6fcd7fcbb1c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_variacao_margem_bruta =
+			
+			[MMargem_bruta_actual_month] - [MMargem_brutaLM]
+		formatString: #,0
+		lineageTag: ae90970d-3f21-4b74-bfd0-ae8deb71a61f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure custo_simulado = ```
+			
+			VAR vreceita_bruta_simulado =
+			([lucro_bruto_actual_month] * (1 + simulador_quantidade[Valor Var Qtd]) - [lucro_bruto_actual_month]) + [MReceita_bruta]
+			
+			VAR vvar_receita_bruta =
+			 vreceita_bruta_simulado - [MReceita_bruta]
+			
+			VAR vcusto_var_receita =
+			[CCusto|Receitabruta] * vvar_receita_bruta
+			 
+			 VAR vvariacao_custos =
+			 [CCusto_actual_month] * (1 + simulador_custos[Valor simulador_custos]) *-1
+			
+			 RETURN
+			 vcusto_var_receita + vvariacao_custos
+			```
+		formatString: #,0
+		lineageTag: 1ebf1e2e-7212-4dfb-8304-596a5d4e8536
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure despesas_gerais_simulado =
+			
+			VAR resultado =
+			[despesas_gerais_simples] * (1 + simulador_despesas_gerais[Valor simulador_despesas_gerais])
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0
+		lineageTag: 5b9a2316-5447-48f6-bef9-bb1186f2a4d5
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure lucro_operacional_simulado = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			    RETURN
+			    CALCULATE(
+			[lucro_bruto_simulado] - [despesas_gerais_simulado],
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: #,0
+		lineageTag: 626fb6e6-c704-47df-8139-41e5b8297632
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure despesas_gerais_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    
+			RETURN
+			CALCULATE(
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Variaveis_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Folha_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_comerciais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketplace" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Salarios_ordenados" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Beneficios" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Impostos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Provisoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Variaveis_Entrega" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Logistica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Consultoria_Tecnica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Alugueis" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Prestacao_de_Servicos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Manutencoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Informatica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Ocupacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_contratuais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_depreciacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_tributarias" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_controladas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_nao_controladas"
+			    ),
+			    balancetenew[vlr]
+			),
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			```
+		formatString: #,0
+		lineageTag: 4d52f252-2b9a-4bbc-b704-59e013c2bf15
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_variacao_receita_bruta$ =
+			
+			[MReceita_bruta] - [receita_bruta_simulado]
+		formatString: #,0
+		lineageTag: e68a44b0-9042-4300-aa2f-b0c9a869fdb1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_%deducoes_impostos =
+			
+			DIVIDE([deducoes_impostos],
+			[MReceita_bruta])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a9656383-1d97-41ea-817e-2e683571c3ee
+
+	measure deducoes_impostos_simulado = ```
+			
+			VAR vdeducoes_impostos_receita =
+			ROUND(
+			DIVIDE([deducoes_impostos],
+			[MReceita_bruta]), 4)
+			
+			VAR vdeducoes_var_receita =
+			CALCULATE(
+			vdeducoes_impostos_receita * 
+			[var_receita_bruta$] )
+			
+			RETURN
+			
+			    vdeducoes_var_receita 
+			    + [deducoes_impostos]
+			
+			```
+		formatString: #,0
+		lineageTag: 45eacd73-e966-42d8-a665-50d4a2988d4e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_switch_DRE = ```
+			
+			
+			    SWITCH(
+			        SELECTEDVALUE(d_mascara_DRE[NÍVEL 1]),
+			        "Receita Bruta", [receita_bruta_simulado],
+			        "(-) Deduções da Receita Bruta", [deducoes_impostos_simulado],
+			        "Receita Líquida", [receita_liquida_simulado],
+			        "(-) Custos dos Produtos Vendidos", [custo_simulado],
+			        "(-) Custos dos Serviços Vendidos", [custo_simulado],
+			        "Margem Bruta", [lucro_bruto_simulado],
+			        "(-) Despesas Gerais", [despesas_gerais_simulado],
+			        "Resultado Operacional", [lucro_operacional_simulado],
+			        BLANK()
+			    )
+			
+			
+			
+			```
+		lineageTag: 9269a647-38e6-4976-8d84-8149a8b5fb4f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure receita_liquida_simulado =
+			
+			[receita_bruta_simulado] - [deducoes_impostos_simulado]
+		formatString: #,0
+		lineageTag: 13e73151-ab89-41fc-9b96-7221f55d6b38
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure lucro_bruto_simulado =
+			
+			
+			VAR resultado =
+			[receita_liquida_simulado] - [custo_simulado]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0
+		lineageTag: 62546469-3473-4169-bdf3-21c45f60642a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure deducoes_impostos_simulado_neg =
+			
+			CALCULATE(
+			[simulador_%deducoes_impostos] * [receita_bruta_simulado]) *-1
+		formatString: #,0
+		lineageTag: be2bdb98-579d-44a9-8e70-6bc3b05b231f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_bruta$ =
+			
+			ROUND(
+			[receita_bruta_simulado] - [MReceita_bruta], 0)
+		formatString: #,0
+		lineageTag: dadbbd26-5127-4258-b605-df974ad4c876
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_bruta% =
+			
+			DIVIDE(
+			[var_receita_bruta$],
+			[MReceita_bruta]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 84ec1a1f-ef2d-4d1d-9fc9-77e5f41cb41b
+
+	measure var_deducoes_impostos$ =
+			
+			[deducoes_impostos_simulado] - [deducoes_impostos]
+		formatString: #,0
+		lineageTag: 22f61816-e555-4409-872e-3580ea9586e2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_deducoes_impostos% =
+			
+			DIVIDE(
+			    [var_deducoes_impostos$],
+			    ABS([deducoes_impostos])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c4bacf20-7f28-4a37-9537-c29ec17377a2
+
+	measure var_receita_liq$ =
+			ROUND(
+			[receita_liquida_simulado] - [MReceita_Liquida_actual_month], 0)
+		formatString: #,0
+		lineageTag: c48a4c72-f9ca-4613-865e-0fad6c79a723
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_liq% =
+			
+			DIVIDE(
+			[var_receita_liq$],
+			[MReceita_Liquida_actual_month]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b2c74ecb-ee97-4fb4-bc13-ea3d1def42c6
+
+	measure var_custo$ =
+			
+			ROUND(
+			[custo_simulado] - [CCusto_actual_month_positivo], 0)
+		formatString: #,0
+		lineageTag: 8838b6c5-3b8c-4a64-9e44-1faeae48bd7f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure CCusto_actual_month_positivo = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    SUMX(
+			    FILTER(
+			        balancetenew, 
+			        balancetenew[Query] = "Custo dos Produtos Vendidos"
+			    ), 
+			        balancetenew[vlr]
+			    ),
+			dCalendario[data] = UltimoMesTrimestre
+			) *-1
+			```
+		formatString: #,0
+		lineageTag: 800f41e5-15f2-4aa6-a6ce-ab7876453126
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_custo% =
+			
+			DIVIDE(
+			    [var_custo$],
+			    [CCusto_actual_month_positivo]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5c125bd3-9af6-48c2-9221-b2f928248fd3
+
+	measure var_lucro_bruto$ =
+			
+			VAR resultado =
+			[lucro_bruto_simulado] - [lucro_bruto_actual_month]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0,
+			resultado)
+		lineageTag: 9903f4ef-e556-4993-9f35-0f36cfee5967
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure var_lucro_bruto% =
+			
+			DIVIDE(
+			    [var_lucro_bruto$],
+			    [lucro_bruto_actual_month]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: ff554055-ec73-4479-bbe1-bcd5c1b135ce
+
+	measure despesas_gerais_actual_month_positivo =
+			
+			[despesas_gerais_actual_month] *-1
+		formatString: #,0
+		lineageTag: 69000e7d-6a5f-40ca-beb4-fa1813e2c0e0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_despesas_gerais$ =
+			
+			ROUND(
+			[despesas_gerais_simulado] - [despesas_gerais_simples], 0)
+		formatString: #,0
+		lineageTag: c4c4fa92-7be8-40e0-991d-c10d54b97be2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_despesas_gerais% =
+			
+			DIVIDE(
+			    [var_despesas_gerais$],
+			    ABS([despesas_gerais_actual_month])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 61412e11-c8c4-4b03-a746-a203d00d8522
+
+	measure var_lucro_operacional$ =
+			
+			VAR resultado =
+			IF(
+			            [lucro_operacional_simulado] - [rresultado_operacional] >= -0.0001 && [lucro_operacional_simulado] - [rresultado_operacional] <= 0.0001,
+			            0, [lucro_operacional_simulado] - [rresultado_operacional]
+			)
+			
+			RETURN
+			ROUND(resultado, 0)
+		lineageTag: e167135b-9acb-4a9b-a435-5a98a3903fa2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure var_lucro_operacional% =
+			
+			DIVIDE(
+			    [var_lucro_operacional$],
+			    ABS(
+			    [rresultado_operacional])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 4ecef246-c7ed-4e4d-a099-df3b73b62d34
+
+	measure lucro_liquido_simulado =
+			
+			[var_lucro_operacional$] + [LLucro_liquido_actual_month]
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: a42e2b5d-b0a1-4300-9144-cdfddbadb907
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure lucro_liquido_simulado_card =
+			
+			IF([lucro_liquido_simulado] > 0, "Lucro Líquido", "Prejuízo")
+		lineageTag: 3b50add8-d37f-4a84-927c-96089b1a8e38
+
+	measure lucro_liquido_simulado_sinal =
+			
+			IF([lucro_liquido_simulado] > 0, "🟢", "🔴")
+		lineageTag: 00ae74da-456d-42f6-adf9-bc16d328f0b6
+
+	measure dfc_contas_receber_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber" 
+			    ),
+			    balancetenew[vlr]
+			),
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			
+			
+			```
+		formatString: #,0
+		lineageTag: 9ee0e415-31f3-4695-865d-20b80b7a1da8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_contas_receber_LM =
+			
+			CALCULATE( [dfc_contas_receber_actual_month], DATEADD(dCalendario[data], -1, MONTH))
+		formatString: #,0
+		lineageTag: 74cd35ce-e18c-4a80-8d23-c6549c75435e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_contas_receber_simulado_total =
+			
+			ROUND(
+			[var_receita_bruta$] + [simulador_reduc_dias_CR], 0)
+		formatString: #,0
+		lineageTag: e584e516-badb-4fcd-973d-0477db9bfd1a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_contas_pagar_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores" 
+			    ),
+			    balancetenew[vlr]
+			),
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: #,0
+		lineageTag: 354f7839-6075-4a70-8907-c0a51afbe4b9
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'var var_contas_pagar_simulado_DRE' = ```
+			
+			    VAR resultado = [variacao_custo_simulado] + [var_despesas_gerais$]
+			    RETURN
+			        IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0,
+			            resultado
+			        )
+			
+			```
+		formatString: #,0
+		lineageTag: a1bf3734-2e93-4643-8d62-fa3a043598cb
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure vendas_ano_menos_dev_simulado =
+			
+			[VendasANOMenosDevACU] + [var_receita_bruta$] - [var_deducoes$]
+		formatString: #,0
+		lineageTag: bea0ab8e-1410-486d-8ff0-bd45479caf4c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Prazo_medio_contas_receber_simulado_DRE = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    medidas_simulador[contas_receber_simulado] / 
+			    medidas_simulador[vendas_ano_menos_dev_simulado] * 
+			    Medidas_balancetenew[Valor_mensal],
+			    dCalendario[data] = UltimoMesTrimestre
+			)
+			```
+		formatString: 0
+		lineageTag: da3e04e3-6f4d-48bd-b309-41a8063c0ca8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure contas_receber_simulado =
+			
+			[contas receber] + [var_receita_liq$]
+		lineageTag: 75989327-bfc7-4479-80b6-1be26c0f8721
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure compras_no_ano_simulado = ```
+			
+			(Medidas_balancetenew[CCusto_ACU_normal_card] *-1 + 
+			[var_custo$]) +
+			(Medidas_balancetenew[ATCIR_Estoques]) - 
+			Medidas_balancetenew[ATCIR_Estoques_End_of_LY]
+			```
+		lineageTag: 169bf34e-6b63-4084-9dd7-009df253752a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Fornecedores_liquidos_simulado_DRE = ```
+			
+			/*IF(
+			    NOT(
+			        ISBLANK(
+			            medidas_aginglist[fornecedores_aging])), 
+			    medidas_aginglist[fornecedores_aging], 
+			    [PASSCIR_Fornecedores]
+			)*/[PASSCIR_Fornecedores] + [var_custo$]
+			```
+		lineageTag: 3bce2017-6537-4bc5-b658-c5e3d3ce06ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_pagar_simulado_DRE =
+			
+			DIVIDE(
+			[Fornecedores_liquidos_simulado_DRE],
+			[compras_no_ano_simulado]
+			) * [Valor_mensal]
+		formatString: 0
+		lineageTag: 9d11539a-bab4-47ea-9b5d-551f5ebb4e2f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_switch_simulado = ```
+			
+			CALCULATE(
+			SWITCH (
+			    SELECTEDVALUE(d_mascara_dfc[classificação]),
+			    "lucro_prejuizo_liq", [total_mes_atual],
+			    "ajustes_nao_afetam_caixa", [total_mes_atual],
+			"depreciaçao", [total_mes_atual],
+			"agio", [total_mes_atual],
+			"resultado_acumulado", [desvio],
+			"resultado_equivalencia_patrim", [total_mes_atual],
+			"outros_ajustes", [total_mes_atual],
+			"Resultado_ajustado", [total_mes_atual],
+			"var_contas_patrimoniais", [total_mes_atual],
+			"contas_receber", [total_mes_atual],
+			"adiantamentos", [total_mes_atual],
+			"impostos_recuperar", [total_mes_atual],
+			"impostos_recuperar_lp", [total_mes_atual],
+			"estoques", [total_mes_atual],
+			"desp_antecipadas", [total_mes_atual],
+			"fornecedores", [total_mes_atual],
+			"obrigacoes_trabalhistas", [total_mes_atual],
+			"obrigacoes_tributarias", [total_mes_atual],
+			"partes_relacionadas", [total_mes_atual],
+			"outras_contas_pagar", [total_mes_atual],
+			"outras_obrig_pagar_lp", [total_mes_atual],
+			"clientes_lp", [total_mes_atual],
+			"prov_lp", [total_mes_atual],
+			"ativo_dir_uso", [total_mes_atual],
+			"caixa_liq_operacional", [total_mes_atual],
+			"fluxo_investimentos", [total_mes_atual],
+			"aquisicoes_imobilizado", [total_mes_atual],
+			"distrib_lucros", [total_mes_atual],
+			"investimentos", [total_mes_atual],
+			"outros_investimentos", [total_mes_atual],
+			"caixa_liq_investimentos", [total_mes_atual],
+			"fluxo_financiamentos", [total_mes_atual],
+			"emprestimos", [total_mes_atual],
+			"afac", [total_mes_atual],
+			"capital_social", [total_mes_atual],
+			"outras_obrigacoes", [total_mes_atual],
+			"distrib_lucros", [total_mes_atual],
+			"caixa_liq_financiamentos", [total_mes_atual],
+			"caixa_inicial", [total_mes_atual],
+			"caixa_final", [total_mes_atual],
+			"var_liq_caixa", [total_mes_atual],
+			    0
+			)
+			)
+			
+			```
+		lineageTag: a0fca2fc-4668-40ba-992c-70435ff7d258
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure dfc_resultado_ajustado_simulado = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			VAR vresultado_ajust =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Resultado_Ajustado"
+			        ),
+			        balancetenew[vlr]
+			    ),
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			
+			VAR vvar_lucro =
+			    [lucro_liquido_simulado] - [LLucro_liquido_actual_month]
+			
+			RETURN
+			    vresultado_ajust + vvar_lucro
+			
+			```
+		formatString: #,0
+		lineageTag: f056f3a3-15e4-4605-b043-3bbd346a9243
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_lucro_liq_simulado =
+			
+			VAR vvariacao =
+			[lucro_liquido_simulado] - [LLucro_liquido_actual_month]
+			
+			RETURN
+			IF(
+			            vvariacao >= -0.0001 && vvariacao <= 0.0001,
+			            0, vvariacao)
+		formatString: #,0
+		lineageTag: d0086028-27a2-4223-bfdb-0ac98951bab2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_contas_receber_simulado = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			VAR vvar_contas_receb_simu =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			
+			RETURN
+			
+			vvar_contas_receb_simu + ([var_receita_bruta$] *-1) + ([simulador_reduc_dias_CR] *-1)
+			```
+		formatString: #,0
+		lineageTag: a8631b09-731c-492d-be53-ef7aacda985c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_contas_pagar_simulado = ```
+			
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			
+			VAR vvar_fornec =
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores" 
+			    ),
+			    balancetenew[vlr]
+			),
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vvar_fornec + [simulador_var_contas_pagar_dias_] + [var var_contas_pagar_simulado_DRE]
+			```
+		formatString: #,0
+		lineageTag: 8e75557f-85cc-49e9-8d80-a94a77e4762a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_ope_simulado = ```
+			
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Operacional"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq + [var_lucro_liq_simulado] - [var_contas_receber_simulado_total] + [var var_contas_pagar_simulado_DRE] + [simulador_var_contas_pagar_dias_] - [variacao_estoques_simulado_din]
+			```
+		formatString: #,0
+		lineageTag: 02f77abe-2c92-4d3d-97bc-8875b9f635d4
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_estoque_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Estoques" 
+			    ),
+			    balancetenew[vlr]
+			),
+			dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: #,0
+		lineageTag: 4b419776-35b3-46fa-ac5c-baca96d19b63
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_invest_simulado = ```
+			
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq_invest =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Caixa_Liq_Investimentos"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq_invest + [var_lucro_liq_simulado] - [var_contas_receber_simulado_total] + [var var_contas_pagar_simulado_DRE] + [simulador_var_contas_pagar_dias_] - [variacao_estoques_simulado_din]
+			```
+		formatString: #,0
+		lineageTag: 119a0d06-a782-435a-8f58-34f49c88ed47
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_financ_simulado = ```
+			
+			
+			VAR vcaixa_liq_financ =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Caixa_Liq_Financiamentos"
+			            
+			            ),
+			            balancetenew[vlr]))
+			
+			RETURN
+			vcaixa_liq_financ - [var_contas_receber_simulado_total] + [var var_contas_pagar_simulado_DRE] + [simulador_var_contas_pagar_dias_] - [simulador_red_dias_estoque]
+			```
+		formatString: #,0
+		lineageTag: a83f93d0-b602-420b-8e82-fdc564368517
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_caixa_simulado = ```
+			
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq_caixa =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_caixasequicaixas"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq_caixa 
+			+ [var_lucro_liq_simulado]  
+			- [var_contas_receber_simulado_total] 
+			+ [var_contas_pagar_simulado_total] 
+			+ [simulador_var_contas_pagar_dias_] 
+			- [variacao_estoques_simulado_din]
+			```
+		formatString: #,0
+		lineageTag: 6e6a28cf-7b7f-4f3a-b184-44bcf6cf0d26
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_resultado_ajustado = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Resultado_Ajustado"
+			        ),
+			        balancetenew[vlr]
+			    ),
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: #,0
+		lineageTag: 3171fead-718e-4426-a5de-dfe01d32c253
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_ope = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Operacional"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq
+			```
+		formatString: #,0
+		lineageTag: f111770d-48e5-4dcc-9ca7-b54a7ec7045e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_invest = ```
+			
+			 VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Investimentos"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq
+			```
+		formatString: #,0
+		lineageTag: 4bd2c897-e9bd-410e-94d2-c82a7f7e9262
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vcaixa_liq_caixa =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_caixasequicaixas"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vcaixa_liq_caixa
+			```
+		formatString: #,0
+		lineageTag: dfe5c3c7-479a-4f66-9a78-2e7ab159e9e1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_estoque_simulado = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			RETURN
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_VARPAT_Estoques"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre) + ([variacao_estoques_total] *-1)
+			```
+		formatString: #,0
+		lineageTag: b9f36b45-36f7-4b23-8a5d-892568cfebd7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_reduc_dias_CR =
+			
+			VAR cr_prazo =
+			DIVIDE(
+			    [contas_receber_simulado],
+			[Prazo_medio_contas_receber_simulado_DRE]
+			) * [Valor Simulador_PMR]
+			
+			RETURN
+			IF(
+			            cr_prazo >= -0.0001 && cr_prazo <= 0.0001,
+			            0,
+			cr_prazo
+			)
+		formatString: #,0
+		lineageTag: cbb92c7c-fc41-4f1e-ae70-44dbc3402895
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure valor_dias_PMR_simulador = ```
+			
+			IF(
+			    [Valor Simulador_PMR] = 1 || [Valor Simulador_PMR] = -1,
+			    FORMAT([Valor Simulador_PMR], "0 dia"),
+			    FORMAT([Valor Simulador_PMR], "0 dias")
+			)
+			
+			```
+		lineageTag: b499cb91-ede1-47c3-a6fa-c8fd077f2eb2
+
+	measure var_contas_receber_simulado_DRE = ```
+			
+			 VAR resultado =
+			[var_receita_bruta$]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+			```
+		formatString: #,0
+		lineageTag: b66e113c-7a38-454d-8f9b-7afbc9b22d0b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Prazo_medio_contas_receber_simulado_TOTAL = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			    ROUND(
+			CALCULATE(
+			    medidas_simulador[contas_receber_simulado] / 
+			    medidas_simulador[vendas_ano_menos_dev_simulado] * 
+			    Medidas_balancetenew[Valor_mensal],
+			    dCalendario[data] = UltimoMesTrimestre
+			) + [Valor Simulador_PMR], 2)
+			```
+		formatString: 0.00
+		lineageTag: b49d4c54-d1ab-45c3-b55b-38edeb4af138
+
+	measure valor_dias_PMP_simulador =
+			
+			IF(
+			    [Valor Simulador PMP] = 1 || [Valor Simulador PMP] = -1,
+			    FORMAT([Valor Simulador PMP], "0 dia"),
+			    FORMAT([Valor Simulador PMP], "0 dias")
+			)
+		lineageTag: 1af85714-7fea-43b4-a536-5607a87e7599
+
+	measure simulador_var_contas_pagar_dias_ =
+			
+			VAR cr_prazo =
+			DIVIDE(
+			    [contas_pagar_simulado],
+			[prazo_medio_contas_pagar_simulado_DRE]
+			) * [Valor Simulador PMP]
+			
+			RETURN
+			cr_prazo
+		formatString: #,0
+		lineageTag: 09114ed7-4c13-42f1-92c3-ab3fd6561497
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure contas_pagar_simulado =
+			
+			[Fornecedores liquidos]-- + [var var_contas_pagar_simulado_DRE]
+		lineageTag: 41b48e94-901b-48e8-9f48-489142c6dadc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure var_contas_pagar_simulado_total =
+			
+			[simulador_var_contas_pagar_dias_] + [var var_contas_pagar_simulado_DRE]
+		formatString: #,0
+		lineageTag: 7ec1a1bb-d2bf-4a63-b172-8c53d855ff05
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure prazo_medio_contas_pagar_simulado_TOTAL =
+			
+			ROUND(
+			(DIVIDE(
+			[Fornecedores_liquidos_simulado_DRE],
+			[compras_no_ano_simulado]
+			) * [Valor_mensal]) + [Valor Simulador PMP], 2)
+		formatString: 0.00
+		lineageTag: c367bced-c8e4-45ff-8c47-60da554c9beb
+
+	measure valor_dias_PME_simulador =
+			
+			IF(
+			    [Valor Simulador_PME] = 1 || [Valor Simulador_PME] = -1,
+			    FORMAT([Valor Simulador_PME], "0 dia"),
+			    FORMAT([Valor Simulador_PME], "0 dias")
+			)
+		lineageTag: dd2f0285-7fb8-4e3f-981c-03ed910ae491
+
+	measure simulador_red_dias_estoque =
+			
+			DIVIDE([ATCIR_Estoques], [Prazo Médio do Giro do Estoque]) * [Valor Simulador_PME]
+		formatString: #,0
+		lineageTag: d5f8892d-5dd4-408e-9d24-3cc618b6ed91
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_financ = ```
+			
+			
+			VAR vcaixa_liq_financ =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Caixa_Liq_Financiamentos"
+			            
+			            ),
+			            balancetenew[vlr]))
+			
+			RETURN
+			vcaixa_liq_financ
+			```
+		formatString: #,0
+		lineageTag: 35ce3f71-28f7-4c09-9a26-e78867e1a6c6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure prazo_medio_giro_do_estoque_simulado_TOTAL = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR ResultadoCalculo = 
+			    CALCULATE(
+			        Medidas_balancetenew[ATCIR_Estoques] / 
+			        Medidas_balancetenew[CCusto_ACU] * Medidas_balancetenew[Valor_mensal] * -1,
+			        dCalendario[data] = UltimoMesTrimestre
+			    ) + [Valor Simulador_PME]
+			RETURN
+			    ROUND(ResultadoCalculo, 2)
+			
+			```
+		formatString: 0
+		lineageTag: 19e402b4-a93a-4bfa-badb-4dccf2b9f677
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dif_dfc_var_caixa_liq = ```
+			
+			VAR resultado =
+			[dfc_var_caixa_liq_caixa_simulado] - [dfc_var_caixa_liq] 
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+			```
+		formatString: #,0
+		lineageTag: 57957444-3857-458d-a1d8-f55625f81102
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_caixa_iq_card = ```
+			
+			IF(
+			    [dif_dfc_var_caixa_liq] > 0, 
+			    FORMAT("Variação Positiva de Caixa", "#00FF00"), 
+			    FORMAT("Variação Negativa de Caixa", "#FF0000")
+			)
+			
+			
+			
+			```
+		lineageTag: bd678d5d-8005-4c06-b049-a888308edc30
+
+	measure circulo_dfc_simulador = ```
+			
+			VAR ImagemVerde = "https://i.ibb.co/51ZGBWP/Planning-GRAFISMOS-Artboard-10-RGB.png"
+			VAR ImagemVermelha = "https://i.ibb.co/P5c4FTB/circulo-vermelho.png"
+			VAR ImagemSelecionada = IF([dif_dfc_var_caixa_liq] > 0, ImagemVerde, ImagemVermelha)
+			RETURN
+			    FORMAT(1, "<img src='" & ImagemSelecionada & "' width='100' height='100'>")
+			
+			```
+		lineageTag: 51e72f3f-3f6d-4f18-a5a9-810f48543604
+		dataCategory: ImageUrl
+
+	measure variacao%_DRE =
+			
+			DIVIDE(([var var_contas_pagar_simulado_DRE] *-1),
+			[dfc_contas_pagar_actual_month])
+		lineageTag: 8f375582-20c6-493f-9d7d-20acb0af2c87
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_contas_pagar_DRE_simulado =
+			
+			DIVIDE([var var_contas_pagar_simulado_DRE],
+			[dfc_contas_pagar_actual_month])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 82c89cf1-1f53-4e8a-be34-75ec7db96e5a
+
+	measure variacao%_contas_pagar_PMP =
+			
+			DIVIDE([simulador_var_contas_pagar_dias_],
+			[dfc_contas_pagar_actual_month])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c9807ad1-f7a2-492b-9899-dfbed8e3b82a
+
+	measure variacao%_caixa_liq_simulado =
+			
+			DIVIDE([dfc_var_caixa_liq_caixa_simulado] - [dfc_var_caixa_liq],
+			ABS([dfc_var_caixa_liq]))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f36c5a0e-1a05-43a9-a9cb-8ef0c7aad510
+
+	measure deducoes_simulado = ```
+			
+			VAR vdeducoes_impostos_receita =
+			ROUND(
+			DIVIDE([deducoes_actual_month],
+			[MReceita_bruta]), 4)
+			
+			VAR vdeducoes_var_receita =
+			CALCULATE(
+			vdeducoes_impostos_receita * 
+			[var_receita_bruta$] )
+			
+			RETURN
+			
+			    vdeducoes_var_receita 
+			    + [deducoes_actual_month]
+			```
+		formatString: #,0
+		lineageTag: d39cb4ce-3792-403f-b237-f3ebdf37da52
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_deducoes$ =
+			
+			[deducoes_simulado] - [deducoes_actual_month]
+		formatString: #,0
+		lineageTag: c4ba81ff-8ee0-4429-8df7-f4e1022bd975
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_deduc_imp|receita_bruta% = ```
+			
+			VAR vdeducoes_impostos = 
+			([deducoes_actual_month] *-1) + ([tributos_incidentes_actual_month] *-1)
+			
+			RETURN
+			DIVIDE(
+			    vdeducoes_impostos,
+			    [MReceita_bruta]
+			)
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: fe9f6361-4263-4cff-a195-bd631a3fb207
+
+	measure simulador_receita_liq|receita_bruta% =
+			
+			DIVIDE(
+			    [MReceita_Liquida_actual_month],
+			    [MReceita_bruta]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 9355d390-138c-4c09-8f4d-bdb7ffcf886d
+
+	measure simulador_desp_gerais|receita_bruta% =
+			
+			DIVIDE(
+			    [despesas_gerais_actual_month] *-1,
+			    [MReceita_bruta]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 16bd766c-37d9-4502-aaa5-53f16a060912
+
+	measure simulador_rresultado_op|receita_bruta% =
+			
+			DIVIDE(
+			    [rresultado_operacional],
+			    [MReceita_bruta]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 410a52a1-9b86-403d-9f1c-149b09124ab4
+
+	measure deduc_imp|receita_bruta_simulado% =
+			
+			DIVIDE(
+			    [deducoes_impostos_simulado],
+			    [receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 3a5f18a6-9a6e-47cf-8705-3381eec36bcf
+
+	measure receita_liq|receita_bruta_simulado% =
+			
+			DIVIDE(
+			    [receita_liquida_simulado],
+			    [receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 4a9d1e97-ea00-40cd-8d54-db5784690654
+
+	measure lucro_bruto|receita_bruta_simulado% =
+			
+			DIVIDE(
+			    [lucro_bruto_simulado],
+			    [receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 8d680df9-3aa1-4580-973a-775970161eeb
+
+	measure desp_gerais|receita_bruta_simulado_% =
+			
+			DIVIDE(
+			    [despesas_gerais_simulado],
+			[receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 033abb3c-7575-4a74-b215-fd94d145b872
+
+	measure lucro_op|receita_bruta_simulado% =
+			
+			DIVIDE(
+			    [lucro_operacional_simulado],
+			    [receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c7f2d370-5179-421d-b11d-587cbca06751
+
+	measure lucro_liq_simulado_video =
+			
+			[lucro_liquido_simulado]
+		lineageTag: c7238543-82d3-4d1e-9009-1136c29e65dd
+
+		formatStringDefinition = ```
+				VAR V_lucro = [lucro_liquido_simulado] - [LLucro_liquido_actual_month]
+				VAR V_variacao = DIVIDE(V_lucro, [LLucro_liquido_actual_month])
+				
+				VAR V_formato = 
+				SWITCH(
+				    TRUE(),
+				    V_lucro >= 1000000000, "R$ #,##0.0B;R$ -#,##0.0B",
+				    V_lucro >= 1000000, "R$ #,##0.0M; R$ -#,##0.0M",
+				    V_lucro >= 1000, "R$ #,##0.0K;R$ -#,##0.0K",
+				    "R$ #,##0;R$ -#,##0"
+				)
+				
+				VAR V_icone = IF(V_variacao > 0, " ⇡", " ⇣")
+				
+				RETURN
+				"""" & FORMAT(V_lucro, V_formato) & " | " &
+				"""" & FORMAT(V_variacao, "0%;-0%") &
+				V_icone
+				
+				
+				
+				```
+
+	measure custo_sim|receita_bruta_simulado_% =
+			
+			DIVIDE(
+			    [custo_simulado],
+			[receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6861827e-2c27-4878-ad28-77cad0eeffca
+
+	measure variacao_receita_bruta_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [receita_bruta_simulado] - [MReceita_bruta],
+			            [MReceita_bruta]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([receita_bruta_simulado] - [MReceita_bruta]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [receita_bruta_simulado] - [MReceita_bruta]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para "•"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: 2e307f59-161a-443a-ac8f-fd46adfb2b4a
+
+	measure variacao_deducoes_impost_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [deducoes_impostos_simulado] - [deducoes_impostos],
+			            [deducoes_impostos]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([deducoes_impostos_simulado] - [deducoes_impostos]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [deducoes_impostos_simulado] - [deducoes_impostos]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para "•"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: 518c55c9-0de7-4de2-822a-e06afefacb3c
+
+	measure variacao_receita_liq_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [receita_liquida_simulado] - [MReceita_Liquida_actual_month],
+			            [MReceita_Liquida_actual_month]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([receita_liquida_simulado] - [MReceita_Liquida_actual_month]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [receita_liquida_simulado] - [MReceita_Liquida_actual_month]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			```
+		lineageTag: 6ea4101c-2a31-41c8-b221-aaa3a33ca984
+
+	measure variacao_custo_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [custo_simulado] - [CCusto_actual_month_positivo],
+			            [CCusto_actual_month_positivo]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([custo_simulado] - [CCusto_actual_month_positivo]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [custo_simulado] - [CCusto_actual_month_positivo]
+			
+			
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			```
+		lineageTag: 9672db94-a7e9-48ba-94b0-26c9b84ec2a8
+
+	measure variacao_lucro_bruto_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_bruto_simulado] - [lucro_bruto_actual_month],
+			            [lucro_bruto_actual_month]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([lucro_bruto_simulado] - [lucro_bruto_actual_month]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_bruto_simulado] - [lucro_bruto_actual_month]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			```
+		lineageTag: 094bdd9b-e5c2-4053-a3ab-1d873f4a56fc
+
+	measure variacao_desp_gerais_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [despesas_gerais_simulado] - [despesas_gerais_simples],
+			            [despesas_gerais_actual_month_positivo]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([despesas_gerais_simulado] - [despesas_gerais_simples]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [despesas_gerais_simulado] - [despesas_gerais_simples]
+			
+			VAR v_variacao_final =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0,
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			FORMAT(v_variacao_final, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 3f8ba7ae-0b52-43ef-8a4a-bf12612b7224
+
+	measure variacao_lucro_operacional_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_operacional_simulado] - [rresultado_operacional],
+			            [rresultado_operacional]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([lucro_operacional_simulado] - [rresultado_operacional]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_operacional_simulado] - [rresultado_operacional]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        ABS(v_variacao_din) >= 1000000000, "R$ #,,,#0;R$ -#,,,#0",
+			        ABS(v_variacao_din) >= 1000000, "R$ #,,#0;R$ -#,,#0",
+			        ABS(v_variacao_din) >= 1000, "R$ #,#0;R$ -#,#0",
+			        "R$ #,##0;R$ -#,##0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: b39cf026-06b4-4bbd-b3f1-a7ed2d2ef0f5
+
+	measure var_lucro_liq_simulado% =
+			
+			DIVIDE(
+			[lucro_liquido_simulado] - [LLucro_liquido_actual_month],
+			ABS([LLucro_liquido_actual_month]))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 90576c30-89e3-4736-8d19-8d0433d898b5
+
+	measure lucro_liquido_card =
+			
+			IF([LLucro_liquido_actual_month] > 0, "Lucro Anterior", "Prej Anterior")
+		lineageTag: 8c7a2af0-28a7-4e8e-b9ab-b791dbd109ab
+
+	measure variacao_quantid_simulado = ```
+			
+			// A variação da quantidade é com base na margem bruta 
+			VAR variacao_qtd =
+			([lucro_bruto_actual_month] * (1 + simulador_quantidade[Valor Var Qtd])) - [lucro_bruto_actual_month]
+			 
+			 RETURN
+			 ROUND(
+			 variacao_qtd, 0)
+			```
+		formatString: #,0
+		lineageTag: 0605a16b-2572-4f93-af74-32ca5f12b131
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_preco_simulado = ```
+			
+			VAR variacao_qtd =
+			([lucro_bruto_actual_month] * (1 + simulador_quantidade[Valor Var Qtd])) - [lucro_bruto_actual_month]
+			 
+			 VAR variacao_preco =
+			 ([MReceita_bruta] * (1 + simulador_preco[Valor Preço] )) - [MReceita_bruta]
+			
+			 RETURN
+			 ROUND(
+			 variacao_preco, 0)
+			```
+		formatString: #,0
+		lineageTag: 52df8e05-d0a7-4423-9361-053358a640aa
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_custo_simulado =
+			
+			ROUND(
+			 ([CCusto_actual_month] * (simulador_custos[Valor simulador_custos]) *-1), 0)
+		formatString: #,0
+		lineageTag: 8e18fb21-fa82-4cd5-8026-3a0dbc77d28f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure despesas_gerais_acu_ano_civil =
+			
+			CALCULATE(
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Variaveis_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Folha_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_comerciais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketplace" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Salarios_ordenados" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Beneficios" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Impostos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Provisoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Variaveis_Entrega" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Logistica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Consultoria_Tecnica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Alugueis" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Prestacao_de_Servicos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Manutencoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Informatica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Ocupacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_contratuais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_depreciacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_tributarias" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_controladas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_nao_controladas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Utilidades_Servicos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Servicos_Profissionais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Comunicacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Propaganda_Publicidade" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Viagens_Estadia" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Frota_Transportes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Bancarias" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesass_com_Outras_Provisoes"
+			    ),
+			    balancetenew[vlr]
+			), DATESYTD(dCalendario[data])
+			) *-1
+		formatString: #,0
+		lineageTag: 86d11d23-560d-4c45-8181-76cb50a806b7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure receita_bruta_simulado_acu = ```
+			
+			VAR variacao_qtd =
+			([MMargem_Bruta_ACU] * (1 + simulador_qtd_acumulado[Valor simulador_qtd_acumulado])) - [MMargem_Bruta_ACU]
+			 
+			 VAR variacao_preco =
+			 [MReceita_Bruta_ACU] * (1 + simulador_preco_acumulado[Valor simulador_preco_acumulado])
+			
+			 RETURN
+			 variacao_qtd + variacao_preco
+			```
+		formatString: #,0
+		lineageTag: 8bdda15e-aec0-4045-8f53-133e07f3f9b2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_quantid_simulado_acu = ```
+			
+			VAR variacao_qtd =
+			([MMargem_Bruta_ACU] * (1 + simulador_qtd_acumulado[Valor simulador_qtd_acumulado])) - [MMargem_Bruta_ACU]
+			 
+			
+			 RETURN
+			 ROUND(
+			 variacao_qtd, 0)
+			```
+		formatString: #,0
+		lineageTag: 01c8e9ce-2689-46d7-9e09-c5d040481dd1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure deducoes_impostos_simulado_ACU = ```
+			
+			VAR vdeducoes_impostos_receita =
+			ROUND(
+			DIVIDE([deducoes_impostos_acu],
+			[MReceita_Bruta_ACU]), 4)
+			
+			VAR vdeducoes_var_receita =
+			CALCULATE(
+			vdeducoes_impostos_receita * 
+			[var_receita_bruta_ACU$] )
+			
+			RETURN
+			
+			    vdeducoes_var_receita 
+			    + [deducoes_impostos_acu]
+			
+			```
+		formatString: #,0
+		lineageTag: fe6d6797-3675-4c73-b554-6f84e6354ee4
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_bruta_ACU$ =
+			
+			ROUND(
+			[receita_bruta_simulado_acu] - [MReceita_Bruta_ACU], 0)
+		formatString: #,0
+		lineageTag: 1170980e-9eef-4c06-8c8e-3e3ea5e38aa6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_bruta_ACU% =
+			
+			VAR resultado =
+			DIVIDE(
+			[var_receita_bruta_ACU$],
+			[MReceita_Bruta_ACU]
+			)
+			
+			RETURN
+			ROUND(
+			    resultado, 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 76cf6e3c-95bd-4e13-b900-9879496f72dc
+
+	measure variacao_receita_bruta_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [receita_bruta_simulado_acu] - [MReceita_Bruta_ACU],
+			            [MReceita_Bruta_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [receita_bruta_simulado_acu] - [MReceita_Bruta_ACU]
+			
+			VAR v_variacao_din_if =
+			IF(
+			            v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			            0, v_variacao_din)
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: baf641e0-07ab-445f-86bd-4369ad8a3a83
+
+	measure variacao_deducoes_impost_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [deducoes_impostos_simulado_ACU] - [deducoes_impostos_acu],
+			            [deducoes_impostos_acu]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [deducoes_impostos_simulado_ACU] - [deducoes_impostos_acu]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			```
+		lineageTag: c1bb39c1-faf0-40b5-bded-ea86a775a3c4
+
+	measure var_lucro_liq_simulado_ACU =
+			
+			VAR vvariacao =
+			[lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU]
+			
+			RETURN
+			IF(
+			            vvariacao >= -0.0001 && vvariacao <= 0.0001, 0, vvariacao)
+		formatString: #,0
+		lineageTag: c6e9e0f0-4e94-40b0-9ed2-958648ea61ab
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure receita_liquida_simulado_ACU =
+			
+			[receita_bruta_simulado_acu] - [deducoes_impostos_simulado_ACU]
+		formatString: #,0
+		lineageTag: 9da37fa1-fa34-4d02-bf8a-01b864ea0e16
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_receita_liq_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [receita_liquida_simulado_ACU] - [MReceita_Liquida_ACU],
+			            [MReceita_Liquida_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [receita_liquida_simulado_ACU] - [MReceita_Liquida_ACU]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 9e13644f-41c4-491b-b2cc-63f68c9ca661
+
+	measure variacao_custo_simulado_ACU =
+			
+			ROUND(
+			 ([CCusto_ACU] * (simulador_custo_acumulado[Valor simulador_custo_acumulado]) *-1), 0)
+		formatString: #,0
+		lineageTag: 9b9bb9b1-7bed-4968-8c41-f9b8fe670bc4
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_preco_simulado_ACU = ```
+			
+			 VAR variacao_preco =
+			 ([MReceita_Bruta_ACU] * (1 + simulador_preco_acumulado[Valor simulador_preco_acumulado] )) - [MReceita_Bruta_ACU]
+			
+			 RETURN
+			 ROUND(
+			 variacao_preco, 0)
+			```
+		formatString: #,0
+		lineageTag: 37547ac3-e00f-481f-b7ae-a4960d703004
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure custo_simulado_ACU = ```
+			
+			VAR vreceita_bruta_simulado =
+			([MMargem_Bruta_ACU] * (1 + simulador_qtd_acumulado[Valor simulador_qtd_acumulado]) - [MMargem_Bruta_ACU]) + [MReceita_Bruta_ACU]
+			
+			VAR vvar_receita_bruta =
+			 vreceita_bruta_simulado - [MReceita_Bruta_ACU]
+			
+			VAR vcusto_var_receita =
+			DIVIDE([CCusto_ACU], [MReceita_Bruta_ACU]) * vvar_receita_bruta
+			 
+			 VAR vvariacao_custos =
+			 [CCusto_ACU] * (1 + simulador_custo_acumulado[Valor simulador_custo_acumulado]) *-1
+			
+			 RETURN
+			 vcusto_var_receita + vvariacao_custos
+			```
+		formatString: #,0
+		lineageTag: aab0509b-4550-4640-9150-c6ced3f85984
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_custo_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [custo_simulado_ACU] - ([CCusto_ACU] *-1),
+			            ([CCusto_ACU] *-1)
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [custo_simulado_ACU] - ([CCusto_ACU] *-1)
+			
+			
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: fae1b3df-1df0-4543-874b-ba5eaf7599cf
+
+	measure var_custo_ACU$ =
+			ROUND(
+			[custo_simulado_ACU] - ([CCusto_ACU] *-1), 0)
+		formatString: #,0.00
+		lineageTag: ff3082a7-137c-4e3d-ab25-5784c58b6815
+
+	measure var_receita_liq_ACU$ =
+			ROUND(
+			[receita_liquida_simulado_ACU] - [MReceita_Liquida_ACU], 0)
+		formatString: #,0.00
+		lineageTag: 8aea6ee2-f2ae-4871-8b8b-e4a41a61251f
+
+	measure lucro_bruto_simulado_ACU =
+			
+			[receita_liquida_simulado_ACU] - [custo_simulado_ACU]
+		formatString: #,0
+		lineageTag: e80cc755-41f4-4e89-af19-1dfef26774e7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_lucro_bruto_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_bruto_simulado_ACU] - [MMargem_Bruta_ACU],
+			            [MMargem_Bruta_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_bruto_simulado_ACU] - [MMargem_Bruta_ACU]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%") 
+			```
+		lineageTag: 5e93ff1f-c365-4c00-a5d2-3328767ba307
+
+	measure var_lucro_bruto_ACU$ =
+			
+			VAR vvariacao =
+			[lucro_bruto_simulado_ACU] - [MMargem_Bruta_ACU]
+			
+			RETURN
+			IF(
+			            vvariacao >= -0.0001 && vvariacao <= 0.0001,
+			            0, vvariacao)
+		lineageTag: b3cd70fe-d31a-4577-a777-b089eed0bf1b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure despesas_gerais_simulado_ACU =
+			
+			[despesas_gerais_acu] * (1 + simulador_desp_gerais_acumulado[Valor simulador_desp_gerais_acumulado])
+		formatString: #,0
+		lineageTag: 829c2f28-94f2-464c-ac57-e44e821e11b8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_desp_gerais_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			
+			    CALCULATE(
+			        DIVIDE(
+			            ROUNDUP([despesas_gerais_simulado_ACU],1) - [despesas_gerais_acu],
+			            [despesas_gerais_acu]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    ROUNDUP([despesas_gerais_simulado_ACU],1) - [despesas_gerais_acu]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			    
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: d5803ed6-6183-4675-886c-ab17f89707b3
+
+	measure var_despesas_gerais_ACU$ =
+			
+			ROUND(
+			[despesas_gerais_simulado_ACU] - [despesas_gerais_acu], 0)
+		formatString: #,0
+		lineageTag: d0f3eac4-4ef3-45d0-9a51-f05e306be560
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure lucro_operacional_simulado_ACU =
+			
+			[lucro_bruto_simulado_ACU] - [despesas_gerais_simulado_ACU]
+		formatString: #,0
+		lineageTag: 5143af08-ce5f-4122-add9-e530e8947b8e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_lucro_operacional_ACU$ =
+			
+			VAR resultado =
+			[lucro_operacional_simulado_ACU] - [rresultado_operacional_ACU]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0.00
+		lineageTag: e7a9c1e4-e65e-41ab-bfe8-0b1d185b3547
+
+	measure variacao_lucro_operacional_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_operacional_simulado_ACU] - [rresultado_operacional_ACU],
+			            [rresultado_operacional_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao >= 0, "🡑", "🡓"
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_operacional_simulado_ACU] - [rresultado_operacional_ACU]
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: b3c92f4c-2824-4cc7-a882-b9704e3029bd
+
+	measure deduc_imp|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [deducoes_impostos_simulado_ACU],
+			    [receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 1ceb5b30-aac0-4f78-909d-557065ab09b9
+
+	measure receita_liq|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [receita_liquida_simulado_ACU],
+			    [receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c2265184-1300-4dec-94e8-5e2e748fe159
+
+	measure custo_sim|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [custo_simulado_ACU],
+			[receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6b579761-9a94-41db-88bd-da23900b1780
+
+	measure lucro_bruto|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [lucro_bruto_simulado_ACU],
+			    [receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 674c8794-2eba-4f15-862e-26bf35136e47
+
+	measure desp_gerais|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [despesas_gerais_simulado_ACU],
+			[receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 102da45d-190b-4555-8b48-285d07dfa9e1
+
+	measure lucro_op|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			    [lucro_operacional_simulado_ACU],
+			    [receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5cc12d09-e01f-4311-b515-6f60dde4d9fb
+
+	measure lucro_liquido_simulado_ACU =
+			
+			[var_lucro_operacional_ACU$] + [LLucro_liquido_ACU]
+		formatString: #,0
+		lineageTag: 63a6032b-fbe8-4dd4-98ca-fbcdbaea2fe5
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_lucro_liq_simulado_ACU% =
+			
+			DIVIDE(
+			[lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU],
+			ABS([LLucro_liquido_ACU]))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5d4eafdf-c22b-404d-8868-993b3cc3215e
+
+	measure lucro_liquido_simulado_ACU_card =
+			
+			IF([lucro_liquido_simulado_ACU] > 0, "Lucro Líq. Simulado", "Prejuízo Simulado")
+		lineageTag: d9299ad4-4d52-4981-8e1a-ff73587dbeb1
+
+	measure lucro_liquido_ACU_card =
+			
+			IF([LLucro_liquido_ACU] > 0, "Lucro", "Prejuízo")
+		lineageTag: 8e0772ae-5015-4a6d-9f07-dab39ffd055a
+
+	measure lucro_liquido_card_ =
+			
+			IF([LLucro_liquido_actual_month] > 0, "Lucro", "Prejuízo")
+		lineageTag: 2b98ddcd-0544-43d0-a1ed-28fcf398259a
+
+	measure ebitda_simulado =
+			
+			[lucro_operacional_simulado] - [Ebitda_despesa_depreciacao]
+		formatString: #,0
+		lineageTag: e93baeb3-70c9-43ec-88a5-bb896d3830e2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure lucro_liq|receita_bruta_simulado% =
+			
+			DIVIDE(
+			[lucro_liquido_simulado],
+			[receita_bruta_simulado]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6d02fa67-d6fb-45f2-a4af-56de280e3939
+
+	measure desp_gerais|receita_bruta_ACU =
+			
+			DIVIDE(
+			    [despesas_gerais_acu],
+			    [MReceita_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 2cd1f851-b0e5-4915-8621-064cafdbd36f
+
+	measure ebitda_simulado_ACU =
+			
+			[lucro_operacional_simulado_ACU] - [Ebitda_despesa_depreciacao_ACU]
+		formatString: #,0
+		lineageTag: aca4fa9f-97a8-4635-be42-15326a7020e7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_receita_bruta$_sinal =
+			
+			IF(
+			    [var_receita_bruta$] = 0, "⚪",
+			IF([var_receita_bruta$] > 0, "🟢", "🔴"))
+		lineageTag: 2443351d-ca05-470a-8ed3-16d3975f40e0
+
+	measure diferenca_var_receita_bruta% =
+			
+			VAR vvariacao_neg = [var_receita_bruta%] - [variacao_receita_bruta]
+			
+			RETURN
+			 IF([var_receita_bruta%] < 0,
+			vvariacao_neg *-1,
+			vvariacao_neg)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 73aab98b-e6a8-44c3-ab4c-d0068abdb57d
+
+	measure var_receita_bruta%_sinal = ```
+			
+			IF(
+			    [var_receita_bruta$] = 0, 
+			    "⚪",
+			IF(
+			    [diferenca_var_receita_bruta%] > 0, 
+			    "🟢", 
+			    "🔴"
+			    )
+			)
+			```
+		lineageTag: ba8326bc-0644-42bd-a250-0caa0459f934
+
+	measure var_lucro_bruto$_sinal =
+			
+			IF(
+			    [var_lucro_bruto$] = 0, "⚪",
+			IF([var_lucro_bruto$] > 0, "🟢", "🔴"))
+		lineageTag: a8e0821e-6b08-4b05-9d49-84eed0fde3ee
+
+	measure var_lucro_bruto%_sinal = ```
+			
+			IF(
+			    [var_lucro_bruto$] = 0,
+			    "⚪",
+			IF([var_lucro_bruto%] > 0, 
+			"🟢", 
+			"🔴"
+			)
+			)
+			```
+		lineageTag: 83e88eb2-c59a-46cb-bb2b-9e68e57ae852
+
+	measure var_despesas_gerais$_sinal =
+			
+			IF(
+			    [var_despesas_gerais$] = 0, "⚪",
+			IF([var_despesas_gerais$] < 0, "🟢", "🔴"))
+		lineageTag: 71e6cdfc-779e-4e7c-b0c9-0573545ad60d
+
+	measure var_despesas_gerais%|receita_bruta =
+			
+			[desp_gerais|receita_bruta_simulado_%] -
+			[%gastos_gerais|receita_bruta]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5ed2e7f2-0d1b-4320-93c1-776b46690523
+
+	measure var_desp_gerais_sinal =
+			
+			IF(
+			    [var_despesas_gerais$] = 0,
+			    "⚪",
+			IF([var_despesas_gerais%|receita_bruta] < 0, "🟢", "🔴"))
+		lineageTag: 148908bd-d1bf-45be-8471-a36770b5a850
+
+	measure var_lucro_operacional_sinal =
+			
+			IF(
+			    [var_lucro_operacional$] = 0,
+			    "⚪",
+			IF([var_lucro_operacional$] > 0, "🟢", "🔴"))
+		lineageTag: f490f14d-a4b0-467f-aede-345b2816cfba
+
+	measure var_lucro_operacional%_sinal =
+			
+			IF(
+			    [var_lucro_operacional$] = 0,
+			    "⚪",
+			IF([var_lucro_operacional%] > 0, "🟢", "🔴"))
+		lineageTag: ec1336e7-db38-41df-930c-716fc44c6fe5
+
+	measure var_ebitda_simulado$ =
+			
+			VAR vvariacao =
+			[ebitda_simulado] - [EEBITDA_actual_month]
+			
+			RETURN
+			IF(
+			            vvariacao >= -0.0001 && vvariacao <= 0.0001,
+			            0, vvariacao)
+		lineageTag: 0181afb3-4dec-4946-97f3-c7de91bca016
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure var_ebitda$_sinal =
+			
+			IF(
+			    [var_ebitda_simulado$] = 0, "⚪",
+			IF([var_ebitda_simulado$] > 0, "🟢", "🔴"))
+		lineageTag: ef333b03-2a0d-47de-bb77-433412414b4a
+
+	measure var_lucro_liq_simulado$_sinal =
+			
+			IF(
+			    [var_lucro_liq_simulado] = 0,
+			    "⚪",
+			IF([var_lucro_liq_simulado] > 0, "🟢", "🔴"))
+		lineageTag: e038bec6-8d72-486d-8205-c8f4a7f36c26
+
+	measure diferenca_var_receita_bruta_ACU% =
+			
+			VAR vvariacao_neg = [var_receita_bruta_ACU%] - [variacao_receita_bruta_ACU]
+			
+			RETURN
+			 IF([var_receita_bruta_ACU%] < 0,
+			vvariacao_neg *-1,
+			vvariacao_neg)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a1868cbb-e786-481c-874a-137bd241037e
+
+	measure var_receita_bruta_ACU%_sinal =
+			
+			IF([diferenca_var_receita_bruta_ACU%] > 0, "🟢", "🔴")
+		lineageTag: 1f40ad51-38f9-4d30-bc7c-acbb05726b4a
+
+	measure var_lucro_bruto_ACU$_sinal = ```
+			
+			IF(
+			    [var_lucro_bruto_ACU$] = 0,
+			"⚪",
+			IF([var_lucro_bruto_ACU$] > 0,
+			 "🟢", 
+			 "🔴"
+			 )
+			)
+			```
+		lineageTag: 7089df4e-affe-4f8c-921c-29b9cd52ace8
+
+	measure var_lucro_bruto_ACU% =
+			
+			DIVIDE(
+			    [var_lucro_bruto_ACU$],
+			    [MMargem_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 92fcd968-2778-478a-ba4b-1f664c4d757e
+
+	measure var_lucro_bruto_ACU%_sinal =
+			
+			IF([var_lucro_bruto_ACU%] > 0, "🟢", "🔴")
+		lineageTag: f2097d21-7a9b-450b-86aa-881f216d5b8b
+
+	measure var_lucro_operacional_ACU% =
+			
+			
+			DIVIDE(
+			    [var_lucro_operacional_ACU$],
+			    ABS(
+			    [rresultado_operacional_ACU])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 274edfaa-2feb-4b7f-90d4-ea9d96706523
+
+	measure variacao_qtd_simulado_dfc =
+			
+			VAR resultado =
+			[variacao_quantid_simulado] *-1
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0
+		lineageTag: 743bc16f-2a8e-4ec3-93d5-34801d9d7861
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_clientes_simulado = ```
+			// a variação de clientes é a variação da DFC
+			[cfs_caixa_clientes_simulado] - [receita_bruta_simulado] 
+			```
+		formatString: #,0
+		lineageTag: 19e972c1-b182-4edc-8921-500656f90a49
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_fornecedores_simulado = ```
+			// a variação de fornecedores no CFS é fornecedores - estoques
+			[cfs_custos_diretos_simulado] - 
+			[cfs_caixa_fornecedores_simulado]
+			```
+		formatString: #,0
+		lineageTag: 986cbe9d-101b-412a-9eb1-1f3ee852cdda
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_lucro_bruto_cx_simulado =
+			
+			[cfs_variacao_clientes_simulado] + [cfs_variacao_fornecedores_simulado]
+		formatString: #,0
+		lineageTag: 4ffcd37e-3588-4b7e-ab80-8ffbba62ef0a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_fluxo_caixa_liq_simulado = [cfs_fluxo_caixa_operac_simulado] + [cfs_outras_saidas_de_caixa]
+		formatString: #,0
+		lineageTag: a5f0fa47-e029-46cc-89f9-e1ea46e07a07
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_ebitda$_ACU_simulado =
+			ROUND(
+			[EEbitda_ACU] - [ebitda_simulado_ACU], 0)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 68e31771-cfbd-49f8-9db9-dc4aecb63f2b
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure variacao_lucro_liq_ACU_simulado =
+			
+			[LLucro_liquido_ACU] - [lucro_liquido_simulado_ACU]
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 466223a7-f226-4aa2-aabb-80a7a4b71adc
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure %Lucro_liquido_acu_LY|Mreceita_bruta_acu_simulado = ```
+			
+			
+			    DIVIDE(
+			    [lucro_liquido_simulado_ACU], 
+			    [receita_bruta_simulado_acu])
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 072820b2-4d49-4fd0-a0d7-2a1271a32e57
+
+	measure diferenca_%LLucro_liquido_acu|receita_bruta_acu_simulado =
+			ROUND(
+			[%LLucro_liquido_acu|receita_bruta_acu] - [%Lucro_liquido_acu_LY|Mreceita_bruta_acu_simulado], 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: bb7578b2-0032-4ac3-b991-7605c02a08aa
+
+	measure dfc_variacao_operacional_outras_contas = ```
+			
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			
+			VAR vvariacao_total =
+			CALCULATE(
+			    SUMX(
+			        FILTER(balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_TOTAL"),
+			        balancetenew[vlr]),
+			        dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			        RETURN
+			
+			        vvariacao_total - [dfc_contas_pagar_actual_month] - [dfc_contas_receber_actual_month] - [dfc_estoque_actual_month]
+			```
+		formatString: #,0
+		lineageTag: 565f56f0-772a-42c0-b4cb-25c81a1f24a3
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_estoques_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_estoque_simulado] - [dfc_estoque_actual_month],
+			           ABS( [dfc_estoque_actual_month])
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    ([dfc_var_estoque_simulado] - [dfc_estoque_actual_month])
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: 7a6b078c-9289-454a-9039-7ab20e0c2634
+
+	measure variacao_estoques_simulado_din =
+			
+			[dfc_estoque_actual_month] - [dfc_var_estoque_simulado]
+		formatString: #,0
+		lineageTag: 357358f7-cfee-467c-a5e6-f6910c1726a8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_clientes_simulado_din =
+			
+			VAR resultado =
+			[dfc_var_contas_receber_simulado] - [dfc_contas_receber_actual_month]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0,
+			            resultado
+			)
+		formatString: #,0
+		lineageTag: 24fab1f3-fd18-495d-b2f0-a175ff950d97
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_contas_receber_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_contas_receber_simulado] - [dfc_contas_receber_actual_month],
+			            [dfc_contas_receber_actual_month]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([dfc_var_contas_receber_simulado] - [dfc_contas_receber_actual_month]) < 0.0001, "•", 
+			        IF(
+			            v_variacao > 0, "🡑", 
+			            "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_contas_receber_simulado] - [dfc_contas_receber_actual_month]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR v_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, v_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: 257d3698-b25d-43ae-a075-49972d194b63
+
+	measure dc_contas_pagar_simulador_din =
+			
+			[dfc_contas_pagar_actual_month] - [dfc_contas_pagar_actual_month]
+		formatString: #,0
+		lineageTag: e4da00f5-e132-4ddb-a649-25db695b86e0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_contas_pagar_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_contas_pagar_simulado] - [dfc_contas_pagar_actual_month],
+			            [dfc_contas_pagar_actual_month]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([dfc_var_contas_pagar_simulado] - [dfc_contas_pagar_actual_month]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_contas_pagar_simulado] - [dfc_contas_pagar_actual_month]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR v_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, v_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: f75eafa9-34c5-4069-a404-fc2543f1ce24
+
+	measure simulador_red_dias_estoque_negat =
+			
+			[simulador_red_dias_estoque] *-1
+		formatString: #,0
+		lineageTag: aeb4aa3b-78d4-48fd-b5ec-4b31e2bd78ff
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_fluxo_investimentos = ```
+			
+			 VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vfluxo_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Fluxo_Investimentos"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vfluxo_liq
+			```
+		formatString: #,0
+		lineageTag: 61a69f52-6327-470a-a660-377e6295c3f0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_fluxo_financiamentos = ```
+			
+			 VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			VAR vfluxo_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Fluxo_Financiamentos"),
+			            balancetenew[vlr]),
+			            dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			
+			RETURN
+			vfluxo_liq
+			```
+		formatString: #,0
+		lineageTag: 50286969-837d-4c09-8a1b-b0f1aa5ccf93
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_lucro_liquido_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_liquido_simulado] - [LLucro_liquido_actual_month],
+			            [LLucro_liquido_actual_month]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([lucro_liquido_simulado] - [LLucro_liquido_actual_month]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_liquido_simulado] - [LLucro_liquido_actual_month]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: 71ac0701-2d5b-408a-a162-e2fefb86926b
+
+	measure variacao_lucro_liquido =
+			
+			[lucro_liquido_simulado] - [LLucro_liquido_actual_month]
+		lineageTag: e3f604cd-70aa-42d0-ac38-034218d6fcf8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_caixa_liq_operac_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_ope_simulado] - [dfc_var_caixa_liq_ope],
+			            [dfc_var_caixa_liq_ope]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_ope_simulado] - [dfc_var_caixa_liq_ope]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: aa8fc998-754d-422c-aad0-a5fd9ce9c9a6
+
+	measure variacao_caixa_liq_invest_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_invest_simulado] - [dfc_var_caixa_liq_invest],
+			            ABS([dfc_var_caixa_liq_invest])
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_invest_simulado] - [dfc_var_caixa_liq_invest]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: f28c7df7-f957-435a-96a4-341621e941ea
+
+	measure variacao_caixa_liq_video_simulado = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_caixa_simulado] - [dfc_var_caixa_liq],
+			            [dfc_var_caixa_liq]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_caixa_simulado] - [dfc_var_caixa_liq]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: ccf06bc7-65a2-49b1-afdb-a5d006015b3e
+
+	measure variacao_caixa_liq_ope_simulado =
+			
+			[dfc_var_caixa_liq_ope_simulado] - [dfc_var_caixa_liq_ope]
+		lineageTag: 79578f46-4815-4915-b172-dd7435ea1f07
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_caixa_liq_invest_simulado =
+			
+			[dfc_var_caixa_liq_invest_simulado] - [dfc_var_caixa_liq_invest]
+		lineageTag: 81e69fea-5e6c-4c34-84ac-49bd06519822
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_caixa_liq_simulado =
+			
+			[dfc_var_caixa_liq_caixa_simulado] - [dfc_var_caixa_liq]
+		lineageTag: c735f504-abf6-4904-86a3-5c24ed4a13ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_PMGE_simulado =
+			
+			[prazo_medio_giro_do_estoque_simulado_TOTAL] - [prazo_medio_giro_estoque_2_casas]
+		lineageTag: 29feac18-b1db-4846-a95c-e51f4a6168b1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_PMR_simulado =
+			
+			[Prazo_medio_contas_receber_simulado_TOTAL] - [prazo_medio_contas_receber_2_casas]
+		lineageTag: 8c534f2a-9112-4fc9-a1e9-fbdaac495e2d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_PMP_simulado =
+			
+			[prazo_medio_contas_pagar_simulado_TOTAL] - [prazo_medio_contas_pagar_2_casas]
+		lineageTag: 3a4757bd-5cfb-470b-967e-7e63e51d9da0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_giro_estoque_2_casas =
+			
+			ROUND([Prazo Médio do Giro do Estoque], 2)
+		lineageTag: 5510e133-ad3f-411a-b1bb-5a4064a82040
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_receber_2_casas =
+			
+			ROUND([Prazo Médio Contas a Receber], 2)
+		lineageTag: 0c54f8f4-3e87-4797-b7f7-f60a59b57a61
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_pagar_2_casas =
+			
+			ROUND(
+			[Prazo Médio Contas a Pagar], 2)
+		lineageTag: 057a23d3-6d13-47b3-8a98-2229b838f3e6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure despesas_gerais_simples = ```
+			
+			 (
+			[rresultado_operacional] - [lucro_bruto_actual_month]) *-1
+			```
+		formatString: #,0
+		lineageTag: b7624521-3efa-4cd6-b295-6490be1897f7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_estoque_DRE =
+			
+			// a variação do estoque tem como sua contra partida os custos.
+			// os custos variados pela quantidade (demanda) terão seu aumento com base na proporção original dos custos
+			
+			VAR vreceita_bruta_simulado =
+			([lucro_bruto_actual_month] * (1 + simulador_quantidade[Valor Var Qtd]) - [lucro_bruto_actual_month]) + [MReceita_bruta]
+			
+			VAR vvar_receita_bruta =
+			 vreceita_bruta_simulado - [MReceita_bruta]
+			
+			VAR vcusto_var_receita =
+			[CCusto|Receitabruta] * vvar_receita_bruta
+			
+			RETURN
+			vcusto_var_receita *-1
+		lineageTag: 6516a3fd-3dab-4c0d-a957-1324ec7166ab
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_estoques_total =
+			
+			VAR resultado =
+			[variacao_estoque_DRE] +
+			[simulador_red_dias_estoque]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0
+		lineageTag: d18a2ba0-5e84-426a-882d-c62bbe633a6e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_estoque_PMP =
+			
+			// a variação é multiplicada por -* por a diminuição de caixa tem efeito positivo no caixa já o aumento efeito contrário
+			[simulador_red_dias_estoque] *-1
+		formatString: #,0
+		lineageTag: 805746b6-d3f4-40f9-a0b6-ce7542541099
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure simulador_receita_liq|receita_bruta_ACU% =
+			
+			DIVIDE(
+			    [MReceita_Liquida_ACU],
+			    [MReceita_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f700b817-a29c-487d-b4c8-89dfe4269340
+
+	measure simulador_desp_gerais|receita_bruta_ACU% =
+			
+			DIVIDE(
+			    [despesas_gerais_acu] *-1,
+			    [MReceita_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 8bc0cd86-0578-4bc7-b4c7-16cdfe0b18a4
+
+	measure lucro_liq|receita_bruta_simulado_ACU% =
+			
+			DIVIDE(
+			[lucro_liquido_simulado_ACU],
+			[receita_bruta_simulado_acu]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: e6f6e2a7-8f98-4c46-b3ac-37bd0992c12c
+
+	measure simulador_rresultado_op|receita_bruta_ACU% =
+			
+			DIVIDE(
+			    [rresultado_operacional_ACU],
+			    [MReceita_Bruta_ACU]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b7515f9a-8c8c-471a-b74c-25411e27b1e5
+
+	measure variacao_lucro_liquido_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU],
+			            [LLucro_liquido_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, V_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 190d9d27-107a-4510-bda9-dc814b307ec2
+
+	measure var_deducoes$_ACU =
+			
+			VAR resultado =
+			
+			[deducoes_impostos_simulado_ACU] -
+			[deducoes_impostos_acu]
+			RETURN
+			
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		lineageTag: c0828815-8aba-4ec8-9b88-ad72379cbb0e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure var_deducoes_impostos_ACU% =
+			
+			VAR resultado =
+			DIVIDE(
+			    [var_deducoes$_ACU],
+			    ABS([deducoes_impostos_acu])
+			)
+			
+			RETURN
+			ROUND(
+			    resultado, 0)
+		lineageTag: 32f7c7a5-4da5-433f-91f0-9aaceb552a1f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure dfc_resultado_ajustado_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Resultado_Ajustado"
+			        ),
+			        balancetenew[vlr]
+			    ),
+			    DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: d1430a0c-5a08-4fd6-bc0b-b6d212f77882
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_estoque_ACU = ```
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Estoques" 
+			    ),
+			    balancetenew[vlr]
+			),
+			DATESYTD(dCalendario[data]))
+			```
+		formatString: #,0
+		lineageTag: 7eb6d946-8250-4bf9-b9f7-e9bf1353ab39
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_contas_receber_ACU = ```
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber" 
+			    ),
+			    balancetenew[vlr]
+			),
+			DATESYTD(dCalendario[data]))
+			```
+		formatString: #,0
+		lineageTag: 4515b490-4b85-459b-8c78-f0634cff1634
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_contas_pagar_ACU = ```
+			
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores" 
+			    ),
+			    balancetenew[vlr]
+			),
+			DATESYTD(dCalendario[data]))
+			```
+		formatString: #,0
+		lineageTag: 4eaf1ab5-dac4-4dde-8d75-62d452bfef5f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_variacao_operacional_outras_contas_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_TOTAL"),
+			        balancetenew[vlr]),
+			        DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: 48f59b60-8d1b-4ff0-8f03-24f45efaa133
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_ope_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Operacional"),
+			            balancetenew[vlr]),
+			            DATESYTD(
+			                dCalendario[data]))
+		formatString: #,0
+		lineageTag: f9833be6-57ed-49cd-a405-823b03e51b49
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_fluxo_investimentos_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Fluxo_Investimentos"),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: 08c71b8c-7d87-4130-8aa6-8a1e338a174f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_invest_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Investimentos"),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: cc1b42ea-df7a-4352-930c-064a8a6a149a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_fluxo_financiamentos_ACU =
+			
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Fluxo_Financiamentos"),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+		formatString: #,0
+		lineageTag: d40eeb3a-c46e-4aaa-b6a2-693b7687babe
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_ACU = ```
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_caixasequicaixas"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+			```
+		formatString: #,0
+		lineageTag: f1201c0a-b980-46fe-8a2f-c10dc4fb7794
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_resultado_ajustado_simulado_ACU =
+			
+			VAR vresultado_ajust =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Resultado_Ajustado"
+			        ),
+			        balancetenew[vlr]
+			    ),
+			    DATESYTD(dCalendario[data]))
+			
+			VAR vvar_lucro =
+			    [lucro_liquido_simulado_ACU] - [LLucro_liquido_ACU]
+			
+			RETURN
+			    vresultado_ajust + vvar_lucro
+		formatString: #,0
+		lineageTag: bc71a3d3-5dc0-4fee-aaff-a20547fc33bf
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_estoque_simulado_ACU =
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_VARPAT_Estoques"),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+			             + ([variacao_estoques_total_ACU] *-1)
+		lineageTag: ad46acc3-8e17-475e-935b-89f846b78df7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_estoques_total_ACU =
+			
+			VAR resultado =
+			[variacao_estoque_DRE_ACU] +
+			[simulador_red_dias_estoque] // incluir a variacao de estoque acumulada
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0, resultado)
+		formatString: #,0
+		lineageTag: b9c1f914-209a-433e-96dc-01f4d6b53855
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_estoque_DRE_ACU =
+			
+			// a variação do estoque tem como sua contra partida os custos.
+			// os custos variados pela quantidade (demanda) terão seu aumento com base na proporção original dos custos
+			
+			VAR vreceita_bruta_simulado =
+			([MMargem_Bruta_ACU] * (1 + simulador_quantidade[Valor Var Qtd]) - [MMargem_Bruta_ACU]) + [MReceita_Bruta_ACU]
+			
+			VAR vvar_receita_bruta =
+			 vreceita_bruta_simulado - [MReceita_Bruta_ACU]
+			
+			VAR vcusto_var_receita =
+			[CCusto|Receitabruta_ACU] * vvar_receita_bruta
+			
+			RETURN
+			vcusto_var_receita *-1
+		formatString: #,0
+		lineageTag: 83b160cf-d16d-4447-a7bb-3684f355dcef
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_contas_receber_simulado_ACU =
+			
+			VAR vvar_contas_receb_simu =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+			
+			
+			RETURN
+			
+			vvar_contas_receb_simu + ([var_receita_bruta_ACU$] *-1) + ([simulador_reduc_dias_CR] *-1)
+		formatString: #,0
+		lineageTag: a2cbdffb-51ea-485f-8dfe-baa08058c533
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_contas_pagar_simulado_ACU = ```
+			
+			VAR vvar_fornec =
+			CALCULATE(    
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores" 
+			    ),
+			    balancetenew[vlr]
+			),
+			DATESYTD(dCalendario[data]))
+			
+			RETURN
+			vvar_fornec + [simulador_var_contas_pagar_dias_] + [var var_contas_pagar_simulado_DRE_ACU]
+			```
+		formatString: #,0
+		lineageTag: 3f89ca8c-dc92-4b93-a292-ee96900f446c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'var var_contas_pagar_simulado_DRE_ACU' = ```
+			
+			    VAR resultado = [variacao_custo_simulado_ACU] + [var_despesas_gerais_ACU$]
+			    RETURN
+			        IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0,
+			            resultado
+			        )
+			```
+		lineageTag: e73cdddf-7ef6-4619-a5c3-e2ac0e353310
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure dfc_var_caixa_liq_ope_simulado_ACU = ```
+			
+			VAR vcaixa_liq =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] ="DFC_Caixa_Liq_Operacional"),
+			            balancetenew[vlr]), DATESYTD(dCalendario[data]))
+			            
+			
+			RETURN
+			vcaixa_liq + [var_lucro_liq_simulado_ACU] - [var_contas_receber_simulado_total_ACU] 
+			+ [var var_contas_pagar_simulado_DRE_ACU] + [simulador_var_contas_pagar_dias_] - [variacao_estoques_total_ACU]
+			```
+		formatString: #,0
+		lineageTag: 6672b961-b4e2-46d5-8f39-499c30a39673
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_contas_receber_simulado_total_ACU =
+			
+			ROUND(
+			[var_receita_bruta_ACU$] + [simulador_reduc_dias_CR], 0)
+		formatString: #,0
+		lineageTag: fb12bbaa-dc7c-4ce6-8f94-d9c173a08897
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dfc_var_caixa_liq_invest_simulado_ACU = ```
+			
+			
+			VAR vcaixa_liq_invest =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_Caixa_Liq_Investimentos"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+			
+			RETURN
+			vcaixa_liq_invest + [var_lucro_liq_simulado_ACU] - [var_contas_receber_simulado_total_ACU] + [var var_contas_pagar_simulado_DRE_ACU] + [simulador_var_contas_pagar_dias_] - [variacao_estoques_total_ACU]
+			```
+		lineageTag: bcb8463c-0291-41c4-a782-a00fe257c8d0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure dfc_var_caixa_liq_caixa_simulado_ACU = ```
+			
+			VAR vcaixa_liq_caixa =
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "DFC_caixasequicaixas"
+			            
+			            ),
+			            balancetenew[vlr]),
+			            DATESYTD(dCalendario[data]))
+			
+			RETURN
+			vcaixa_liq_caixa + [var_lucro_liq_simulado_ACU] - [var_contas_receber_simulado_total_ACU] + [var var_contas_pagar_simulado_DRE_ACU] + [simulador_var_contas_pagar_dias_] - [variacao_estoques_total_ACU]
+			```
+		formatString: #,0
+		lineageTag: a8cfe18c-cb67-4d01-b554-a2814b19163b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure var_contas_pagar_simulado_total_ACU =
+			
+			[simulador_var_contas_pagar_dias_] + [var var_contas_pagar_simulado_DRE_ACU]
+		formatString: #,0
+		lineageTag: c565ecfc-7c53-4e55-a01a-55a4166613bd
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure variacao_estoques_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_estoque_simulado_ACU] - [dfc_estoque_ACU],
+			           ABS( [dfc_estoque_ACU])
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    ([dfc_var_estoque_simulado_ACU] - [dfc_estoque_ACU])
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 584d9c38-89f0-4a24-bed4-fc38ac9ab180
+
+	measure variacao_contas_receber_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_contas_receber_simulado_ACU] - [dfc_contas_receber_ACU],
+			            [dfc_contas_receber_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([dfc_var_contas_receber_simulado_ACU] - [dfc_contas_receber_ACU]) < 0.0001, "•", 
+			        IF(
+			            v_variacao > 0, "🡑", 
+			            "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_contas_receber_simulado_ACU] - [dfc_contas_receber_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR v_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, v_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			
+			```
+		lineageTag: e0677f0a-3df5-4f02-8901-f8cecf968e66
+
+	measure variacao_clientes_simulado_din_ACU =
+			
+			VAR resultado =
+			[dfc_var_contas_receber_simulado_ACU] - [dfc_contas_receber_ACU]
+			
+			RETURN
+			IF(
+			            resultado >= -0.0001 && resultado <= 0.0001,
+			            0,
+			            resultado
+			)
+		lineageTag: 454e8db4-0bda-419d-ba45-88e4b33be0cc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure variacao_contas_pagar_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_contas_pagar_simulado_ACU] - [dfc_contas_pagar_ACU],
+			            [dfc_contas_pagar_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        ABS([dfc_var_contas_pagar_simulado_ACU] - [dfc_contas_pagar_ACU]) < 0.0001, "•", 
+			        IF(
+			            v_variacao >= 0, "🡑", "🡓"
+			        )
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_contas_pagar_simulado_ACU] - [dfc_contas_pagar_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, v_variacao_din
+			    )
+			
+			VAR v_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"  -- Define a cor para o "-"
+			    )
+			
+			RETURN
+			
+			FORMAT(v_variacao_din_if, v_formato_moeda)
+			& " | " &
+			FORMAT(v_seta, v_formato_seta) & " " &  
+			FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 1f2dabce-dfa6-4cc4-bab4-f634b60273d9
+
+	measure variacao_caixa_liq_operac_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_ope_simulado_ACU] - [dfc_var_caixa_liq_ope_ACU],
+			            [dfc_var_caixa_liq_ope_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_ope_simulado_ACU] - [dfc_var_caixa_liq_ope_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 58407241-b29a-43ca-83c5-dc66aaa8b1d8
+
+	measure variacao_caixa_liq_invest_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_invest_simulado_ACU] - [dfc_var_caixa_liq_invest_ACU],
+			            ABS([dfc_var_caixa_liq_invest_ACU])
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_invest_simulado_ACU] - [dfc_var_caixa_liq_invest_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 9b6de232-24cb-4f42-b942-2a8849c7629a
+
+	measure variacao_caixa_liq_video_simulado_ACU = ```
+			
+			VAR v_variacao =
+			    CALCULATE(
+			        DIVIDE(
+			            [dfc_var_caixa_liq_caixa_simulado_ACU] - [dfc_var_caixa_liq_ACU],
+			            [dfc_var_caixa_liq_ACU]
+			        )
+			    )
+			
+			VAR v_seta =
+			    IF(
+			        v_variacao > 0, "🡑",
+			        IF(v_variacao < 0, "🡓", "•")
+			    )
+			
+			VAR v_variacao_din =
+			    [dfc_var_caixa_liq_caixa_simulado_ACU] - [dfc_var_caixa_liq_ACU]
+			
+			VAR v_variacao_din_if =
+			    IF(
+			        v_variacao_din >= -0.0001 && v_variacao_din <= 0.0001,
+			        0, 
+			        v_variacao_din
+			    )
+			
+			VAR V_formato_moeda = 
+			    SWITCH(
+			        TRUE(),
+			        v_variacao_din >= 1000000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        v_variacao_din >= 1000, "R$ #,#,#0,0;R$ -#,#,#0,0",
+			        "R$ #,#0,;R$ -#,#0,0"
+			    )
+			
+			VAR v_formato_seta =
+			    SWITCH(
+			        TRUE(),
+			        v_seta = "🡑", "GREEN",  
+			        v_seta = "🡓", "RED",
+			        v_seta = "•", "BLACK"
+			    )
+			
+			    RETURN
+			    FORMAT(v_variacao_din_if, V_formato_moeda)
+			    & " | " &
+			    FORMAT(v_seta, v_formato_seta) & " " &  
+			    FORMAT(v_variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 16d06adb-d05d-4454-ac12-47168b15002b
+
+	measure cfs_variacao_clientes_simulado_ACU =
+			// a variação de clientes é a variação da DFC
+			[cfs_caixa_clientes_simulado_ACU] - [receita_bruta_simulado_acu]
+		formatString: #,0
+		lineageTag: 754a7eb2-aa63-4a34-b2b2-525edd21ef8b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_fornecedores_simulado_ACU = ```
+			// a variação de fornecedores no CFS é fornecedores - estoques
+			[cfs_custos_diretos_simulado_ACU] - 
+			[cfs_caixa_fornecedores_simulado_ACU]
+			```
+		formatString: #,0
+		lineageTag: 23b2ed81-0d58-446e-9515-59ce8507e384
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_lucro_bruto_cx_simulado_ACU =
+			
+			[cfs_variacao_clientes_simulado_ACU] + [cfs_variacao_fornecedores_simulado_ACU]
+		formatString: #,0
+		lineageTag: a1976617-86f3-4300-8285-cab57b25be28
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_fluxo_caixa_liq_simulado_ACU = [cfs_fluxo_caixa_operac_simulado_ACU] + [cfs_outras_saidas_de_caixa_ACU]
+		formatString: #,0
+		lineageTag: 5066e11c-a1b3-4778-9ff6-625b1dd511e9
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure dif_var_margem_brutaACU_simulado_sinal =
+			
+			IF(
+			    medidas_simulador[var_lucro_bruto_ACU$] = 0,
+			"⚪",
+			IF(
+			    medidas_simulador[var_lucro_bruto_ACU$] < 0, "🔴", "🟢"))
+		lineageTag: db97a591-e0b6-4eda-a196-272a6923c195
+
+	measure var_gastos_gerais_ACU__simulado_sinal = ```
+			
+			IF(
+			    [var_despesas_gerais_ACU$] = 0, 
+			    "⚪",
+			IF([var_despesas_gerais_ACU$] > 0, 
+			"🔴", 
+			"🟢"
+			)
+			)
+			```
+		lineageTag: 01da8661-b3c8-47ba-bef4-b745397d6861
+
+	measure var_%gastos_gerais_ACU_simulado_sinal = ```
+			
+			IF(
+			     [var_despesas_gerais_ACU$] = 0,
+			     "⚪",
+			IF(
+			    [var_%gastos_gerais|receita_bruta_ACU] > 0, 
+			    "🔴", 
+			    "🟢"
+			    )
+			)
+			```
+		lineageTag: bb13eaf1-b05e-468c-89b1-36a4da5437bf
+
+	measure var_receita_bruta_ACU_simulado_sinal = ```
+			
+			IF(
+			    [var_receita_bruta_ACU%] = 0, 
+			    "⚪",
+			IF([diferenca_var_receita_bruta_ACU%] > 0, 
+			"🟢", 
+			"🔴"
+			)
+			)
+			```
+		lineageTag: e5112dae-ebb0-4d9b-ae36-16bd3a01080c
+
+	measure var_despesas_gerais%_simulado_ACU =
+			
+			[desp_gerais|receita_bruta_ACU] - [desp_gerais|receita_bruta_simulado_ACU%]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 2895e407-6f36-4ed7-a1df-904d35de866b
+
+	measure variacao_%gastos_gerais_ACU_simulado_sinal = ```
+			
+			IF(
+			    [var_despesas_gerais%_simulado_ACU] = 0,
+			    "⚪",
+			IF(
+			    [var_despesas_gerais%_simulado_ACU] > 0, 
+			    "🔴", 
+			    "🟢"
+			    ))
+			```
+		lineageTag: 6a1e46e3-9ba3-4fe7-858e-592423c653dd
+
+	measure var_resultado_operacional_ACU_simulado_sinal = ```
+			
+			IF(
+			    [var_lucro_operacional_ACU$] = 0,
+			    "⚪",
+			IF([var_lucro_operacional_ACU$] > 0, 
+			"🟢", 
+			"🔴"
+			))
+			```
+		lineageTag: 429f6ad7-f7f7-40db-85a3-6a6574c6d4d0
+
+	measure var_%resultado_op|receita_bruta_ACU_simulado_sinal = ```
+			
+			IF(
+			    [var_lucro_operacional_ACU%] = 0,
+			    "⚪",
+			IF([var_lucro_operacional_ACU%] > 0, 
+			"🟢", 
+			"🔴"
+			))
+			```
+		lineageTag: 44140ed0-1702-4660-984a-6d45bbb015dc
+
+	measure var_ebitda$_ACU_simulado_sinal = ```
+			
+			IF(ROUND(
+			    [variacao_ebitda$_ACU_simulado], 0) = 0,
+			    "⚪",
+			    IF(
+			        [variacao_ebitda$_ACU_simulado] < 0, 
+			        "🔴", 
+			        "🟢"
+			        )
+			        )
+			
+			```
+		lineageTag: ba0250ea-134b-41e3-8519-5b916b048990
+
+	measure var_lucro_liq_ACU_simulado$_sinal =
+			
+			IF(
+			    [var_lucro_liq_simulado_ACU] = 0,
+			    "⚪",
+			IF([var_lucro_liq_simulado_ACU] > 0, "🟢", "🔴"))
+		lineageTag: c4d2de88-d002-4f13-84a0-7e4bf0ac459e
+
+	measure var_lucro_liq%_ACU_simulado_sinal =
+			
+			IF(
+			    [diferenca_%LLucro_liquido_acu|receita_bruta_acu_simulado] = 0,
+			    "⚪",
+			IF([diferenca_%LLucro_liquido_acu|receita_bruta_acu_simulado] > 0, "🟢", "🔴"))
+		lineageTag: 8bb3f9ab-1ec4-4a77-96aa-501d9ed73f17
+
+	measure despesas_gerais_acu_selecionado =
+			
+			CALCULATE(
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Variaveis_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacional_Despesas_Folha_Vendas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_comerciais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketplace" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Salarios_ordenados" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Marketing" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Beneficios" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Impostos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal_Provisoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_pessoal" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_administrativas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Variaveis_Entrega" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Folha_Centro_Distribuicao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Logistica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Consultoria_Tecnica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Alugueis" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Prestacao_de_Servicos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Manutencoes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Informatica" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Ocupacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_contratuais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_depreciacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_tributarias" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_controladas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_nao_controladas" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Utilidades_Servicos" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Servicos_Profissionais" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Comunicacao" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Propaganda_Publicidade" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Viagens_Estadia" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_com_Frota_Transportes" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesas_Bancarias" ||
+			    balancetenew[Query] = "DRE_Desp_Operacionais_Despesass_com_Outras_Provisoes"
+			    ),
+			    balancetenew[vlr]
+			), DATESBETWEEN(
+			    dCalendario[data],
+			    MIN(dCalendario[data]),
+			    MAX(dCalendario[data])
+			)) *-1
+		formatString: #,0
+		lineageTag: 8d7c74f2-3b64-4f3c-a4e5-0f9631ddbeee
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure despesas_gerais_acu =
+			
+			IF(
+			    SELECTEDVALUE(
+			        d_clientes_time[tipo_analise], BLANK()
+			    ) = "Ano Civil",
+			    [despesas_gerais_acu_ano_civil],
+			    [despesas_gerais_acu_selecionado])
+		formatString: #,0
+		lineageTag: da5d5257-1538-4ab9-9b43-ee06cfc359c3
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Coluna 1'
+		dataType: string
+		lineageTag: e91c9575-9d66-485e-a0a4-bd46923b5d49
+		summarizeBy: none
+		sourceColumn: Coluna 1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas_simulador = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Coluna 1" = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

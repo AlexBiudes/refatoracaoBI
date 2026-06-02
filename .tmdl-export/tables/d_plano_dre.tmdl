@@ -1,0 +1,66 @@
+table d_plano_dre
+	lineageTag: 86cc6676-f9e4-467d-b580-1bbfd17cc68e
+
+	column descricao
+		dataType: string
+		lineageTag: 4799b9ee-99ac-4923-9079-28290002a13a
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'nível 1'
+		dataType: string
+		lineageTag: 42b3808d-aa14-47cb-a4a6-fb3db05b5e43
+		summarizeBy: none
+		sourceColumn: nível 1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'nível 2'
+		dataType: string
+		lineageTag: 4cc3dfff-376b-40f6-8c8f-f1efa58a001e
+		summarizeBy: none
+		sourceColumn: nível 2
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: de0b0ef5-a32c-4dfa-96ff-6eec7a566c83
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column subtotal
+		dataType: string
+		lineageTag: 6666bae8-d5ec-4bd1-9a17-3a615f0bd622
+		summarizeBy: none
+		sourceColumn: subtotal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ordem certa'
+		dataType: int64
+		formatString: 0
+		lineageTag: e11b82cf-c3e7-45d7-9162-990d69f712c3
+		summarizeBy: sum
+		sourceColumn: ordem certa
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_plano_dre-e2df46a7-2c24-4afa-927c-dd7524fa8a71 = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("xVnLcts2FP0Vjlft1Injd7qUZbujVrY0kuqNJ8OBSFhFSxEKQWqRv/F0kWlnvOwX8Md67yX4kERSl6mbLPwQcC7OEXBx8Hp8PIikJ1UsnHmUxOLg8GBiP1/Zzw8y9IVxfOncycgTvo4UfJTOVEZrlX7WpibmHfwcH3w4fDy4ln6Sfk7/kdCCcLZx37353mlHXMu1Dmz9IWCNp8NYI39vLmK1lPiJcHkrlv4ko5/cuIPlyh2EnvIBK4071fNIupbHagCINthsiXPMkVOCxoPpodMf3Q7u4e+gf4e/xwP4NZ1CbRFusG1HO7ciTiJB4qycU5Ljl8xuoD4myq/2+DB96VZ0DD9n1HA/AX7HBwnjSPsJasFxUz51Dn5FQphGyG4DeWHeoedbRNXx3yIoquoZqpEbFBdE4WGRu6a06yAeSkSk0ue1VJStD3kDGxSXRVoMEy/SLmY9jtGdiBZyWaQdVdKnmkrs9vdFO5CTK3e0kpHwlA5FQAXSCOM+VL9CXur8BEiVpawt8fSyVFtfitJ/5FBCFwjsgdcmP37HYL/VwW/i1ZmPm5jhWxbUEAbupDKKPcT9Kra+lIhPmMQu5McfMl4FwpOvx37KZYf/jIZhmIoARl8bV0dgYaKc+rtiAJo+IxZ8dFRBV+U446zdXM8ZR0/WEypc8Ia/Ct+s+GWW8553G4VX5b7oOgZXMpRPCiDM/Ld97LxxKDJ9saFtA3HZVVS+PHWVVIlr09NohU16wMLXymjZWVAWaBf5NkmNVtkgqZOQdu6TRqOscgt/qUJl4gj2MGuOWfZ2AlqqSAfLNjPH/gpqWF7ahw0TrMnXGK7mifKE5o1MFoirfhELm8E/dQccqWR5brnG3kBrciG+rkaWD2fj+s37k+3dQ72ABkAgTx/A05cc31xDGtge3tehSYIYzzfuTHohQ03WCWWcM0v/ygMZENLHtvNekCwSydngIGUF3VRO9Gz3HkfSxAJSyPWlS1t4b/+SkvkmRVJiYKpUt/9MGCllm/qdCJNYhh5jhbE7AcIXx8e2OjrLsSwelQzCJx0tBT+xs4D0uS61t+pICXdv7I68ZCXY85/QOzO+3tpPmdvkEOMS5ga9Cm4oJm72JtmXq0jC/prdBdc2gNsLLFsmi4xx/WD0wmwDPEqA0eRXEuaogFWZcjFM30XzDgTrsNbfADcUEzfLb0OwkU78IbpCg4iaOlLCdtZfYxUoX/h4O8Q0tixJykCn1tf2oEgl24Bzabh/flLGFEO+R2h5G1MJZOzZTtmGC7vgBJc01uTaL6cRgarO2OYLwSuxEKEv3HEyD+BUhmPASXVcizD2LYxXFvqWAyB5bEd+UGIhQ9hEwqLnK+b6YIOA1obxEKSMfZ1xG+kYtkCRCM1KRzH3nEZhwLsZyICQOpaTX4nQY7onQvGOQzSXEi/Ht+0SSg7c+fRae2bdqSEtbbY90/Fu6X4JLSV0e7zl1ve90SZtfluNhq3LOz8k/uEIqJuWpd0Vy7lHm95S37iq1YGpjy73CN5YYvRWXzElt6roLvn9l/XxbDTrDb9dR5fuPxy5gp5OYIPuPqkQ5pBUEVr9ROKxRvjVFjA3suvzHr2jQGUJu+VEY2Ket9n8zccE1qkAtvhwVBsL2FUtdagqWWkB6d+IcDYRbXVNiuj9o83ZrTfYtzTzpYmXV+2T0mblVoqfz4P/OAf2SWH5NmY2vtDB9kL+LypKF88nU5GnoqBrTEM7b4rSLb4NNNFtGjUI7EBXzDw+3cXuVPS1O5i40u1Ph8NiwtmnwXLmmeod7rA3mMDaO+z1pzufaMqV1mqj8KQ/wbcYu84MJuOfjyyjheBJPYcUz6BT+wxKqvIvUbogbdXtfZQ71Z4qLmCrBAUquxEocO0sFdei9z2d4MXF74n6pO2Lq97prqJAJw6B05dPe2ptl12AS334Fw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [descricao = _t, #"nível 1" = _t, #"nível 2" = _t, categoria = _t, subtotal = _t, #"ordem certa" = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem certa", Int64.Type}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado", each ([descricao] <> "DRE_Desp_NAO_Operacionais_Receita_nao_operacionalTOTAL"))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

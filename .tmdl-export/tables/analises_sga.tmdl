@@ -1,0 +1,29 @@
+table analises_sga
+	lineageTag: c26b3eb7-dfc4-416d-845c-3b8c50e7f50c
+
+	column 'tipo analise'
+		dataType: string
+		lineageTag: 9a628af2-e9fd-488b-b2ac-be0fc7957c26
+		summarizeBy: none
+		sourceColumn: tipo analise
+
+		annotation SummarizationSetBy = Automatic
+
+	column num
+		dataType: string
+		lineageTag: ac6bca0f-c717-4a2f-9acd-4746416d4a20
+		summarizeBy: none
+		sourceColumn: num
+
+		annotation SummarizationSetBy = Automatic
+
+	partition analises_sga = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45Wco8pNTAwMnNU0lEyVIrViVYKRhIxUoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"tipo analise" = _t, num = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,39 @@
+table d_despesas_clientes
+	lineageTag: 2d2e73c3-8ed8-4125-8c64-56fefff13a04
+
+	column grupo
+		dataType: string
+		lineageTag: 5ec88bc8-3be8-4a04-bf5b-b8c95fa7fd28
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: e9d64967-0636-42d1-9fab-cef3242dcb67
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column despesa_tipo
+		dataType: string
+		lineageTag: 621635f7-7903-4398-a6b7-7eae0e3acc23
+		summarizeBy: none
+		sourceColumn: despesa_tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_despesas_clientes-ae11efc5-4454-4580-b28e-b73daba77ccb = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("vVnNcts2EH4VjM/JTJLO9C6Lsq3EjDWixtNpmgMErpWtSYABQXaat+nk0CfoJVe/WHdBUqLtxAJktRcRorDf/mD/sPrw4eTcNpUR76VrLHyRJy9O0unbVEySVCykdaiwknd/3/0DNf2UQF1BLWsxNSVYhRLrk48vvoexHLYYMSmwBO1MLUCcwhpzGQU1LMU51O7uqxHz0qyxwLu/LMoome6+FQ6rQooEa2dx3WBubBTEVpZBuRjiq9+aV6/e/Jw8x65XFjdQvnn93PM5BQu7E1qAvWlKSfakd3UJhGqegpvrVtbYAm0ZLZ9mfiZrJy6gqGjndi3m+sbYUhJDKS5XySQK5hJkDlZkpmiUAXKvUqxAm8JsSJFcDuBKmnhsv85ANRbdn8eDXX2iGLDyC/mv1GIJlbGOqRpNFghGzCrLnpc5aW9JnJYCYwixKPrF8oo26LopnAkJpp7u9M27ndFXoDrbKKK6dHkwyq9NLUuS+jkK0MOnBTIcEI5pvQ2nxpJdyalaGSVRdvp6p04w1fXsF7YjGyQwDnvCycaiKmQdTJClEzFfeU4O6dhC6d6mmZh9bihRdDb+/8w7yg4crLUITherZk1JCQtOusSXvwcIPqIaLfcoC2wV8uSMi0sqHTTM6Aevn8ZKsEWfHGjnrK6kYsOd8QuRmhaQSyDvqTncQsNFfcKqAuuFGtYiN5xHaizCAubcyhuqHGyNYSlm5VoWcgM6UJALibfSsseTYRrLidCBRWMDXH5LS0K3bAy3v3Q+4sfbpfokiW088UwZemJdRjCeketTfdRd3Ige6gDeZWUBdI6B8fd9S5eQIwdgOHm3ILlRNcUhfAfKMCd7RE6ZwoIL6bG2pG9NDWJpKHZ3Bueim2HR7odZQAVihdr5FvP+tx9RUjr1nP1TTOjEZc5hey0t/G5EDj74Le/njkv6iuls46t1SNykKmFhrHnpO4Ft10XIu9b4MZJ2lGObY0GRctR3k1qa09no1XfRJ4oLzJFEjQeLEzYFWRxJ1FioOEEzsC0qOJKsB6CFi5t2d5X0CLIeAhUhKEVkocwx5IxHChdzUlUFiPfG5tROHcMDDgeM89kzY/JjpaxIqP9W0KfRF4VUt30xQOoCmMmDV/crQ/WgMszmy9nlfG9tWBp0tGl5RX39XHOH7XMlEYFuTdF2Kohsf/EdI/V3OtSbULLLJa4BLRtiuA2SaaaS+i10/XwhrAnoAROgYtkUUgzAk7w1G6qs+7uQQRN6bKxpqhjt6UFNgOHYiKNaS30by4idRvIoKpc59O04Bs4xxsdFVyOr6bAi+Affo4bzjbt9DVTb08uMQvBqcmTFHmV/IhfNWrz0n2wu0HCDFKvBKFNLDbATV9q3wwXdYbRiNy1F98v+xvgoV6nFecovSKvzyejW302f1OM5Ef38db9oW1QSBUlDt7vmR4r1jjwZkMhv3B/UwnIY70Y8kVhnZGbqoc8K2VJSTYB6cB0hidGgKFEeqgm5SMm5dVIZHiPnJWoe3PLkIXBQtoWaoir2ptH7h5vsZlzsbxvr60UY2wOuIcufRNZUdndFvP9iNHUJvY5dy9ID+ad4DxvD0SZgNzf2yj0HK8ENlQc8CGRquYoWqGUPExh/l6g/c26iBwVcASp2ejpdcs9An2Kma9R811tA/bnBOjA8OoBJSTWfx0fchpM+KeUgFXo2HcRy5GMRZAnKjeZ78hS4a+Fs2r/iwT0nIi8LWzYCNc2yZymTTRe8Go3jB5RQAElp4qF3BvZRHcIqOcS3O9pr6Q12Ro8ijusCbAWu4f8J5lp1YRrLnSTPZEMHGUQzTxa+B6Dzdo0bypcv1ATRe/XDHnLk5UQfNro4vVhyHhbdFU4sqHzPdd7wv2e+Pxza7SCpB7ALMfpzkNsJBTUPRE3fRZ9LwjfalHvK1cd/AQ==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [grupo = _t, empresa = _t, despesa_tipo = _t])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

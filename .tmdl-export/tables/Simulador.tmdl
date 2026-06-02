@@ -1,0 +1,28 @@
+table Simulador
+	lineageTag: 676a5454-d660-49a8-819a-123cc1451864
+
+	measure 'Valor Simulador' = SELECTEDVALUE('Simulador'[Simulador], 0)
+		lineageTag: d93e9ce4-22e5-4d7d-8313-62af05b3cf0d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Simulador
+		lineageTag: d246c6e0-90e4-463d-8d8e-6b019940c9c7
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Simulador = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = a124fd52fc5b4f4797b33706434025c0
+

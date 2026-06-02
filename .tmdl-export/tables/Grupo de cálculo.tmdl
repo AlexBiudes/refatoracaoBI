@@ -1,0 +1,29 @@
+table 'Grupo de cálculo'
+	lineageTag: 79bac40b-e846-4282-a849-5a2100e9c08d
+
+	calculationGroup
+
+		calculationItem acumulado =
+				
+				CALCULATE(
+				    SELECTEDMEASURE(),
+				    DATESYTD(dCalendario[data]))
+
+	column inteligencia_temp
+		dataType: string
+		lineageTag: 31cadcd0-409c-4fac-a493-221a5ae2458e
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 57265d19-dbdd-4224-b248-c4e2851f1dd0
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

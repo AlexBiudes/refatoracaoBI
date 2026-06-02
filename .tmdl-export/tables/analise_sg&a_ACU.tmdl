@@ -1,0 +1,48 @@
+table analise_sg&a_ACU
+	lineageTag: 1f2212e3-11b6-4b99-83a6-3ac15e8c6586
+
+	column ana_sg&a_ACU
+		lineageTag: e5b276a3-b971-411a-9e81-89f37d4a9a8b
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'ana_sg&a_ACU Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'ana_sg&a_ACU Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ana_sg&a_ACU Campos'
+		isHidden
+		lineageTag: cf12f094-9363-4012-9674-1a00e7667b96
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'ana_sg&a_ACU Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ana_sg&a_ACU Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 2d560d9e-3d92-4224-9c7b-ab16f9e69a35
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition analise_sg&a_ACU = calculated
+		mode: import
+		source =
+				{
+				    ("analise_g&a_ACU", NAMEOF('Medidas_balancetenew'[analise_g&a_ACU]), 1),
+				    ("analise_sg&a_ACU", NAMEOF('Medidas_balancetenew'[analise_sg&a_ACU]), 2)
+				}
+
+	annotation PBI_Id = 0465b24ba2c84cc49b4d48dc2d38566e
+

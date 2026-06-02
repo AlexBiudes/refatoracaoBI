@@ -1,0 +1,177 @@
+table medidas_receitas_open
+	lineageTag: dac4a785-f3bf-4e39-a509-869d8770a160
+
+	measure total_receitas =
+			
+			CALCULATE(
+			    SUM(f_receitas_open[total_valor_total]),
+			    ALLSELECTED(d_clientes_time[estabelecimento])
+			)
+		formatString: #,0
+		lineageTag: 3e2afd3c-eadc-4ca5-9b1a-33754cad736c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure total_receita_absoluto_UF =
+			
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(f_receitas_open[uf])
+			//,ALLSELECTED(dCalendario[data])
+			)
+		formatString: #,0
+		lineageTag: aa143968-2d86-49ba-b330-ffec86a70049
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure total_receita_absoluto_item =
+			
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(f_receitas_open[descricao_item])
+			//,ALLSELECTED(dCalendario[data])
+			)
+		lineageTag: a6857020-df56-4563-9ac6-2eeb60341402
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure total_receita_absoluto_filial =
+			
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(d_clientes_time[Nome Empresa + Filial]),
+			ALLSELECTED(dCalendario[data])
+			)
+		lineageTag: d7a7abef-ed5b-4b48-82d4-d246cbbc0c46
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure total_receita_absoluto_cliente =
+			
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(d_clientes_receitas_open[nome_cliente])
+			//,ALLSELECTED(dCalendario[data])
+			)
+		lineageTag: fb4f5190-e3e6-4395-9ea5-433bd240ba9f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure total_receita_absoluto_acumulado =
+			
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(f_receitas_open),
+			ALLSELECTED(dCalendario[data])
+			)
+		lineageTag: 21a6d3cb-4d45-4de5-83fe-570c0c1d997a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure contagem_itens =
+			
+			SUM(f_receitas_open[QUANTIDADE])
+		formatString: #,0
+		lineageTag: 7bb6ae5a-dfa9-4160-b45a-cfc283035541
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure '%_receita_por UF' = ```
+			
+			    CALCULATE(
+			DIVIDE(
+			    [total_receitas],
+			    [total_receita_absoluto_UF]
+			)
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 0ee9aaf5-0a2b-4c9f-8d20-ad2a90111f6f
+
+	measure '%_receita_por item' = ```
+			
+			    CALCULATE(
+			DIVIDE(
+			    [total_receitas],
+			    [total_receita_absoluto_item]
+			)
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a01456a6-2b52-44cc-bdd6-07e6a560c8f3
+
+	measure '%_receita_por filial_acum' = ```
+			
+			    CALCULATE(
+			DIVIDE(
+			    [total_receitas],
+			    [total_receita_absoluto_filial]
+			)
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 15d49fd5-8621-40b3-9dda-ffb43e088bb1
+
+	measure %_receita_por_Cliente_acumulado = ```
+			
+			VAR vreceita_cliente_acu =
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(d_clientes_receitas_open[nome_cliente])
+			//,ALLSELECTED(dCalendario[data])
+			)
+			
+			VAR vtotal_receita_absoluto_acumulado = 
+			CALCULATE(
+			SUM(f_receitas_open[total_valor_total]),
+			ALL(f_receitas_open),
+			DATESYTD(dCalendario[data])
+			)
+			
+			RETURN
+			    DIVIDE(
+			        vreceita_cliente_acu,
+			        CALCULATE(
+			            vtotal_receita_absoluto_acumulado,
+			            ALLEXCEPT(f_receitas_open, f_receitas_open[nome_cliente])
+			        )
+			    )
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f6bc2e86-c9fd-419b-aed9-271d000245bd
+
+	measure '%_receita_por Cliente' = ```
+			
+			    CALCULATE(
+			DIVIDE(
+			    [total_receitas],
+			    [total_receita_absoluto_cliente]
+			)
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 06ac3d27-661b-4c34-9245-f573442958d5
+
+	measure volumetria_receitas_open =
+			
+			IF(NOT(ISBLANK(medidas_receitas_open[total_receitas])), "🟢", "🔴")
+		lineageTag: c67cda1f-a98a-4c01-ab1f-0d6eb43898bd
+
+	column Column
+		formatString: 0
+		lineageTag: c4e6e15f-be05-4cf1-804f-fa18770fb805
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas_receitas_open = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 00a11df004ba4642a6b14bd3ed54657a
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

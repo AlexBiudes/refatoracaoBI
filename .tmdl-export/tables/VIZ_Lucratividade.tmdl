@@ -1,0 +1,76 @@
+table VIZ_Lucratividade
+	lineageTag: df2ee5ae-b8f8-4aea-a965-58415ecd3fff
+
+	column descricao
+		dataType: string
+		lineageTag: 2bce7e01-a455-4c58-b27f-948d6aa840e5
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column vlr
+		dataType: double
+		lineageTag: cc10d596-0be7-4ca6-88b3-93817d86d8ba
+		summarizeBy: sum
+		sourceColumn: vlr
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column data
+		dataType: string
+		lineageTag: ece5e6c4-7ae4-452a-b845-1b55e0810668
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 9b7a55c4-c0ce-47f6-9b6a-e52ff16181bc
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: 5522ec11-8e2d-44cb-b886-b8277fb23fed
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo
+		dataType: string
+		lineageTag: d76e94a2-67fb-4b4f-bb21-268afc48b39a
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: e5d7d7ed-7100-417c-b251-d12704f2cea9
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	partition VIZ_Lucratividade = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    VIZ_Lucratividade_View = BI_tratado_Schema{[Name="VIZ_Lucratividade",Kind="View"]}[Data]
+				in
+				    VIZ_Lucratividade_View
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

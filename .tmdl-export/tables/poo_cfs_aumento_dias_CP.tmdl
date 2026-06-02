@@ -1,0 +1,26 @@
+table poo_cfs_aumento_dias_CP
+	lineageTag: 95048eda-f54a-4833-abfc-fc23f73ae238
+
+	measure 'Valor poo_cfs_aumento_dias_CP' = SELECTEDVALUE('poo_cfs_aumento_dias_CP'[poo_cfs_aumento_dias_CP], 1)
+		formatString: 0
+		lineageTag: 2406eefc-d4bc-4f15-832a-e542ce7b3d14
+
+	column poo_cfs_aumento_dias_CP
+		formatString: 0
+		lineageTag: 311fec2f-8e57-4cb7-b397-bb96e5e92b85
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition poo_cfs_aumento_dias_CP = calculated
+		mode: import
+		source = GENERATESERIES(-20, 20, 1)
+
+	annotation PBI_Id = 24ea93532f5847ddad36b5d6ea2a9e50
+

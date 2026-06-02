@@ -1,0 +1,146 @@
+table fluxo_de_caixa_outros
+	lineageTag: f09ce9eb-aca0-4845-8c0c-82ef0347da9c
+
+	measure switch_cfs_outros_itens_fluco_cx =
+			
+			SWITCH(
+			    SELECTEDVALUE(fluxo_de_caixa_outros[Outros Itens]),
+			    "Juros Pagos", [cfs_juros_totais],
+			    "Imposto Recebido", [cfs_impostos_recebidos],
+			    "Renda Extraordinária", [cfs_renda_extraordinaria],
+			    "Distribuição/Dividendos Pagos", [cfs_distribuicao_de_lucros_DIF] *-1,
+			    "Ativo Imobilizado Adquirido", [cfs_aquisicoes_imobilizado],
+			    "Outros Ativos Líquidos", [cfs_outros_ativos_liq],
+			    "Capital Introduzido", [cfs_capital_introduzido_DIF]
+			    )
+		formatString: #,0
+		lineageTag: 5964c3dd-afdb-43b7-94fc-5ae9925180f7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_aquisicoes_imobilizado =
+			
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_ATINVEST_Imobilizado_Bruto"
+			    ),
+			    balancetenew[vlr])
+		lineageTag: 5641feac-131b-4629-9fca-da9e9daae3c1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_outros_ativos_liq =
+			
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "BL_ATCIR_Outras_Contas_Receber" ||
+			        balancetenew[Query] = "BL_ATCIR_Creditos_Conta_Vinculada" ||
+			        balancetenew[Query] = "BL_ATCIR_Adiantamentos" ||
+			        balancetenew[Query] = "BL_ATCIR_Outros_Creditos" ||
+			        balancetenew[Query] = "BL_ATNCIR_Outras_Contas_Receber" ||
+			        balancetenew[Query] = ""),
+			        balancetenew[vlr])
+		lineageTag: 4d49f671-2bb5-45d8-96b4-6e3c6ad3441a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_aquisicoes_imobilizado_ACU = ```
+			
+			CALCULATE(
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_ATINVEST_Imobilizado_Bruto"
+			    ),
+			    balancetenew[vlr]),
+			    DATESYTD(dCalendario[data]))
+			
+			```
+		lineageTag: 726349fa-9bed-4ee3-9e9d-5dd11a638493
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure cfs_outros_ativos_liq_ACU =
+			
+			CALCULATE(
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "BL_ATCIR_Outras_Contas_Receber" ||
+			        balancetenew[Query] = "BL_ATCIR_Creditos_Conta_Vinculada" ||
+			        balancetenew[Query] = "BL_ATCIR_Adiantamentos" ||
+			        balancetenew[Query] = "BL_ATCIR_Outros_Creditos" ||
+			        balancetenew[Query] = "BL_ATNCIR_Outras_Contas_Receber" ||
+			        balancetenew[Query] = ""),
+			        balancetenew[vlr]),
+			        DATESYTD(dCalendario[data]))
+		lineageTag: 8f1fdfad-c5e5-4c1c-bc8a-077d5287b87b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure switch_cfs_outros_itens_fluco_cx_ACU =
+			
+			SWITCH(
+			    SELECTEDVALUE(fluxo_de_caixa_outros[Outros Itens]),
+			    "Juros Pagos", [cfs_juros_totais_ACU],
+			    "Imposto Recebido", [cfs_impostos_recebidos_ACU],
+			    "Renda Extraordinária", [cfs_renda_extraordinaria_ACU],
+			    "Distribuição/Dividendos Pagos", [cfs_distribuicao_de_lucros_DIF_ACU] *-1,
+			    "Ativo Imobilizado Adquirido", [cfs_aquisicoes_imobilizado_ACU],
+			    "Outros Ativos Líquidos", [cfs_outros_ativos_liq_ACU],
+			    "Capital Introduzido", [cfs_capital_introduzido_DIF_ACU]
+			    )
+		formatString: #,0
+		lineageTag: a10ac5e1-596f-4cf9-a9d4-2821312937d8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Fluxo de cx Outros Itens'
+		dataType: string
+		lineageTag: ca26ded4-dd33-400f-8182-fa8b2ddac592
+		summarizeBy: none
+		sourceColumn: Fluxo de cx Outros Itens
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Outros Itens'
+		dataType: string
+		lineageTag: 752cbecd-d400-4b93-b11e-30cf45122550
+		summarizeBy: none
+		sourceColumn: Outros Itens
+		sortByColumn: ordem_outros
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_outros
+		dataType: int64
+		formatString: 0
+		lineageTag: acafd69f-6158-4d07-8a8c-cc752af8ca2a
+		summarizeBy: sum
+		sourceColumn: ordem_outros
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinal
+		dataType: string
+		lineageTag: eead8a51-e17f-4fa2-ad56-27a47d0abddd
+		summarizeBy: none
+		sourceColumn: sinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fluxo_de_caixa_outros = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("hY5Na8JAEIb/yrBnRfqh7cWDaAsRwZJryGHiLDIQM3E/QvDfSA+e/BX5Y90kpXgpe5jDPrPP+06Wqb13RiwkTlcWSMPOH4yoidr6Hn/hUWx4PYWZqnzy///kVIt1Aqk+6IKpR89RKdUVIXy0zqAY4qq7GsbAX6Lmhq0zXHjubt23zDbcMIWwh5Nfoxkrx41AcpKCS74gCazo7NmM18+j/i8fYizsunuQaeheRN011uywhKQKe/KXsfMt6n2WvpUerJFb/CsNm/cwS5XnPw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Fluxo de cx Outros Itens" = _t, #"Outros Itens" = _t, ordem_outros = _t, sinal = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem_outros", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

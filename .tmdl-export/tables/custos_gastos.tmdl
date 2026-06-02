@@ -1,0 +1,48 @@
+table custos_gastos
+	lineageTag: c8c642cd-564f-44c5-9472-ccca111f699a
+
+	column custos_gastos
+		lineageTag: 9475a277-4616-4680-957e-7766601c66fe
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'custos_gastos Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'custos_gastos Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'custos_gastos Campos'
+		isHidden
+		lineageTag: e65e6741-ca43-4aa3-9a77-cf8788cc42ac
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'custos_gastos Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'custos_gastos Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: a06f5997-0319-4de5-b696-89a4b8bbba21
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition custos_gastos = calculated
+		mode: import
+		source =
+				{
+				    ("Custos", NAMEOF('Medidas_balancetenew'[ccusto_video]), 0),
+				    ("Gastos Gerais", NAMEOF([gastos_gerais_video]), 1)
+				}
+
+	annotation PBI_Id = 03e344392fdc4562ae49fe442a863019
+

@@ -5,7 +5,7 @@
 | Regra | Descrição | Origem | Impacto | Status |
 |---|---|---|---|---|
 | R01: Exclusão de D&A | Custos de depreciação e amortização devem ser excluídos da soma de despesas para o EBITDA. | Controladoria | EBITDA e Margem EBITDA | Pendente |
-| R02: Alocação Contábil | Apenas contas com tag `EBITDA_Grupo = "Sim"` na Dim_Contas entram na soma de custos e despesas. | Controladoria | Cálculo de EBITDA | Pendente |
+| R02: Alocação Contábil | Apenas contas com tag `EBITDA_Grupo = "Sim"` na d_mascara_ebitda e d_Plano_Depara entram na soma de custos e despesas. | Controladoria | Cálculo de EBITDA | Pendente |
 | R03: Variações cambiais | Lançamentos de variação cambial não realizada devem ser ignorados. | Financeiro | EBITDA Realizado | Pendente |
 
 ## Regras Pendentes de Confirmação

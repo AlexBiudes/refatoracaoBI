@@ -1,0 +1,9 @@
+role 'TRUCK ME'
+	modelPermission: read
+
+	tablePermission balancetenew = [cnpj] == "30081357000102"
+
+	tablePermission d_clientes_time = [cnpj] == "30081357000102"
+
+	annotation PBI_Id = 001490cbb9544bbba1f8f1a3d96829da
+

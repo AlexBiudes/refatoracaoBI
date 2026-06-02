@@ -1,0 +1,26 @@
+table POOmargem
+	lineageTag: 9df9360e-51d1-4052-80d4-fdecc6cd9cf2
+
+	measure 'Valor POOmargem' = SELECTEDVALUE('POOmargem'[POOmargem], 0.01)
+		formatString: 0%;-0%;0%
+		lineageTag: e7f701c3-3957-4318-9549-cc542da95599
+
+	column POOmargem
+		formatString: 0%;-0%;0%
+		lineageTag: 81bd8308-6599-42a0-9e4b-b73820367cf0
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition POOmargem = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 1ac10cac19c54920804f0a0b3cfcacb9
+

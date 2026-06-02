@@ -1,0 +1,99 @@
+table F_Despesas_McD
+	lineageTag: e720bb48-cb53-4dbf-8340-3558b2e27537
+
+	column vlr
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 921d878d-1a52-4b28-9c9a-05d15aad7167
+		summarizeBy: sum
+		sourceColumn: vlr
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao
+		dataType: string
+		lineageTag: 1fd49122-2239-4dae-8349-dfe51cc2aaf8
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f49d5927-fd0c-4cde-b473-da27e708f292
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column cnpj
+		dataType: string
+		lineageTag: 155883ec-e8e5-4110-aee3-21445b28dc3b
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column empresa
+		dataType: string
+		lineageTag: d54b0ead-84a0-4672-9e9a-442afd5bc1e3
+		summarizeBy: none
+		sourceColumn: empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo
+		dataType: string
+		lineageTag: 5dd37b59-22bb-4e5e-8c6b-7f1b747bab5a
+		summarizeBy: none
+		sourceColumn: grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column conta
+		dataType: string
+		lineageTag: b1d65d61-ec76-4732-a75c-3b5941036fa0
+		summarizeBy: none
+		sourceColumn: conta
+
+		annotation SummarizationSetBy = Automatic
+
+	column descricao2
+		dataType: string
+		lineageTag: 20a36fc5-7516-4165-8786-2167969d8b55
+		summarizeBy: none
+		sourceColumn: descricao2
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_desp
+		dataType: string
+		lineageTag: c0e79d03-99e6-43c5-968a-e3a27ff9d32e
+		summarizeBy: none
+		sourceColumn: chave_desp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Despesas_McD = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_QA_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    VIZ_Despesas_McD_View = BI_QA_Schema{[Name="VIZ_Despesas_McD",Kind="View"]}[Data],
+				    #"Personalização Adicionada" = Table.AddColumn(VIZ_Despesas_McD_View, "chave_desp", each [cnpj]&[descricao2]),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Personalização Adicionada",{{"chave_desp", Text.Upper, type text}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Texto em Maiúscula"," ","",Replacer.ReplaceText,{"chave_desp"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído",{{"data", type date}}),
+				    #"Texto em Maiúscula1" = Table.TransformColumns(#"Tipo Alterado",{{"descricao2", Text.Upper, type text}})
+				in
+				    #"Texto em Maiúscula1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

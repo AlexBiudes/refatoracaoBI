@@ -1,0 +1,154 @@
+table F_estoques_ABC
+	lineageTag: c1172e90-ff06-4108-add7-9cd372a841bb
+
+	measure contagem_itens_estoques =
+			
+			SUMX(
+			    F_estoques_ABC,
+			    F_estoques_ABC[Quantidade])
+		formatString: #,0
+		lineageTag: 49845a0e-f2a0-4bd2-a49f-1a013ecd9cd8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column CNPJ
+		dataType: string
+		lineageTag: 9a8e3f1a-e681-428f-893c-e797c5d15e90
+		summarizeBy: none
+		sourceColumn: CNPJ
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descrição
+		dataType: string
+		lineageTag: 1200493e-e79b-444f-8461-fc13a6e0ba7b
+		summarizeBy: none
+		sourceColumn: Descrição
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantidade
+		dataType: double
+		formatString: 0
+		lineageTag: 702de3d5-674d-41b9-8223-db64debdc105
+		summarizeBy: sum
+		sourceColumn: Quantidade
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Valor Total'
+		dataType: double
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 07339f4e-c788-407a-9507-f7c4c6746757
+		summarizeBy: sum
+		sourceColumn: Valor Total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column 'Data Base'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 222b538d-0e7f-4b17-a08b-9013e5308c9f
+		summarizeBy: none
+		sourceColumn: Data Base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Origem Operação'
+		dataType: string
+		lineageTag: 9ed1de96-700e-4468-97ef-1c89084181ac
+		summarizeBy: none
+		sourceColumn: Origem Operação
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_primaria
+		dataType: string
+		lineageTag: d7eaf4f6-2859-4b7c-aa53-361ee6b3ca65
+		summarizeBy: none
+		sourceColumn: chave_primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column chave_produto
+		dataType: string
+		lineageTag: ce4c5e54-0214-4a87-8395-b0d89ed5b1a5
+		summarizeBy: none
+		sourceColumn: chave_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column rank_valor_total_por_cnpj_e_origem_e_data
+		dataType: int64
+		formatString: 0
+		lineageTag: 7c7f3eed-ba97-4917-92c2-9c02979e8849
+		summarizeBy: sum
+		sourceColumn: rank_valor_total_por_cnpj_e_origem_e_data
+
+		annotation SummarizationSetBy = Automatic
+
+	column freq_acumulada_percentual
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c11e1694-034d-46fd-ba3a-641125741896
+		summarizeBy: sum
+		sourceColumn: freq_acumulada_percentual
+
+		annotation SummarizationSetBy = Automatic
+
+	column ABC
+		dataType: string
+		lineageTag: 25706259-5005-4c35-a3ab-1f8fd36bf977
+		summarizeBy: none
+		sourceColumn: ABC
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_ranking
+		dataType: string
+		lineageTag: 6aa896bf-a63d-4469-94f6-530d8a91530e
+		summarizeBy: none
+		sourceColumn: tipo_ranking
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_estoques_ABC = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Viz_Analise_Estoques_View = BI_tratado_Schema{[Name="VIZ_Ranking_Estoque",Kind="View"]}[Data],
+				    #"Colunas Renomeadas" = Table.RenameColumns(Viz_Analise_Estoques_View,{{"cnpj", "CNPJ"}, {"descricao", "Descrição"}, {"quantidade", "Quantidade"}, {"valor_total", "Valor Total"}, {"data_base", "Data Base"}, {"origem_operacao", "Origem Operação"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas",".","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","/","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","-","",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído2",{{"Data Base", type date}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado", each ([CNPJ] <> "nan")),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Linhas Filtradas","nan","Geral",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Valor Substituído3",{{"Origem Operação", Text.Upper, type text}}),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Texto em Maiúscula", each true),
+				    #"Valor Substituído18" = Table.ReplaceValue(#"Linhas Filtradas1","00066871000108","66871000108",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Valor Substituído19" = Table.ReplaceValue(#"Valor Substituído18","66871000108","00066871000108",Replacer.ReplaceText,{"CNPJ"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Valor Substituído19", "chave_primaria", each [CNPJ] & " " & [Origem Operação]),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"Personalização Adicionada", "chave_produto", each [CNPJ] & " " & [Descrição]),
+				    #"Linhas Filtradas2" = Table.SelectRows(#"Personalização Adicionada1", each ([Origem Operação] <> "NAN")),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Linhas Filtradas2",{{"freq_acumulada_percentual", type number}, {"chave_produto", type text}}),
+				    #"Valor Substituído4" = Table.ReplaceValue(#"Tipo Alterado1"," ","",Replacer.ReplaceText,{"chave_produto"}),
+				    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","GERAL","OUTRAS OPERACOES",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5","USADOS-SEMINOVOS","USADOS - ",Replacer.ReplaceText,{"Origem Operação"}),
+				    #"Valor Substituído7" = Table.ReplaceValue(#"Valor Substituído6","-"," - ",Replacer.ReplaceText,{"Origem Operação"})
+				in
+				    #"Valor Substituído7"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

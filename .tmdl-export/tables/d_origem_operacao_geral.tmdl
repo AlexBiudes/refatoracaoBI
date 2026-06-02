@@ -1,0 +1,56 @@
+table d_origem_operacao_geral
+	lineageTag: f3466121-ebc7-4173-9f2b-7c3a49a0d933
+
+	column origem_operacao
+		dataType: string
+		lineageTag: 12182bb5-efe2-42ca-9853-5e58e7ce2066
+		summarizeBy: none
+		sourceColumn: origem_operacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column cnpj
+		dataType: string
+		lineageTag: 8d9add17-b4ec-4484-b843-99baf7c8d367
+		summarizeBy: none
+		sourceColumn: cnpj
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_relatorio
+		dataType: string
+		lineageTag: edf99970-f766-4d13-a626-3b0bffc9f57e
+		summarizeBy: none
+		sourceColumn: tipo_relatorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Chave_Primaria
+		dataType: string
+		lineageTag: 52aa3d06-b7b4-4afb-a8b9-25d7ebc6db74
+		summarizeBy: none
+		sourceColumn: Chave_Primaria
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_origem_operacao_geral = m
+		mode: import
+		source =
+				let
+				    Fonte = GoogleBigQuery.Database(),
+				    #"bi-planning-367317" = Fonte{[Name="bi-performance"]}[Data],
+				    BI_tratado_Schema = #"bi-planning-367317"{[Name="BI_PROD",Kind="Schema"]}[Data],
+				    Aging_List_Adiantamentos_Clientes_Table = BI_tratado_Schema{[Name="VIZ_DIMENSAO_ORIGEM_OPERACAO",Kind="Table"]}[Data],
+				    #"Valor Substituído2" = Table.ReplaceValue(Aging_List_Adiantamentos_Clientes_Table,"Í","I",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído2", each ([cnpj] <> null and [cnpj] <> "") and ([Chave_Primaria] <> null) and ([origem_operacao] <> "")),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Linhas Filtradas"," ","_",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","_"," ",Replacer.ReplaceText,{"origem_operacao"}),
+				    #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído1"," ","",Replacer.ReplaceText,{"Chave_Primaria"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Valor Substituído3", {"Chave_Primaria"})
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

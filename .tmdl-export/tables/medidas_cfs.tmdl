@@ -1,0 +1,374 @@
+table medidas_cfs
+	lineageTag: abf91a8c-5d4b-49fc-87fc-cd2c72ad9081
+
+	measure cfs_POO_receita_bruta =
+			
+			([MReceita_Bruta_ACU] * 2)
+		formatString: #,0
+		lineageTag: 72906ff7-204d-4d55-9aa1-4819504095ef
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_receita_simulada =
+			
+			[cfs_POO_receita_bruta] * POOreceita[Valor POOreceita]
+		formatString: #,0
+		lineageTag: 315b7cc7-408b-4f28-aff3-fb5183802d37
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_POO_custos =
+			
+			[cfs_custos_diretos_ACU] * 2
+		formatString: #,0
+		lineageTag: e78f1d64-a6cb-4234-91a1-a7594db45556
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_custos_simulado =
+			
+			[cfs_POO_custos] * POOcustos[Valor POOcustos]
+		formatString: #,0
+		lineageTag: 12855bc6-0a9b-4c59-b819-a5d0b7a17561
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_POO_margem_bruta =
+			
+			[MMargem_Bruta_ACU] * 2
+		formatString: #,0
+		lineageTag: b8e25944-7236-4773-a8ac-59377a4627b6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_margem_simulado =
+			
+			[cfs_POO_margem_bruta] * POOmargem[Valor POOmargem]
+		formatString: #,0
+		lineageTag: 061e99b7-6470-4939-b1b3-6e6924e354f3
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_POO_gastos_gerais =
+			
+			[cfs_gastos_gerais_POO_ACU] * 2
+		formatString: #,0
+		lineageTag: c681bc48-15fd-4f53-8c71-cc25f2af9b1a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_gastos_simulado =
+			
+			[cfs_POO_gastos_gerais] * POOgastos[Valor POOgastos]
+		formatString: #,0
+		lineageTag: 1a8e575f-c90b-4bdc-b001-3a66420b8446
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_fornecedores = ```
+			// a variação de fornecedores no CFS é fornecedores - estoques
+			VAR vfornecedores = 
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Fornecedores"),
+			        balancetenew[vlr]
+			        )
+			        
+			VAR vestoques =        
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DFC_VARPAT_Estoques"),
+			    balancetenew[vlr]
+			)
+			
+			
+			RETURN
+			// vestoques - 
+			 IF(vfornecedores < 0, vfornecedores *-1, vfornecedores) *-1
+			```
+		formatString: #,0
+		lineageTag: d8108fe0-e975-4000-8ddf-b0dc5063a1cf
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_clientes =
+			// a variação de clientes é a variação da DFC
+			ROUND(
+			SUMX(
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "DFC_VARPAT_Contas_Receber"),
+			        balancetenew[vlr]), 0)
+		formatString: #,0
+		lineageTag: c3a51e38-0c91-4b33-8f2d-68c21720f3b6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_clientes_sinal =
+			
+			IF([cfs_variacao_clientes] < 0, "🔴", "🟢")
+		lineageTag: efa3bb50-6730-44a8-b0f8-fa75133ff81f
+
+	measure cfs_variacao_fornec_sinal =
+			
+			IF( [cfs_variacao_fornecedores] < 0, "🔴", "🟢")
+		lineageTag: c69892d8-591d-4f40-9088-1fe868c15ef7
+
+	measure cfs_variacao_lucro_bruto_cx =
+			
+			[cfs_variacao_clientes] + [cfs_variacao_fornecedores]
+		formatString: #,0
+		lineageTag: a9199547-dc72-447f-b05a-88a0c2c25871
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_lucro_bruto_cx_sinal =
+			
+			IF([cfs_variacao_lucro_bruto_cx] < 0, "🔴", "🟢")
+		lineageTag: 82a98781-eeea-466b-994e-5d520d3e705e
+
+	measure cfs_juros_totais =
+			
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DRE_Juros_Totais"),
+			    balancetenew[vlr]
+			)
+		formatString: #,0
+		lineageTag: 5bfc67dd-b26b-4ae3-8b06-2c4ae7ff69f0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_fluxo_caixa_liq =
+			
+			[cfs_fluxo_caixa_operac] - [cfs_juros_totais] + [cfs_impostos_recebidos] + [cfs_renda_extraordinaria] - [cfs_distribuicao_de_lucros] + [cfs_aquisicoes_imobilizado] + [cfs_outros_ativos_liq]
+		formatString: #,0
+		lineageTag: 06379eac-ead3-4662-b18e-c3e242311c6e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure switch_cfs_outros_itens =
+			
+			SWITCH(
+			    SELECTEDVALUE(lucro_de_caixa_outros[Outros Itens]),
+			    "Juros Pagos", [cfs_juros_totais],
+			    "Imposto Recebido", [cfs_impostos_recebidos],
+			    "Renda Extraordinária", [cfs_renda_extraordinaria],
+			    "Distribuição/Dividendos Pagos", [cfs_distribuicao_de_lucros_DIF] *-1,
+			    "Depreciação e Amortização", [Ebitda_despesa_depreciacao]
+			    //"Lucro Mantido", [cfs_lucro_mantido]
+			    )
+		formatString: #,0
+		lineageTag: f86cc73f-645f-421d-b66b-9f52679105ad
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_outras_saidas_de_caixa =
+			
+			[cfs_juros_totais] + [cfs_impostos_recebidos] + [cfs_renda_extraordinaria] + [cfs_distribuicao_de_lucros_DIF] + [cfs_aquisicoes_imobilizado] + [cfs_outros_ativos_liq] + [cfs_capital_introduzido_DIF]
+		formatString: #,0
+		lineageTag: c5126a3f-4510-4b01-a82a-c0da2aef9977
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_capital_introduzido_actual_month = ```
+			
+			
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "BL_PL_Adto_Aumento_Capital"),
+			            balancetenew[vlr]) +
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			        balancetenew[Query] = "BL_PL_Capital_Social"),
+			        balancetenew[vlr])
+			    
+			```
+		formatString: #,0
+		lineageTag: dc050268-e064-43b3-a203-33a38f0e7172
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_capital_introduzido_LM = ```
+			
+			CALCULATE(
+			    [cfs_capital_introduzido_actual_month], 
+			    DATEADD(
+			        dCalendario[data], -1, MONTH
+			        )
+			        )
+			```
+		formatString: #,0
+		lineageTag: 9f52d1bb-398f-4325-97f4-d56a4c756fcc
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_capital_introduzido_DIF =
+			
+			[cfs_capital_introduzido_actual_month] - [cfs_capital_introduzido_LM]
+		formatString: #,0
+		lineageTag: 02877cc2-55e6-4cea-8401-9260015a0368
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_reduc_dias_CR = ```
+			
+			VAR cr_prazo =
+			DIVIDE(
+			    [contas receber],
+			[Prazo Médio Contas a Receber]
+			) * [Valor poo_red_dias_CR]
+			
+			RETURN
+			cr_prazo
+			
+			```
+		formatString: #,0
+		lineageTag: 61c0669f-5ead-4be6-8c1d-64378b37321b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_aumento_dias_CP = ```
+			
+			DIVIDE([BL_PASSCIR_Fornecedores], [Prazo Médio Contas a Pagar]) * poo_cfs_aumento_dias_CP[Valor poo_cfs_aumento_dias_CP]       
+			```
+		formatString: #,0
+		lineageTag: 0a3018c3-7bd9-432f-a98a-4c2c574161b6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_red_dias_estoque =
+			
+			DIVIDE([ATCIR_Estoques], [Prazo Médio do Giro do Estoque]) * poo_cfs_red_dias_estoque[Valor poo_cfs_red_dias_estoque]
+		formatString: #,0
+		lineageTag: 58675ee6-70ea-4bad-ba3e-66ae1bcb029b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_poo_fluxo_de_caixa_liq = ```
+			
+			[cfs_divida_liquida_LY] -
+			[divida_liquida] 
+			```
+		formatString: #,0
+		lineageTag: 763b866f-9e79-4e74-af61-f7de42c955c8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_impacto_lucro_op =
+			
+			[cfs_receita_simulada] + [cfs_margem_simulado] + [cfs_custos_simulado] + [cfs_gastos_simulado]
+		formatString: #,0
+		lineageTag: d297664e-7c3c-48b8-83e9-154d55d6ef33
+
+	measure cfs_sua_posicao_ajustada =
+			
+			[rresultado_operacional_ACU] + [cfs_impacto_lucro_op]
+		formatString: #,0
+		lineageTag: 0580598a-26d6-49a0-bece-dc7c99d8782e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_juros_totais_ACU =
+			
+			CALCULATE(
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "DRE_Juros_Totais"),
+			    balancetenew[vlr]
+			),
+			DATESYTD(dCalendario[data]))
+		lineageTag: e25496c4-4d86-437d-a987-089b88513525
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure switch_cfs_outros_itens_ACU =
+			
+			SWITCH(
+			    SELECTEDVALUE(lucro_de_caixa_outros[Outros Itens]),
+			    "Juros Pagos", [cfs_juros_totais_ACU],
+			    "Imposto Recebido", [cfs_impostos_recebidos_ACU],
+			    "Renda Extraordinária", [cfs_renda_extraordinaria_ACU],
+			    "Distribuição/Dividendos Pagos", [cfs_distribuicao_de_lucros_DIF_ACU] *-1,
+			    "Depreciação e Amortização", [Ebitda_despesa_depreciacao_ACU]
+			    //"Lucro Mantido", [cfs_lucro_mantido]
+			    )
+		formatString: #,0
+		lineageTag: 004b4d73-306d-4e28-99c7-f3db02b1c261
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_outras_saidas_de_caixa_ACU =
+			
+			[cfs_juros_totais_ACU] + [cfs_impostos_recebidos_ACU] + [cfs_renda_extraordinaria_ACU] + [cfs_distribuicao_de_lucros_DIF_ACU] + [cfs_aquisicoes_imobilizado_ACU] + [cfs_outros_ativos_liq_ACU] + [cfs_capital_introduzido_DIF_ACU]
+		formatString: #,0
+		lineageTag: e91708e8-548d-48fe-b836-2d2a3940df32
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_capital_introduzido_DIF_ACU = ```
+			
+			VAR vcapital_ACU = 
+			
+			CALCULATE(
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			            balancetenew[Query] = "BL_PL_Adto_Aumento_Capital"),
+			            balancetenew[vlr]) +
+			    SUMX(
+			        FILTER(
+			            balancetenew,
+			        balancetenew[Query] = "BL_PL_Capital_Social"),
+			        balancetenew[vlr]),
+			        DATESYTD(dCalendario[data]))
+			
+			VAR vcapital_LY_ACU =
+			CALCULATE(
+			    vcapital_ACU,
+			    DATEADD(dCalendario[data], -1, YEAR))
+			
+			RETURN
+			    vcapital_ACU - vcapital_LY_ACU
+			
+			```
+		formatString: #,0
+		lineageTag: 62679a8b-a600-4a62-b755-b1154ad627da
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure cfs_variacao_clientes_sinal_ACU =
+			
+			IF([cfs_variacao_clientes_simulado_ACU] < 0, "🔴", "🟢")
+		lineageTag: 258fcd64-3cd1-43c6-b393-8ef4c211736d
+
+	measure cfs_variacao_fornec_sinal_ACU =
+			
+			IF( [cfs_variacao_fornecedores_simulado_ACU] < 0, "🔴", "🟢")
+		lineageTag: 9781449e-502e-4429-8247-6298c30c7571
+
+	measure cfs_variacao_lucro_bruto_cx_sinal_ACU =
+			
+			IF([cfs_variacao_lucro_bruto_cx_simulado_ACU] < 0, "🔴", "🟢")
+		lineageTag: 04b472a9-399b-451d-a278-99a9cf307422
+
+	column Column
+		formatString: 0
+		lineageTag: 51836d65-8101-4d89-a2cf-6e3ba65eb6dc
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas_cfs = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 7a2229ad346348259843e045a7f5ce70
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

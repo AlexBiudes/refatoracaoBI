@@ -1,0 +1,547 @@
+table medidas_aginglist
+	lineageTag: 1dc44f5a-5f5c-4c24-86bc-727e99e6df18
+
+	measure aging_diferença_dias_selecionado
+		lineageTag: b5c899b4-ecb6-4a64-96e3-e1f14e6bb9a0
+
+	measure fornecedores_aging = ```
+			
+			VAR UltimoDiaSelecionado = LASTDATE(dCalendario[data])
+			RETURN
+			COALESCE(
+			CALCULATE(
+			    SUM(F_Aging_List_Contas_Pagar[valor_pendente]),
+			    FILTER(
+			        ALL(dCalendario),
+			        dCalendario[data] = UltimoDiaSelecionado
+			    )
+			),0)
+			
+			
+			
+			```
+		formatString: #,0
+		lineageTag: b8345311-cfdb-45ce-8744-a17f2de417b2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure clientes_aging = ```
+			
+			VAR UltimoDiaSelecionado = LASTDATE(dCalendario[data])
+			RETURN
+			COALESCE(
+			CALCULATE(
+			    SUM(F_Aging_List_Contas_Receber[valor_pendente]),
+			    FILTER(
+			        ALL(dCalendario),
+			        dCalendario[data] = UltimoDiaSelecionado
+			    )
+			), 0)
+			
+			
+			```
+		formatString: #,0
+		lineageTag: bf79dd64-e6b0-4a35-bf20-9567d5428e8a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure prazo_medio_contas_pagar_aging = ```
+			
+			VAR UltimoDiaSelecionado = LASTDATE(dCalendario[data])
+			VAR FornecedoresAging = IF(
+			    NOT(ISBLANK(medidas_aginglist[fornecedores_aging])), medidas_aginglist[fornecedores_aging], [PASSCIR_Fornecedores])
+			VAR ComprasNoAnoAging = medidas_aginglist[Compras no ano_aging]
+			VAR ValorMensal = Medidas_balancetenew[Valor_mensal_prazos_medios]
+			
+			RETURN
+			//IF(
+			  //  ISBLANK(FornecedoresAging) || ISBLANK(ComprasNoAnoAging) || ISBLANK(ValorMensal),
+			    //BLANK(),
+			    FornecedoresAging 
+			     / ComprasNoAnoAging * ValorMensal
+			// )
+			
+			```
+		lineageTag: bd056135-b68b-4858-abb0-7808ed71c416
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CCusto_ACU_Aging = ```
+			
+			IF(
+			    SELECTEDVALUE(
+			        d_clientes_time[tipo_analise], BLANK()
+			    ) = "Ano Civil",
+			CALCULATE(
+			    SUMX(
+			    FILTER(
+			        balancetenew, 
+			        balancetenew[Query] = "Custo dos Produtos Vendidos"
+			    ), 
+			        balancetenew[vlr]
+			    ), 
+			    DATESYTD(dCalendario[data]
+			    )
+			),
+			[CCusto_selecionado_normal_card_aging]
+			)
+			```
+		lineageTag: 7271cb4a-ba71-443a-afc7-513d21ee8032
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CCusto_selecionado_aging =
+			
+			VAR MesSelecionado = SELECTEDVALUE(dCalendario[data])
+			RETURN
+			    CALCULATE(
+			        SUMX(
+			            FILTER(
+			                balancetenew,
+			                balancetenew[Query] = "Custo dos Produtos Vendidos" &&
+			                balancetenew[data] <= MesSelecionado
+			            ),
+			            balancetenew[vlr]
+			        ),
+			        ALL(dCalendario[data])
+			    )
+		lineageTag: 4d751223-9eed-41e1-81a6-bfcf49ca3d7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ATCIR_Estoques_aging =
+			
+			CALCULATE(
+			    SUM(balancetenew[vlr]),
+			    FILTER(
+			        balancetenew,
+			        balancetenew[Query] = "BL_ATCIR_Estoques" &&
+			        balancetenew[data] = MAX(balancetenew[data])
+			    )
+			)
+		lineageTag: ef33387e-921e-432d-9c50-46c7e5e4983f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ATCIR_Estoques_End_of_LY_aging =
+			
+			CALCULATE(
+			    'medidas_aginglist'[ATCIR_Estoques_aging],
+			    FILTER(
+			        ALL(dCalendario),
+			        YEAR(dCalendario[data]) = YEAR(MAX(dCalendario[data])) - 1
+			            && MONTH(dCalendario[data]) = 12
+			    )
+			)
+		lineageTag: 18440475-e318-4feb-9b59-2fb16da83984
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Compras no ano_aging' = ```
+			
+			medidas_aginglist[CCusto_ACU_Aging] *-1 + 
+			medidas_aginglist[ATCIR_Estoques_aging] - 
+			medidas_aginglist[ATCIR_Estoques_End_of_LY_aging]
+			```
+		lineageTag: 2abc866f-3df6-4b22-a70e-0d616230158b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CCusto_selecionado_normal_card_aging = ```
+			
+			SUMX(
+			        FILTER(balancetenew, 
+			        balancetenew[Query] = "Custo dos Produtos Vendidos"
+			        ),
+			    balancetenew[vlr]
+			)
+			```
+		lineageTag: a722a0e2-498f-43e1-928c-85e8a194c6cb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure teste_prazo_pgto = ```
+			
+			    medidas_aginglist[fornecedores_aging] / 
+			    medidas_aginglist[Compras no ano_aging] * 
+			    [Valor_mensal]
+			```
+		lineageTag: 0178c63a-160c-45af-ac2e-22badd9e124b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_pagar_aging_LM = ```
+			
+			CALCULATE(
+			    [prazo_medio_contas_pagar_aging], 
+			    DATEADD(dCalendario[data], -1, MONTH
+			    ))
+			```
+		lineageTag: 990331c2-324a-4104-b223-908cadc469c6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_giro_estoque_aging =
+			
+			VAR UltimoDiaSelecionado = LASTDATE(dCalendario[data])
+			VAR Estoquesaging = medidas_aginglist[ATCIR_Estoques_aging]
+			VAR CustoAcumAging = medidas_aginglist[CCusto_ACU_Aging]
+			VAR ValorMensal = Medidas_balancetenew[Valor_mensal_prazos_medios]
+			
+			RETURN
+			COALESCE(
+			IF(
+			    ISBLANK(Estoquesaging) || ISBLANK(CustoAcumAging) || ISBLANK(ValorMensal),
+			    BLANK(),
+			    Estoquesaging / CustoAcumAging * ValorMensal
+			), 0) *-1
+		lineageTag: ec857839-5548-4340-a277-bff106e719a4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_giro_estoque_aging_LM = ```
+			
+			CALCULATE(
+			    [prazo_medio_giro_estoque_aging], 
+			    DATEADD(
+			        dCalendario[data], -1, MONTH
+			    )
+			)
+			```
+		lineageTag: 41f9661f-109d-457c-b1c4-29ca40495a6d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure receita_bruta_aging =
+			
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "Receita Bruta"
+			    ),
+			    balancetenew[vlr]
+			    )
+		lineageTag: cc7f2348-90ad-4a1e-b9cc-266879fd9e42
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure deducoes_aging =
+			
+			SUMX(
+			    FILTER(balancetenew,
+			    balancetenew[Query] = "Deduções da Receita Bruta"
+			    ),
+			    balancetenew[vlr]
+			)
+		lineageTag: e2dfefdc-8046-4a92-9b27-35dbd278043e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure vendas_menos_deducoes_aging =
+			
+			[receita_bruta_aging] + [deducoes_aging]
+		lineageTag: e3622ccc-f6a9-4e38-9856-d6f970b3981a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_receber_aging =
+			
+			VAR UltimoDiaSelecionado = LASTDATE(dCalendario[data])
+			VAR ClientesAging = medidas_aginglist[clientes_aging]
+			VAR VendasNoAnoAging = [vendas_menos_deducoes_aging_ACU]
+			VAR ValorMensal = Medidas_balancetenew[Valor_mensal_prazos_medios]
+			
+			RETURN
+			IF(
+			    ISBLANK(ClientesAging) || ISBLANK(VendasNoAnoAging) || ISBLANK(ValorMensal),
+			    BLANK(),
+			    DIVIDE(
+			    ClientesAging, VendasNoAnoAging) * ValorMensal
+			)
+		lineageTag: 30d72a9f-4f54-41f8-ae58-5b40936c54bb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_receber_aging_LM = ```
+			
+			CALCULATE(
+			    [prazo_medio_contas_receber_aging], 
+			    DATEADD(dCalendario[data], -1, MONTH)
+			)
+			
+			```
+		lineageTag: deee67d3-0300-43d6-a26a-835e9ae03cc3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure vendas_menos_deducoes_aging_ACU = ```
+			
+			CALCULATE( 
+			    [receita_bruta_aging], 
+			    DATESYTD(dCalendario[data]
+			    )
+			)
+			```
+		lineageTag: f7d78508-9cad-4d65-8dc4-1ad3a8202745
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CCusto_ACU_Aging_grafico = ```
+			
+			IF(
+			    SELECTEDVALUE(
+			        d_clientes_time[tipo_analise], BLANK()
+			    ) = "Ano Civil",
+			CALCULATE(
+			    SUMX(
+			    FILTER(
+			        balancetenew, 
+			        balancetenew[Query] = "Custo dos Produtos Vendidos"
+			    ), 
+			        balancetenew[vlr]
+			    ), 
+			    DATESYTD(dCalendario[data]
+			    )
+			),
+			[CCusto_selecionado_normal_card_aging]
+			) * -1
+			```
+		lineageTag: 6c541e2e-1a0a-477a-a0cd-6a994a32e835
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure teste_fornecedores = ```
+			
+			IF(
+			    NOT(ISBLANK(medidas_aginglist[fornecedores_aging])), 
+			    medidas_aginglist[fornecedores_aging], 
+			    [BL_PASSCIR_Fornecedores]
+			)
+			
+			
+			```
+		lineageTag: 76bbc2b6-ce5d-4a05-bb8b-99d3e0132189
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_pgto_misto_aging_balancete = ```
+			
+			COALESCE(
+			ROUND(
+			IF(
+			    NOT(ISBLANK([fornecedores_aging])),
+			    [prazo_medio_contas_pagar_aging],
+			    [Prazo Médio Contas a Pagar]
+			    
+			), 0), 0)
+			```
+		lineageTag: f126495a-b9ff-45af-9c92-b0bc0370ddfc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_pagar_misto_aging_balancete_LM =
+			
+			CALCULATE(
+			[prazo_medio_pgto_misto_aging_balancete],
+			DATEADD(dCalendario[data], -1, MONTH))
+			
+			
+			//IF(
+			//    NOT(ISBLANK([prazo_medio_contas_pagar_aging_LM])),
+			//    [prazo_medio_contas_pagar_aging_LM],
+			//    [PrazomédioPagamentoLM]
+			//)
+		lineageTag: 594381d3-660a-45f3-b048-2554dc4511ff
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_receber_misto_aging_balancete =
+			
+			COALESCE(
+			IF(
+			    COALESCE([clientes_aging], 0) > 0,
+			    //&& [prazo_medio_contas_receber_aging] = [Prazo Médio Contas a Receber],
+			    [prazo_medio_contas_receber_aging],
+			    [Prazo Médio Contas a Receber]), 0)
+		lineageTag: e5821d64-19cb-43cc-b85a-3901836042af
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure prazo_medio_contas_receber_misto_LM =
+			
+			//IF(
+			  //  NOT(ISBLANK(
+			    //    [prazo_medio_contas_receber_aging_LM]))
+			      //  && [prazo_medio_contas_receber_aging_LM] =
+			        //[PrazomédiorRecebimentoLM],
+			        // [prazo_medio_contas_receber_aging_LM],
+			        // [PrazomédiorRecebimentoLM])
+			
+			CALCULATE(
+			            [prazo_medio_contas_receber_misto_aging_balancete],
+			            DATEADD(
+			                dCalendario[data], -1, MONTH))
+		lineageTag: 5a4580c7-bf60-4d24-a508-1a87e6f510ba
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure fornec_apagar =
+			
+			CALCULATE(
+			SUM(balancetenew[vlr]),
+			FILTER(balancetenew,
+			balancetenew[Query] = "BL_PASSCIR_Fornecedores"))
+		formatString: #,0
+		lineageTag: a156031f-0978-4fa5-9f50-abb06cdcc0af
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure adiantamento_fornecedor_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    SUMX(F_Aging_List_Adiantamentos_Fornecedores,
+			    F_Aging_List_Adiantamentos_Fornecedores[valor_pendente])
+			    ,
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre)
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: b9d3f89a-0daf-4e04-bc16-9dfc534ccbf7
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure adiantamento_clientes_actual_month = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    SUMX(F_Aging_List_Adiantamentos_Clientes,
+			    F_Aging_List_Adiantamentos_Clientes[valor_pendente]),
+			    dCalendario[data] >= UltimoMesTrimestre && dCalendario[data] <= UltimoDiaTrimestre
+			    )
+			```
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 3493cb9b-aecd-4907-8036-5794ea95120f
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure adiantamento_clientes_LM =
+			
+			COALESCE(
+			CALCULATE(
+			    [adiantamento_clientes_actual_month], DATEADD(dCalendario[data], -1, MONTH)), 0)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: 58c75679-ee68-453b-9f7c-d0efba38038e
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure periodo_atual_aging = ```
+			
+			VAR UltimoDiaTrimestre = 
+			    LASTDATE(
+			        DATESINPERIOD(
+			            dCalendario[data], 
+			            MAX(dCalendario[data]), -3, 
+			            QUARTER
+			        )
+			    )
+			VAR UltimoMesTrimestre = 
+			    EOMONTH(UltimoDiaTrimestre,-1)+1
+			    RETURN
+			CALCULATE(
+			    MAX(dCalendario[Mês e Ano Abreviado]),
+			    ALL(dCalendario),
+			    VALUES(dCalendario[Mês e Ano Abreviado]
+			    ),
+			    dCalendario[data] = UltimoMesTrimestre
+			)
+			```
+		lineageTag: ffa742c6-369c-4790-b628-76b6bd72c887
+
+	measure periodo_anterior_aging =
+			
+			CALCULATE([periodo_atual_aging], DATEADD(dCalendario[data], -1, MONTH))
+		lineageTag: 413fe4e5-9e86-43a3-812e-51af3767ba33
+
+	measure %var_adto_clientes = ```
+			
+			VAR diferenca = [adiantamento_clientes_actual_month] - [adiantamento_clientes_LM]
+			VAR variacao = DIVIDE(diferenca, [adiantamento_clientes_LM])
+			VAR setas =
+			    SWITCH(
+			        TRUE(),
+			        variacao > 0, " ⇡",
+			        variacao < 0, " ⇣",
+			        "Sem a Variação" 
+			    )
+			RETURN
+			    setas & " " & FORMAT(variacao, "0.00%;-0.00%")
+			```
+		lineageTag: 416a45a4-4c54-4628-9e97-7b71d4ca1906
+
+	measure adiantamento_fornecedor_LM =
+			
+			COALESCE(
+			CALCULATE([adiantamento_fornecedor_actual_month], DATEADD(dCalendario[data], -1, MONTH)), 0)
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: b0248cbb-37fd-4678-82bc-ecf6450e83f3
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure %var_adto_fornecedores =
+			
+			VAR diferenca = [adiantamento_fornecedor_actual_month] - [adiantamento_fornecedor_LM]
+			VAR variacao = DIVIDE(diferenca, [adiantamento_fornecedor_LM])
+			VAR setas =
+			    SWITCH(
+			        TRUE(),
+			        variacao > 0, " ⇡",
+			        variacao < 0, " ⇣",
+			        "Sem a Variação"
+			    )
+			RETURN
+			    setas & " " & FORMAT(variacao, "0.00%;-0.00%")
+		lineageTag: 6a64c179-fc19-426e-8593-0d2c5a83a330
+
+	measure adiant_clientes_aging_teste =
+			
+			SUM(
+			    F_Aging_List_Adiantamentos_Clientes[valor_pendente]
+			)
+		lineageTag: 366a1c76-d6d9-46eb-acb6-1f1fec883a64
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column
+		formatString: 0
+		lineageTag: 637de5d5-5d17-4ee1-aa91-264019b89d9e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas_aginglist = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 8d68b43c7e2b4ecdb712590c4cc329af
+

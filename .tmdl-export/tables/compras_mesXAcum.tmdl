@@ -1,0 +1,48 @@
+table compras_mesXAcum
+	lineageTag: f7f93827-4ffa-45d4-9dad-dcd5f27c48ea
+
+	column compras_mesXAcum
+		lineageTag: fd1d0552-95f6-498e-a3d2-e1010cf39254
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'compras_mesXAcum Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'compras_mesXAcum Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'compras_mesXAcum Campos'
+		isHidden
+		lineageTag: 920bb6f9-6e48-466a-a0c7-48954a76ee27
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'compras_mesXAcum Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'compras_mesXAcum Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 59ef20c0-2c4c-40cf-af41-b09bd7c147d6
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition compras_mesXAcum = calculated
+		mode: import
+		source =
+				{
+				    ("custo_acumulado", NAMEOF('medidas__relatorio_custos'[custo_acumulado]), 0),
+				    ("custo_mes_atual", NAMEOF('medidas__relatorio_custos'[custo_mes_atual]), 1)
+				}
+
+	annotation PBI_Id = 25507fd7968c447c8ac6930fba5d9cd2
+

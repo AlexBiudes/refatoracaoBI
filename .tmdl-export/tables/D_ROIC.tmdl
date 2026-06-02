@@ -1,0 +1,44 @@
+table D_ROIC
+	lineageTag: 86744a0b-7176-466b-9d3f-0550d0f861ab
+
+	column nome
+		dataType: string
+		lineageTag: 7007699b-0390-4cf4-865a-2772b2d3029f
+		summarizeBy: none
+		sourceColumn: nome
+
+		annotation SummarizationSetBy = Automatic
+
+	column query
+		dataType: string
+		lineageTag: 754448df-3f65-4570-a860-f4cc5557e307
+		summarizeBy: none
+		sourceColumn: query
+		sortByColumn: ordem
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem
+		dataType: int64
+		formatString: 0
+		lineageTag: 228b1c01-671a-4a13-a919-7a8f5459454d
+		summarizeBy: sum
+		sourceColumn: ordem
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_ROIC = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("lZBNasMwFISv8tAqJglp+t9FF66dgkFYwjHdBCOEo4JKKrlSvcl1us4pfLEqjhIcUKFZSWLmG715qxUaPUeA29po0C1QIz7abrfVgLvdVyvXGk1QWixY72C6Zb1DbjXbyKM+R9XE5UwjKEQt5DeHV6m4clfDPe4F9j4Urg/cOIJU2EbYAOeFc+7Gc7PpibSguh8NpBGG11IrLu0ggeUxYUPtmGuZ4q7VOXV7iHdryQmNy38s4C5IBDvfB63Bmg9/Wi/r89jnJDHNyhhDlr8tlmWWEhhRDGNIeOOG3MBaQCnM/m9tI0e9YEYxW+rP/ShPfURBssQ9/DG/QlX1Cw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [nome = _t, query = _t, ordem = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"ordem", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,26 @@
+table POOgastos
+	lineageTag: e1e47e44-6beb-4b7a-87ec-8c0033cd2486
+
+	measure 'Valor POOgastos' = SELECTEDVALUE('POOgastos'[POOgastos], 0.01)
+		formatString: 0%;-0%;0%
+		lineageTag: 2efa687a-5cf9-4a53-a16d-3c437fd519da
+
+	column POOgastos
+		formatString: 0%;-0%;0%
+		lineageTag: 113eb267-2ec2-4df0-8b84-6002c236c29c
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition POOgastos = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.01)
+
+	annotation PBI_Id = 66b057e549e342de8b9a881d37d66002
+
