@@ -1,0 +1,33 @@
+/* css/variables.css - Tokens de Design Planning */
+:root {
+    --color-primary: #0AE18C;      /* Verde Planning */
+    --color-primary-dark: #00BF63; /* Verde escuro */
+    --color-secondary: #14C8FA;    /* Ciano */
+    --color-bg: #FFFFFF;           /* Fundo principal */
+    --color-bg-alt: #F2F2F2;       /* Cinza claro */
+    --color-text: #000000;
+    --color-text-light: #555555;
+    --color-alert: #FF3131;        /* Vermelho alerta */
+    --color-insight: #C9F7E2;      /* Verde suave */
+    
+    --font-main: 'Poppins', 'Montserrat', 'Open Sans', Arial, sans-serif;
+    --border-radius: 8px;
+    --shadow: 0 4px 12px rgba(0,0,0,0.05);
+    
+    /* Layout Variables */
+    --sidebar-width: 260px;
+    --header-height: 80px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-bg-alt);
+    color: var(--color-text);
+    line-height: 1.5;
+}

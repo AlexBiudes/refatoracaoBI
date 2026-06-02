@@ -1,0 +1,125 @@
+/* css/layout.css - Grid e Layout Base */
+
+/* App Layout */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--color-bg);
+    border-right: 1px solid #E0E0E0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    transition: width 0.3s ease;
+}
+
+.brand .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 48px;
+}
+
+.radial-symbol {
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle, var(--color-primary) 0%, transparent 80%);
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.radial-symbol::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-primary-dark);
+    border-radius: 50%;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--color-text-light);
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-item:hover {
+    background-color: var(--color-bg-alt);
+    color: var(--color-text);
+}
+
+.nav-item.active {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.tagline {
+    font-size: 12px;
+    color: var(--color-text-light);
+    line-height: 1.4;
+    margin-top: auto;
+}
+
+.tagline .highlight-today {
+    color: var(--color-primary-dark);
+    font-weight: 700;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 48px;
+    background-color: var(--color-bg-alt);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Header */
+.executive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header-titles h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.header-titles .subtitle {
+    color: var(--color-text-light);
+    font-weight: 300;
+}

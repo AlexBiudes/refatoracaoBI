@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variação de Custos | Planning BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <div class="radial-symbol"></div>
+                    <span class="logo-text">Planning</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="ebitda.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    EBITDA
+                </a>
+                <a href="rentabilidade.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    Rentabilidade
+                </a>
+                <a href="custos.html" class="nav-item active">
+                    <span class="nav-icon">💸</span>
+                    Var. Custos
+                </a>
+            </nav>
+            <div class="tagline">
+                Building your company's future. <span class="highlight-today">Today.</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="executive-header">
+                <div class="header-titles">
+                    <h1>Variação de Custos</h1>
+                    <p class="subtitle">Análise de eficiência por produto e grupo de produtos</p>
+                </div>
+                <div class="header-filters">
+                    <select class="filter-dropdown">
+                        <option>Mês Atual</option>
+                        <option>Mês Anterior</option>
+                    </select>
+                    <select class="filter-dropdown">
+                        <option>Grupo de Produtos: Todos</option>
+                        <option>Grupo A</option>
+                        <option>Grupo B</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="gradient-line"></div>
+
+            <section class="kpi-section" id="kpi-container">
+                <!-- KPIs renderizados via JS -->
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-container" style="grid-column: span 2;">
+                    <h3>Variação de Custo Médio por Grupo de Produto</h3>
+                    <div class="chart-wrapper" style="height: 350px;">
+                        <canvas id="costGroupChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-container">
+                    <h3>Top 5 Produtos com Maior Variação de Custo</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th class="numeric">Custo Médio Atual (R$)</th>
+                                <th class="numeric">Custo Médio Anterior (R$)</th>
+                                <th class="numeric">Variação (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Produto X-100</td>
+                                <td class="numeric">2.450</td>
+                                <td class="numeric">2.100</td>
+                                <td class="numeric negative">+16.6%</td>
+                            </tr>
+                            <tr>
+                                <td>Produto Y-200</td>
+                                <td class="numeric">1.800</td>
+                                <td class="numeric">1.650</td>
+                                <td class="numeric negative">+9.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Produto Z-50</td>
+                                <td class="numeric">850</td>
+                                <td class="numeric">950</td>
+                                <td class="numeric positive">-10.5%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/charts/custosChart.js"></script>
+</body>
+</html>

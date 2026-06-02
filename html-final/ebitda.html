@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBITDA | Planning BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <div class="radial-symbol"></div>
+                    <span class="logo-text">Planning</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="ebitda.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    EBITDA
+                </a>
+                <a href="rentabilidade.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    Rentabilidade
+                </a>
+                <a href="custos.html" class="nav-item">
+                    <span class="nav-icon">💸</span>
+                    Var. Custos
+                </a>
+            </nav>
+            <div class="tagline">
+                Building your company's future. <span class="highlight-today">Today.</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="executive-header">
+                <div class="header-titles">
+                    <h1>Visão Executiva de EBITDA</h1>
+                    <p class="subtitle">Análise consolidada de geração de caixa operacional</p>
+                </div>
+                <div class="header-filters">
+                    <select class="filter-dropdown">
+                        <option>Ano: 2023</option>
+                        <option>Ano: 2022</option>
+                    </select>
+                    <select class="filter-dropdown">
+                        <option>Empresa: Todas</option>
+                        <option>Empresa A</option>
+                        <option>Empresa B</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="gradient-line"></div>
+
+            <section class="kpi-section" id="kpi-container">
+                <!-- KPIs renderizados via JS -->
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-container">
+                    <h3>Evolução Mensal - Receita vs EBITDA</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="ebitdaChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Composição do EBITDA (Cascata)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="waterfallChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-container">
+                    <h3>Detalhamento por Linha de DRE (EBITDA_Grupo = "Sim")</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Conta Contábil</th>
+                                <th class="numeric">Mês Atual (R$)</th>
+                                <th class="numeric">Mês Anterior (R$)</th>
+                                <th class="numeric">Variação (%)</th>
+                                <th class="numeric">Impacto no EBITDA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Receita Líquida de Vendas</td>
+                                <td class="numeric">12.100.000</td>
+                                <td class="numeric">11.886.000</td>
+                                <td class="numeric positive">+1.8%</td>
+                                <td class="numeric positive">+214.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Custos dos Produtos Vendidos</td>
+                                <td class="numeric">-5.200.000</td>
+                                <td class="numeric">-5.100.000</td>
+                                <td class="numeric negative">+1.9%</td>
+                                <td class="numeric negative">-100.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Despesas Administrativas</td>
+                                <td class="numeric">-1.800.000</td>
+                                <td class="numeric">-1.750.000</td>
+                                <td class="numeric negative">+2.8%</td>
+                                <td class="numeric negative">-50.000</td>
+                            </tr>
+                            <tr>
+                                <td>(-) Despesas Comerciais</td>
+                                <td class="numeric">-1.300.000</td>
+                                <td class="numeric">-1.350.000</td>
+                                <td class="numeric positive">-3.7%</td>
+                                <td class="numeric positive">+50.000</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>EBITDA Total</strong></td>
+                                <td class="numeric"><strong>3.800.000</strong></td>
+                                <td class="numeric"><strong>3.686.000</strong></td>
+                                <td class="numeric positive"><strong>+3.0%</strong></td>
+                                <td class="numeric positive"><strong>+114.000</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+            
+            <section class="insights-section">
+                <div class="insight-box">
+                    <span class="insight-icon">💡</span>
+                    <div class="insight-content">
+                        <strong>Análise Assistida:</strong> O EBITDA apresentou crescimento nominal, porém a Margem EBITDA teve leve retração devido ao aumento proporcional maior das Despesas Administrativas frente à Receita Líquida.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/charts/ebitdaChart.js"></script>
+</body>
+</html>
