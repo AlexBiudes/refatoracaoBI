@@ -1,2 +1,8 @@
 apresentacao_clientes_BI_V2.pbix
 gcp_key.json
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
