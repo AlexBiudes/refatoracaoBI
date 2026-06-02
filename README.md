@@ -22,7 +22,7 @@ O projeto será conduzido em fases:
 2. Mapeamento das telas antigas
 3. Levantamento de DAX, medidas, gráficos e filtros
 4. Análise de regras de negócio
-5. Planejamento da integração com Power BI API
+5. Planejamento da integração com BigQuery (Back-end)
 6. Refatoração UX/UI
 7. Planejamento da arquitetura HTML
 8. Desenvolvimento futuro da versão HTML
@@ -45,8 +45,9 @@ Tela voltada para análise de evolução, comparação e variação dos custos e
 
 ## Ferramentas Previstas
 
-- Power BI
-- Power BI API
+- Power BI (Desktop)
+- BigQuery & GCP (Banco de Dados de Produção)
+- Python / FastAPI (API Backend)
 - Antigravity
 - Markdown
 - HTML
@@ -65,7 +66,7 @@ A documentação está organizada por áreas:
 - `docs/`: visão geral, objetivos, fases, padrões e glossário
 - `telas-antigas/`: mapeamento das telas atuais do Power BI
 - `refatoracao/`: proposta de modernização e arquitetura da nova solução
-- `powerbi-api/`: estratégia de integração e extração de metadados
+- `backend/`: API em Python (FastAPI) para extração de dados do BigQuery
 - `antigravity/`: prompts dos agentes responsáveis pelo projeto
-- `html-final/`: documentação da futura entrega HTML
+- `html-final/`: entrega front-end HTML/JS conectada à API
 - `backlog/`: tarefas, riscos, pendências e decisões
