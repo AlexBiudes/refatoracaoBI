@@ -51,9 +51,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opt.textContent = `Ano: ${ano}`;
                 selectAno.appendChild(opt);
             });
-            if (savedAno && anos.includes(savedAno)) {
+            if (savedAno && anos.map(String).includes(savedAno)) {
                 selectAno.value = savedAno;
             }
+        } else {
+            console.error("Nenhum ano retornado pela API. O backend está rodando?");
         }
 
         // Buscar empresas
@@ -69,6 +71,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (savedEmpresa && empresas.includes(savedEmpresa)) {
                 selectEmpresa.value = savedEmpresa;
             }
+        } else {
+            console.error("Nenhuma empresa retornada pela API.");
         }
 
         // Listener de eventos para recarregar a tela
