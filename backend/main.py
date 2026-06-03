@@ -49,11 +49,7 @@ def get_bq_client():
 
 def format_currency(value):
     if pd.isna(value): return "R$ 0,00"
-    if abs(value) >= 1_000_000:
-        return f"R$ {value/1_000_000:.1f}M".replace('.', ',')
-    elif abs(value) >= 1_000:
-        return f"R$ {value/1_000:.1f}K".replace('.', ',')
-    return f"R$ {value:.2f}".replace('.', ',')
+    return f"R$ {value:,.2f}".replace(',', '_').replace('.', ',').replace('_', '.')
 
 def format_percentage(value):
     if pd.isna(value): return "0,0%"
@@ -203,18 +199,18 @@ def get_ebitda(ano: int = date.today().year, empresa: Optional[str] = None):
             "chartEvolucao": {
                 "labels": labels_chart,
                 "margem": (df_target['margem_ebitda'] * 100).round(1).tolist() if not df_target.empty else [],
-                "ebitda": (df_target['ebitda'] / 1_000_000).round(2).tolist() if not df_target.empty else [],
-                "receita": (df_target['receita_liquida'] / 1_000_000).round(2).tolist() if not df_target.empty else []
+                "ebitda": df_target['ebitda'].round(2).tolist() if not df_target.empty else [],
+                "receita": df_target['receita_liquida'].round(2).tolist() if not df_target.empty else []
             },
             "chartCascata": {
                 "labels": ["Receita Líquida", "CPV", "Despesas ADM", "Despesas COM", "Outros", "EBITDA"],
                 "data": [
-                    float(round(last_row.get('receita_liquida', 0) / 1_000_000, 2)),
-                    float(round(last_row.get('cpv', 0) / 1_000_000, 2)),
-                    float(round(last_row.get('desp_adm', 0) / 1_000_000, 2)),
-                    float(round(last_row.get('desp_com', 0) / 1_000_000, 2)),
-                    float(round((last_row.get('ebitda', 0) - (last_row.get('receita_liquida', 0) + last_row.get('cpv', 0) + last_row.get('desp_adm', 0) + last_row.get('desp_com', 0))) / 1_000_000, 2)),
-                    float(round(last_row.get('ebitda', 0) / 1_000_000, 2))
+                    float(round(last_row.get('receita_liquida', 0), 2)),
+                    float(round(last_row.get('cpv', 0), 2)),
+                    float(round(last_row.get('desp_adm', 0), 2)),
+                    float(round(last_row.get('desp_com', 0), 2)),
+                    float(round((last_row.get('ebitda', 0) - (last_row.get('receita_liquida', 0) + last_row.get('cpv', 0) + last_row.get('desp_adm', 0) + last_row.get('desp_com', 0))), 2)),
+                    float(round(last_row.get('ebitda', 0), 2))
                 ]
             }
         }
@@ -287,9 +283,9 @@ def get_rentabilidade(ano: int = date.today().year, empresa: Optional[str] = Non
             "chartNaoOperacional": {
                 "labels": ["Desp. Financeiras", "Impostos", "Outras Desp."],
                 "data": [
-                    float(round(last_row.get('DRE_Despesa_financeira', 0) * -1 / 1_000_000, 2)),
-                    float(round(last_row.get('DRE_Imposto_de_Renda', 0) / 1_000_000, 2)),
-                    float(round(last_row.get('DRE_Desp_NAO_Operacionais_Despesas_nao_operacionais', 0) / 1_000_000, 2))
+                    float(round(last_row.get('DRE_Despesa_financeira', 0) * -1, 2)),
+                    float(round(last_row.get('DRE_Imposto_de_Renda', 0), 2)),
+                    float(round(last_row.get('DRE_Desp_NAO_Operacionais_Despesas_nao_operacionais', 0), 2))
                 ]
             }
         }

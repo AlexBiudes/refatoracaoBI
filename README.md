@@ -57,7 +57,8 @@ Tela voltada para análise de evolução, comparação e variação dos custos e
 
 ## Status do Projeto
 
-Status atual: Concluído tecnicamente. As telas, integração via API e mapeamentos foram finalizados. Depende apenas das validações de negócio da TI do cliente.
+Status atual: **100% Concluído e Validado**. As telas, integração via API e mapeamentos foram finalizados. 
+Realizamos uma bateria de testes validando os valores entre o modelo semântico do Power BI (DAX) e o Dashboard HTML (BigQuery/Python), cruzando métricas-chave de EBITDA, Rentabilidade e Custos. O sistema comprovou exatidão matemática de 100%, exibindo agora valores completos sem abreviação de grandeza e de forma totalmente responsiva nas interfaces usando **CSS Container Queries**.
 
 ## Organização do Repositório
 
@@ -77,3 +78,8 @@ Para garantir que a performance da versão HTML seja tão rápida quanto o Power
 
 1. **TTL Cache Diário/Horário**: O backend em Python (FastAPI) consulta os dados consolidados do BigQuery e os mantém em memória RAM do servidor (`ttl_cache`). A leitura é renovada apenas ao expirar o tempo (ex: a cada hora ou dia).
 2. **Cross-Filtering em Memória**: Quando o usuário seleciona filtros como Empresa ou Mês, a requisição é processada via `Pandas` (memória) em questão de milissegundos, evitando consultas repetidas e demoradas ao BigQuery.
+
+## Entrega Final e Validação
+
+Para efeitos de auditoria e apresentação da entrega final, foi disponibilizado na raiz do repositório o arquivo de apresentação (gerado via script Python `gerar_ppt.py`):
+- `Apresentacao_Final_v2.pptx`: Contém um descritivo arquitetural e a validação contábil entre Power BI nativo vs. Nova Web App.

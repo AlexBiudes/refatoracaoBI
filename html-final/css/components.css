@@ -45,6 +45,8 @@
 }
 
 .kpi-card {
+    container-type: inline-size;
+    container-name: kpicard;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
@@ -91,12 +93,14 @@
 }
 
 .kpi-value {
-    font-size: 36px;
+    font-size: clamp(14px, 9cqw, 36px);
     font-weight: 700;
     margin-bottom: 12px;
     background: linear-gradient(135deg, var(--kpi-gradient-start, #FFF), var(--kpi-gradient-end, #DDD));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .kpi-trend {
