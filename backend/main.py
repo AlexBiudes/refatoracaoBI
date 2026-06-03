@@ -8,6 +8,7 @@ from google.oauth2 import service_account
 from typing import Optional
 import time
 from functools import wraps
+import threading
 
 def ttl_cache(maxsize: int, ttl: int):
     cache = {}
@@ -354,6 +355,18 @@ def get_custos(ano: int = date.today().year, empresa: Optional[str] = None):
         }
     except Exception as e:
         return {"error": str(e)}
+
+def pre_warm_cache():
+    try:
+        anos = [date.today().year, date.today().year - 1, date.today().year - 2]
+        for a in anos:
+            get_balancete_df(a, a-1)
+            get_custos_df(a, a-1)
+        print("Cache pre-warmed successfully in background!")
+    except Exception as e:
+        print("Cache pre-warm error:", e)
+
+threading.Thread(target=pre_warm_cache, daemon=True).start()
 
 if __name__ == "__main__":
     import uvicorn
