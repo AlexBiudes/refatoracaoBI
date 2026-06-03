@@ -68,7 +68,7 @@ A documentação está organizada por áreas:
 - `refatoracao/`: proposta de modernização e arquitetura da nova solução
 - `backend/`: API em Python (FastAPI) para extração de dados do BigQuery
 - `antigravity/`: prompts dos agentes responsáveis pelo projeto
-- `html-final/`: entrega front-end HTML/JS conectada à API
+- `html-final/`: entrega front-end HTML/JS conectada à API, contendo suporte a Tema Claro e Escuro dinâmico via CSS.
 - `backlog/`: tarefas, riscos, pendências e decisões
 
 ## Arquitetura Final e Performance (Import Mode Simulado)
