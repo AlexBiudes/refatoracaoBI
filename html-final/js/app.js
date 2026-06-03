@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectEmpresa = document.getElementById('filter-empresa');
 
     if (selectAno && selectEmpresa) {
+        const savedAno = localStorage.getItem('planning_filter_ano');
+        const savedEmpresa = localStorage.getItem('planning_filter_empresa');
+
         // Buscar anos
         const anos = await window.ApiService.getAnos();
         if (anos && anos.length > 0) {
@@ -48,7 +51,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opt.textContent = `Ano: ${ano}`;
                 selectAno.appendChild(opt);
             });
-            // O primeiro ano já vem selecionado por padrão
+            if (savedAno && anos.includes(savedAno)) {
+                selectAno.value = savedAno;
+            }
         }
 
         // Buscar empresas
@@ -61,10 +66,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opt.textContent = emp;
                 selectEmpresa.appendChild(opt);
             });
+            if (savedEmpresa && empresas.includes(savedEmpresa)) {
+                selectEmpresa.value = savedEmpresa;
+            }
         }
 
         // Listener de eventos para recarregar a tela
         const dispatchChange = () => {
+            localStorage.setItem('planning_filter_ano', selectAno.value);
+            localStorage.setItem('planning_filter_empresa', selectEmpresa.value);
+            
             const event = new CustomEvent('filtersChanged', {
                 detail: { ano: selectAno.value, empresa: selectEmpresa.value }
             });
