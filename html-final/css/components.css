@@ -94,7 +94,7 @@
     font-size: 36px;
     font-weight: 700;
     margin-bottom: 12px;
-    background: linear-gradient(135deg, #FFF, #DDD);
+    background: linear-gradient(135deg, var(--kpi-gradient-start, #FFF), var(--kpi-gradient-end, #DDD));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -213,7 +213,7 @@
 .data-table td.negative { color: var(--color-alert); font-weight: 500; }
 
 .data-table tfoot .total-row td {
-    border-top: 1px solid rgba(255,255,255,0.2);
+    border-top: 1px solid var(--glass-border);
     font-size: 16px;
     font-weight: 600;
     color: var(--color-text);
