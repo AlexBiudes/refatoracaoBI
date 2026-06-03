@@ -9,10 +9,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/variables.css?v=3">
     <link rel="stylesheet" href="css/layout.css?v=3">
-    <link rel="stylesheet" href="css/components.css?v=2">
+    <link rel="stylesheet" href="css/components.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body style="opacity: 0;">
+    <!-- Loader Global -->
+    <div id="global-loader" class="global-loader">
+        <div class="spinner-container">
+            <div class="radial-spinner"></div>
+            <div class="loader-text">Conectando ao Back-end...</div>
+        </div>
+    </div>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -114,7 +121,7 @@
 
     <!-- Scripts -->
     <script src="js/api.js?v=2"></script>
-    <script src="js/app.js?v=5"></script>
+    <script src="js/app.js?v=6"></script>
     <script src="js/charts/custosChart.js"></script>
 </body>
 </html>

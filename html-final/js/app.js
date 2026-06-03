@@ -37,12 +37,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectAno = document.getElementById('filter-ano');
     const selectEmpresa = document.getElementById('filter-empresa');
 
+    // Função com Retry (Polling) para aguardar o Backend iniciar
+    const waitForData = async (fetchFunction) => {
+        let data = [];
+        while (!data || data.length === 0) {
+            data = await fetchFunction();
+            if (!data || data.length === 0) {
+                // Se a API ainda não tiver subido, espera 1 segundo e tenta de novo
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+        return data;
+    };
+
     if (selectAno && selectEmpresa) {
         const savedAno = localStorage.getItem('planning_filter_ano');
         const savedEmpresa = localStorage.getItem('planning_filter_empresa');
 
-        // Buscar anos
-        const anos = await window.ApiService.getAnos();
+        // Aguarda os dados do backend ficarem prontos!
+        const anos = await waitForData(window.ApiService.getAnos);
+        const empresas = await waitForData(window.ApiService.getEmpresas);
         if (anos && anos.length > 0) {
             selectAno.innerHTML = '';
             anos.forEach(ano => {
@@ -59,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Buscar empresas
-        const empresas = await window.ApiService.getEmpresas();
         if (empresas && empresas.length > 0) {
             selectEmpresa.innerHTML = '<option value="">Empresa: Todas</option>';
             empresas.forEach(emp => {
@@ -91,6 +104,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Dispara primeiro evento para renderizar com os filtros iniciais
         dispatchChange();
+        
+        // Remove a tela de carregamento (Spinner) e revela o dashboard!
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('hidden');
+        document.body.style.opacity = '1';
+    } else {
+        document.body.style.opacity = '1';
     }
 });
 

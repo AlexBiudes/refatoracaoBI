@@ -279,3 +279,66 @@
     border-color: var(--color-primary);
     box-shadow: 0 0 12px rgba(0, 191, 99, 0.2);
 }
+
+/* Loader Global de Conexao */
+.global-loader {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.radial-spinner {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--color-primary), transparent);
+    animation: spin 1s linear infinite;
+    position: relative;
+}
+
+.radial-spinner::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    background: var(--color-bg);
+    border-radius: 50%;
+}
+
+.loader-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.5px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.global-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
