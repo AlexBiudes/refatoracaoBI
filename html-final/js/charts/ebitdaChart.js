@@ -1,39 +1,53 @@
 // js/charts/ebitdaChart.js
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Buscar dados do mock
-    const data = await window.ApiService.getEbitdaData();
+let chartEvolucaoInstance = null;
+let chartCascataInstance = null;
+
+const renderEbitda = async (ano, empresa) => {
+    const kpiContainer = document.getElementById('kpi-container');
+    kpiContainer.innerHTML = `<div style="text-align: center; width: 100%; padding: 40px; color: var(--primary-color); font-size: 1.2rem;">Carregando dados ao vivo do BigQuery... <br> <small style="color:var(--text-secondary);font-size:0.9rem;">Consultando milhões de linhas via Storage API.</small></div>`;
+    
+    // Buscar dados reais
+    const data = await window.ApiService.getEbitdaData(ano, empresa);
+
+    if (!data || data.error) {
+        kpiContainer.innerHTML = `<div style="text-align: center; width: 100%; padding: 40px; color: #FF3131; font-size: 1.2rem;">Erro ao carregar dados: ${data?.error || 'Erro desconhecido'}</div>`;
+        return;
+    }
 
     // Renderizar KPIs
-    const kpiContainer = document.getElementById('kpi-container');
     const { receitaBruta, receitaLiquida, ebitda, margemEbitda } = data.kpis;
     
     kpiContainer.innerHTML = `
         <div class="kpi-card">
             <div class="kpi-title">Receita Bruta</div>
             <div class="kpi-value">${receitaBruta.value}</div>
-            <div class="kpi-trend ${receitaBruta.isPositive ? 'positive' : 'negative'}">${receitaBruta.trend} vs mês anterior</div>
+            <div class="kpi-trend ${receitaBruta.isPositive ? 'positive' : 'negative'}">${receitaBruta.trend} vs ano anterior</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Receita Líquida</div>
             <div class="kpi-value">${receitaLiquida.value}</div>
-            <div class="kpi-trend ${receitaLiquida.isPositive ? 'positive' : 'negative'}">${receitaLiquida.trend} vs mês anterior</div>
+            <div class="kpi-trend ${receitaLiquida.isPositive ? 'positive' : 'negative'}">${receitaLiquida.trend} vs ano anterior</div>
         </div>
         <div class="kpi-card highlight-card">
             <div class="kpi-title">EBITDA Realizado</div>
             <div class="kpi-value">${ebitda.value}</div>
-            <div class="kpi-trend ${ebitda.isPositive ? 'positive' : 'negative'}">${ebitda.trend} vs mês anterior</div>
+            <div class="kpi-trend ${ebitda.isPositive ? 'positive' : 'negative'}">${ebitda.trend} vs ano anterior</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Margem EBITDA</div>
             <div class="kpi-value">${margemEbitda.value}</div>
-            <div class="kpi-trend ${margemEbitda.isPositive ? 'positive' : 'negative'}">${margemEbitda.trend} vs mês anterior</div>
+            <div class="kpi-trend ${margemEbitda.isPositive ? 'positive' : 'negative'}">${margemEbitda.trend} vs ano anterior</div>
         </div>
     `;
 
+    // Destruir gráficos anteriores se existirem
+    if (chartEvolucaoInstance) chartEvolucaoInstance.destroy();
+    if (chartCascataInstance) chartCascataInstance.destroy();
+
     // Gráfico de Evolução Mensal
     const ctxEbitda = document.getElementById('ebitdaChart').getContext('2d');
-    new Chart(ctxEbitda, {
+    chartEvolucaoInstance = new Chart(ctxEbitda, {
         type: 'bar',
         data: {
             labels: data.chartEvolucao.labels,
@@ -80,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Gráfico Waterfall (Cascata simplificada)
     const ctxWaterfall = document.getElementById('waterfallChart').getContext('2d');
-    new Chart(ctxWaterfall, {
+    chartCascataInstance = new Chart(ctxWaterfall, {
         type: 'bar',
         data: {
             labels: data.chartCascata.labels,
@@ -105,4 +119,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             plugins: { legend: { display: false } }
         }
     });
+};
+
+document.addEventListener('filtersChanged', (e) => {
+    const { ano, empresa } = e.detail;
+    renderEbitda(ano, empresa);
 });

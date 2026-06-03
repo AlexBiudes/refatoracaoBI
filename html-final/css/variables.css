@@ -1,22 +1,29 @@
-/* css/variables.css - Tokens de Design Planning */
+/* css/variables.css - Tokens de Design Premium */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 :root {
-    --color-primary: #0AE18C;      /* Verde Planning */
-    --color-primary-dark: #00BF63; /* Verde escuro */
-    --color-secondary: #14C8FA;    /* Ciano */
-    --color-bg: #FFFFFF;           /* Fundo principal */
-    --color-bg-alt: #F2F2F2;       /* Cinza claro */
-    --color-text: #000000;
-    --color-text-light: #555555;
-    --color-alert: #FF3131;        /* Vermelho alerta */
-    --color-insight: #C9F7E2;      /* Verde suave */
+    --color-primary: #00F0FF;      /* Neon Cyan */
+    --color-primary-dark: #008B99; 
+    --color-secondary: #7000FF;    /* Deep Purple */
+    --color-bg: #0B0E14;           /* Deep dark background */
+    --color-bg-alt: #151A23;       /* Slightly lighter dark */
     
-    --font-main: 'Poppins', 'Montserrat', 'Open Sans', Arial, sans-serif;
-    --border-radius: 8px;
-    --shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* Glassmorphism settings */
+    --glass-bg: rgba(21, 26, 35, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(16px);
     
-    /* Layout Variables */
-    --sidebar-width: 260px;
-    --header-height: 80px;
+    --color-text: #F8F9FA;
+    --color-text-light: #A0AABF;
+    --color-alert: #FF3366;        /* Neon Pink/Red */
+    --color-insight: rgba(0, 240, 255, 0.1); 
+    
+    --font-main: 'Outfit', sans-serif;
+    --border-radius: 16px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    --shadow-hover: 0 12px 48px rgba(0, 240, 255, 0.2);
+    
+    --sidebar-width: 280px;
 }
 
 * {
@@ -27,7 +34,11 @@
 
 body {
     font-family: var(--font-main);
-    background-color: var(--color-bg-alt);
+    background-color: var(--color-bg);
     color: var(--color-text);
-    line-height: 1.5;
+    line-height: 1.6;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.08), transparent 25%);
+    background-attachment: fixed;
 }

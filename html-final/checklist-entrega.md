@@ -4,13 +4,13 @@ Checklist operacional para acompanhamento da entrega técnica e visual do projet
 
 ---
 
-- [ ] Tela EBITDA documentada
-- [ ] Tela Análise de Rentabilidade documentada
-- [ ] Tela Variação dos Custos documentada
-- [ ] Medidas DAX revisadas
-- [ ] Regras de negócio validadas
-- [ ] Layout aprovado
-- [ ] HTML desenvolvido
-- [ ] Responsividade validada
-- [ ] Indicadores conferidos
-- [ ] Documentação final atualizada
+- [x] Tela EBITDA documentada
+- [x] Tela Análise de Rentabilidade documentada
+- [x] Tela Variação dos Custos documentada
+- [x] Medidas DAX revisadas
+- [x] Regras de negócio validadas
+- [x] Layout aprovado
+- [x] HTML desenvolvido
+- [x] Responsividade validada
+- [x] Indicadores conferidos
+- [x] Documentação final atualizada

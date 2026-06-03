@@ -57,7 +57,7 @@ Tela voltada para análise de evolução, comparação e variação dos custos e
 
 ## Status do Projeto
 
-Status inicial: estruturação documental.
+Status atual: Concluído tecnicamente. As telas, integração via API e mapeamentos foram finalizados. Depende apenas das validações de negócio da TI do cliente.
 
 ## Organização do Repositório
 
@@ -70,3 +70,10 @@ A documentação está organizada por áreas:
 - `antigravity/`: prompts dos agentes responsáveis pelo projeto
 - `html-final/`: entrega front-end HTML/JS conectada à API
 - `backlog/`: tarefas, riscos, pendências e decisões
+
+## Arquitetura Final e Performance (Import Mode Simulado)
+
+Para garantir que a performance da versão HTML seja tão rápida quanto o Power BI operando em modelo de Importação (Import Mode), implementamos uma arquitetura híbrida de cache:
+
+1. **TTL Cache Diário/Horário**: O backend em Python (FastAPI) consulta os dados consolidados do BigQuery e os mantém em memória RAM do servidor (`ttl_cache`). A leitura é renovada apenas ao expirar o tempo (ex: a cada hora ou dia).
+2. **Cross-Filtering em Memória**: Quando o usuário seleciona filtros como Empresa ou Mês, a requisição é processada via `Pandas` (memória) em questão de milissegundos, evitando consultas repetidas e demoradas ao BigQuery.

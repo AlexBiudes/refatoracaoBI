@@ -10,4 +10,4 @@ Este diretório destina-se a armazenar e organizar todas as especificações té
 - **especificacao-layout-final.md**: Guia contendo a paleta de cores final aprovada, tipografia, resoluções recomendadas e especificações técnicas de cada gráfico.
 
 ## Status da Pasta
-- *Em planejamento documental*. Esta pasta será preenchida com as especificações finais à medida que avançarmos nas etapas de UX/UI e codificação.
+- **Concluído**. A codificação das telas, integração com o back-end e documentação das diretrizes visuais foram finalizadas. As telas HTML estão prontas para implantação.
