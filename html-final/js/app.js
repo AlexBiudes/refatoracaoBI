@@ -8,6 +8,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.style.opacity = '1';
     }, 50);
 
+    // Lógica de Troca de Tema
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            if (themeToggleBtn) themeToggleBtn.textContent = '🌙';
+        }
+    };
+
+    // Inicializar tema pelo localStorage
+    const savedTheme = localStorage.getItem('planning_theme') || 'light';
+    applyTheme(savedTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('planning_theme', newTheme);
+            applyTheme(newTheme);
+        });
+    }
+
     const selectAno = document.getElementById('filter-ano');
     const selectEmpresa = document.getElementById('filter-empresa');
 
