@@ -2,6 +2,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
+    --color-primary: #00BF63;
+    --color-primary-dark: #008f4a;
+    --color-secondary: #0AE18C;
+    --color-bg: #0B0E14;
+    --color-bg-alt: #151A23;
+    
+    --glass-bg: rgba(21, 26, 35, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(16px);
+    
+    --color-text: #F8F9FA;
+    --color-text-light: #A0AABF;
+    --color-alert: #FF3366;
+    --color-insight: rgba(0, 191, 99, 0.1);
+    
+    --kpi-gradient-start: #FFFFFF;
+    --kpi-gradient-end: #DDDDDD;
+    --logo-gradient-start: #FFFFFF;
+    
+    --font-main: 'Outfit', sans-serif;
+    --border-radius: 16px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    --shadow-hover: 0 12px 48px rgba(0, 191, 99, 0.2);
+    
+    --sidebar-width: 280px;
+}
+
+[data-theme="light"] {
     --color-primary: #00BF63;      /* Planning Green */
     --color-primary-dark: #008f4a; 
     --color-secondary: #0AE18C;    /* Planning Light Green */
@@ -11,7 +39,6 @@
     /* Glassmorphism settings for light mode */
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(0, 0, 0, 0.08);
-    --glass-blur: blur(16px);
     
     /* Text colors for light mode */
     --color-text: #1E293B;         /* Very dark slate */
@@ -25,35 +52,8 @@
     --kpi-gradient-end: #334155;
     --logo-gradient-start: #0F172A;
     
-    --font-main: 'Outfit', sans-serif;
-    --border-radius: 16px;
     --shadow: 0 8px 32px rgba(0,0,0,0.06);
     --shadow-hover: 0 12px 48px rgba(0, 191, 99, 0.15);
-    
-    --sidebar-width: 280px;
-}
-
-[data-theme="dark"] {
-    --color-primary: #00BF63;
-    --color-primary-dark: #008f4a;
-    --color-secondary: #0AE18C;
-    --color-bg: #0B0E14;
-    --color-bg-alt: #151A23;
-    
-    --glass-bg: rgba(21, 26, 35, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    
-    --color-text: #F8F9FA;
-    --color-text-light: #A0AABF;
-    --color-alert: #FF3366;
-    --color-insight: rgba(0, 191, 99, 0.1);
-    
-    --kpi-gradient-start: #FFFFFF;
-    --kpi-gradient-end: #DDDDDD;
-    --logo-gradient-start: #FFFFFF;
-    
-    --shadow: 0 8px 32px rgba(0,0,0,0.4);
-    --shadow-hover: 0 12px 48px rgba(0, 191, 99, 0.2);
 }
 
 * {

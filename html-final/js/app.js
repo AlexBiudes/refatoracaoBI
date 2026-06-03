@@ -12,22 +12,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const themeToggleBtn = document.getElementById('theme-toggle');
     
     const applyTheme = (theme) => {
-        if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+        if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (themeToggleBtn) themeToggleBtn.textContent = '🌑'; // Lua Nova/Dark mode icon
         } else {
             document.documentElement.removeAttribute('data-theme');
-            if (themeToggleBtn) themeToggleBtn.textContent = '🌙';
+            if (themeToggleBtn) themeToggleBtn.textContent = '☀️'; // Sol/Light mode icon
         }
     };
 
-    // Inicializar tema pelo localStorage
-    const savedTheme = localStorage.getItem('planning_theme') || 'light';
+    // Inicializar tema pelo localStorage (default dark)
+    const savedTheme = localStorage.getItem('planning_theme') || 'dark';
     applyTheme(savedTheme);
 
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('planning_theme', newTheme);
             applyTheme(newTheme);
